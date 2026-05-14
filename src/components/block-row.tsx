@@ -1,0 +1,271 @@
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { AlertTriangle, Copy, GripVertical, Pencil, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import type { RichTextBlock } from 'slack-web-api-client';
+import { cn } from '../lib/cn';
+import { Button } from '../lib/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '../lib/ui/popover';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../lib/ui/tooltip';
+import type { BuilderBlock, PreviewHooks, PreviewTheme, SupportedBlock, SupportedBlockType } from '../types';
+import { BlockEditor } from './editors/block-editor';
+import { RichTextEditor } from './editors/rich-text-editor';
+import { SlackBlockPreview } from './preview/slack-block-preview';
+
+const BLOCK_TYPE_LABELS: Record<SupportedBlockType, string> = {
+  section: 'Section',
+  header: 'Header',
+  divider: 'Divider',
+  context: 'Context',
+  actions: 'Actions',
+  image: 'Image',
+  markdown: 'Markdown',
+  rich_text: 'Rich Text',
+  table: 'Table',
+  alert: 'Alert',
+  card: 'Card',
+  carousel: 'Carousel',
+  context_actions: 'Context Actions',
+  input: 'Input'
+};
+
+/**
+ * A single row in the preview surface wrapping a block's preview render
+ * plus a click-to-edit popover. Renders flush like a real Slack message:
+ * no border or background by default. Hover surfaces a faint outline plus
+ * a floating toolbar (drag, duplicate, delete) so editor chrome never
+ * leaks into the visual approximation.
+ * @param props - row props
+ * @param props.builderBlock - the block to render
+ * @param props.previewHooks - optional directive hooks for the preview
+ * @param props.previewTheme - light or dark preview theme
+ * @param props.errors - validation errors for this block, if any
+ * @param props.isOpen - whether this block's editor popover is open
+ * @param props.onOpenChange - called when the popover open state changes
+ * @param props.onUpdate - called with the updated block payload
+ * @param props.onDuplicate - called when the duplicate affordance is clicked
+ * @param props.onDelete - called when the delete affordance is clicked
+ * @returns the rendered block row
+ */
+export function BlockRow({
+  builderBlock,
+  previewHooks,
+  previewTheme,
+  errors,
+  isOpen,
+  onOpenChange,
+  onUpdate,
+  onDuplicate,
+  onDelete
+}: {
+  builderBlock: BuilderBlock;
+  previewHooks?: PreviewHooks;
+  previewTheme?: PreviewTheme;
+  /** Validation errors for this block, if any. */
+  errors?: string[];
+  /** Whether this block's editor popover is open. */
+  isOpen?: boolean;
+  /** Notified when the popover open state changes. */
+  onOpenChange?: (open: boolean) => void;
+  onUpdate: (id: string, block: SupportedBlock) => void;
+  onDuplicate: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: builderBlock.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
+  const hasErrors = !!errors && errors.length > 0;
+  const isRichText = builderBlock.block.type === 'rich_text';
+  const [inlineEditing, setInlineEditing] = useState(false);
+
+  const preview = <SlackBlockPreview block={builderBlock.block} hooks={previewHooks} theme={previewTheme} />;
+
+  return (
+    <div ref={setNodeRef} style={style} className={cn('group relative hover:z-10', isDragging && 'opacity-40')}>
+      {isRichText && inlineEditing ? (
+        <RichTextInlineEditor
+          block={builderBlock.block as RichTextBlock}
+          onSave={(next) => {
+            onUpdate(builderBlock.id, next);
+            setInlineEditing(false);
+          }}
+          onCancel={() => setInlineEditing(false)}
+        />
+      ) : isRichText ? (
+        <button
+          type="button"
+          aria-label="Edit block"
+          onClick={() => setInlineEditing(true)}
+          className={cn(
+            'block w-full cursor-pointer rounded-sm border-0 bg-transparent p-0 text-left transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring',
+            hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
+          )}
+        >
+          {preview}
+        </button>
+      ) : (
+        <Popover open={isOpen} onOpenChange={onOpenChange}>
+          <PopoverTrigger asChild>
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Edit block"
+              className={cn(
+                'block w-full cursor-pointer rounded-sm transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring',
+                hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
+              )}
+            >
+              {preview}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-[32rem]" align="start">
+            <BlockEditor
+              block={builderBlock.block}
+              errors={errors}
+              onChange={(next) => onUpdate(builderBlock.id, next)}
+            />
+          </PopoverContent>
+        </Popover>
+      )}
+      <span className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 bg-background px-1.5 text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        {BLOCK_TYPE_LABELS[builderBlock.block.type]}
+      </span>
+      <div
+        className={cn(
+          'absolute -top-3 right-2 z-10 flex items-center gap-0.5 rounded-md border bg-background p-0.5 shadow-sm transition-opacity',
+          hasErrors ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+        )}
+      >
+        {hasErrors ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={`Show ${errors!.length} validation ${errors!.length === 1 ? 'issue' : 'issues'}`}
+                onClick={() => onOpenChange?.(true)}
+                className="flex h-6 w-6 items-center justify-center rounded text-destructive hover:bg-destructive/10"
+              >
+                <AlertTriangle className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="end">
+              <ul className="flex flex-col gap-0.5">
+                {errors!.slice(0, 4).map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+                {errors!.length > 4 ? <li className="text-muted-foreground">and {errors!.length - 4} more</li> : null}
+              </ul>
+            </TooltipContent>
+          </Tooltip>
+        ) : null}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label="Drag to reorder"
+              className="flex h-6 w-6 cursor-grab items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Drag to reorder</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label="Edit block"
+              onClick={() => {
+                if (isRichText) {
+                  setInlineEditing(true);
+                } else {
+                  onOpenChange?.(true);
+                }
+              }}
+              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Edit</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label="Duplicate block"
+              onClick={() => onDuplicate(builderBlock.id)}
+              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Duplicate</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label="Delete block"
+              onClick={() => onDelete(builderBlock.id)}
+              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Delete</TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Inline rich_text editor with explicit Save/Cancel. Holds a local
+ * draft so edits don't propagate to the parent block until the user
+ * clicks Save. Esc cancels.
+ * @param props - editor props
+ * @param props.block - the rich_text block to edit
+ * @param props.onSave - called with the saved block payload
+ * @param props.onCancel - called when the user discards changes
+ * @returns the rendered inline editor
+ */
+function RichTextInlineEditor({
+  block,
+  onSave,
+  onCancel
+}: {
+  block: RichTextBlock;
+  onSave: (next: RichTextBlock) => void;
+  onCancel: () => void;
+}) {
+  const [draft, setDraft] = useState<RichTextBlock>(block);
+
+  return (
+    <div
+      className="flex flex-col gap-2 rounded-md border border-primary/40 bg-background p-2 shadow-sm"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          e.stopPropagation();
+          onCancel();
+        }
+      }}
+    >
+      <RichTextEditor block={draft} onChange={setDraft} />
+      <div className="flex items-center justify-end gap-2 border-t pt-2">
+        <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="button" size="sm" onClick={() => onSave(draft)}>
+          Save
+        </Button>
+      </div>
+    </div>
+  );
+}

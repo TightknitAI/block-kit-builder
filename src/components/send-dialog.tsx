@@ -1,0 +1,244 @@
+import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toSlackBlocks } from '../lib/to-slack-blocks';
+import { Button } from '../lib/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../lib/ui/dialog';
+import { Label } from '../lib/ui/label';
+import type { ChannelOption, SendAsUserStatus, SendPayload, SupportedBlock } from '../types';
+
+type SendStatus = { kind: 'idle' } | { kind: 'sending' } | { kind: 'success' } | { kind: 'error'; error: string };
+
+/**
+ * Modal dialog that collects the destination channel + send-as identity,
+ * then calls the consumer's `onSend`.
+ *
+ * Channels and user-token status are loaded async via callback props on open.
+ * The consumer brokers all I/O; the dialog never makes a network call.
+ * @param props - dialog props
+ * @param props.open - whether the dialog is open
+ * @param props.onOpenChange - notified when the user closes the dialog
+ * @param props.blocks - the draft blocks to send
+ * @param props.loadChannels - returns channels available to send to
+ * @param props.loadSendAsUserStatus - returns user-token status + OAuth URL
+ * @param props.onSend - terminal action; should return `{ ok }` or `{ ok: false, error }`
+ * @param props.errorCount - total validation errors against the current draft
+ * @param props.onShowIssues - called when the user opens the global issues panel
+ * @returns the rendered send dialog
+ */
+export function SendDialog({
+  open,
+  onOpenChange,
+  blocks,
+  loadChannels,
+  loadSendAsUserStatus,
+  onSend,
+  errorCount,
+  onShowIssues
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  blocks: SupportedBlock[];
+  loadChannels: () => Promise<ChannelOption[]>;
+  loadSendAsUserStatus: () => Promise<SendAsUserStatus>;
+  onSend: (payload: SendPayload) => Promise<{ ok: boolean; error?: string }>;
+  /** Total validation errors against the current draft. */
+  errorCount: number;
+  /** Asks the parent to open the global issues panel. */
+  onShowIssues?: () => void;
+}) {
+  const [channels, setChannels] = useState<ChannelOption[] | null>(null);
+  const [channelsError, setChannelsError] = useState<string | null>(null);
+  const [channelId, setChannelId] = useState<string>('');
+  const [userStatus, setUserStatus] = useState<SendAsUserStatus | null>(null);
+  const [sendAs, setSendAs] = useState<'bot' | 'user'>('bot');
+  const [status, setStatus] = useState<SendStatus>({ kind: 'idle' });
+
+  // Hold the latest callback props in refs so the effects below can depend
+  // only on `open` without retriggering when the consumer passes a fresh
+  // arrow function each render.
+  const loadChannelsRef = useRef(loadChannels);
+  const loadSendAsUserStatusRef = useRef(loadSendAsUserStatus);
+  useEffect(() => {
+    loadChannelsRef.current = loadChannels;
+    loadSendAsUserStatusRef.current = loadSendAsUserStatus;
+  });
+
+  const refreshSendAsUser = useCallback(() => {
+    loadSendAsUserStatusRef
+      .current()
+      .then(setUserStatus)
+      .catch(() => setUserStatus({ canSendAsUser: false }));
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    setStatus({ kind: 'idle' });
+    setChannels(null);
+    setChannelsError(null);
+    setUserStatus(null);
+    setChannelId('');
+    setSendAs('bot');
+    let cancelled = false;
+    loadChannelsRef
+      .current()
+      .then((list) => {
+        if (cancelled) {
+          return;
+        }
+        setChannels(list);
+        setChannelId(list[0]?.id ?? '');
+      })
+      .catch((e) => {
+        if (cancelled) {
+          return;
+        }
+        setChannelsError(e instanceof Error ? e.message : 'Failed to load channels');
+      });
+    refreshSendAsUser();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, refreshSendAsUser]);
+
+  // Refresh user-token status when the window regains focus, so a completed
+  // OAuth round-trip flips the option from disabled to enabled without
+  // a manual reload.
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const handler = () => refreshSendAsUser();
+    window.addEventListener('focus', handler);
+    return () => window.removeEventListener('focus', handler);
+  }, [open, refreshSendAsUser]);
+
+  const handleSubmit = async () => {
+    if (!channelId) {
+      setStatus({ kind: 'error', error: 'Please pick a channel.' });
+      return;
+    }
+    setStatus({ kind: 'sending' });
+    try {
+      const result = await onSend({
+        channelId,
+        blocks: toSlackBlocks(blocks),
+        sendAsUser: sendAs === 'user'
+      });
+      if (result.ok) {
+        setStatus({ kind: 'idle' });
+        onOpenChange(false);
+        return;
+      } else {
+        setStatus({
+          kind: 'error',
+          error: result.error ?? 'Send failed.'
+        });
+      }
+    } catch (e) {
+      setStatus({
+        kind: 'error',
+        error: e instanceof Error ? e.message : 'Send failed.'
+      });
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Send to Slack</DialogTitle>
+          <DialogDescription>Pick a channel and choose who to post as.</DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="channel-picker">Channel</Label>
+            {channels === null && !channelsError && <p className="text-xs text-muted-foreground">Loading channels…</p>}
+            {channelsError && <p className="text-xs text-destructive">{channelsError}</p>}
+            {channels && channels.length === 0 && (
+              <p className="text-xs text-muted-foreground">No public channels available.</p>
+            )}
+            {channels && channels.length > 0 && (
+              <select
+                id="channel-picker"
+                value={channelId}
+                onChange={(e) => setChannelId(e.target.value)}
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                {channels.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    #{c.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="send-as-picker">Post as</Label>
+            <select
+              id="send-as-picker"
+              value={sendAs}
+              onChange={(e) => setSendAs(e.target.value as 'bot' | 'user')}
+              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="bot">App bot</option>
+              <option value="user" disabled={!userStatus?.canSendAsUser}>
+                Your account
+                {userStatus && !userStatus.canSendAsUser ? ' (Slack sign-in required)' : ''}
+              </option>
+            </select>
+            {userStatus && !userStatus.canSendAsUser && userStatus.oauthUrl && (
+              <p className="text-xs text-muted-foreground">
+                <a
+                  href={userStatus.oauthUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-primary hover:underline"
+                >
+                  Sign in with Slack <ExternalLink className="h-3 w-3" />
+                </a>{' '}
+                to post as yourself.
+              </p>
+            )}
+          </div>
+
+          {errorCount > 0 ? (
+            <button
+              type="button"
+              onClick={onShowIssues}
+              className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-2 text-left text-xs text-destructive hover:bg-destructive/10"
+            >
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+              <span className="flex-1">
+                Fix {errorCount} {errorCount === 1 ? 'issue' : 'issues'} before sending.
+              </span>
+              <span className="shrink-0 underline">Show issues</span>
+            </button>
+          ) : null}
+
+          {status.kind === 'error' && (
+            <p className="rounded-md border border-destructive/30 bg-destructive/5 p-2 text-xs text-destructive">
+              {status.error}
+            </p>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={status.kind === 'sending' || !channelId || blocks.length === 0 || errorCount > 0}
+          >
+            {status.kind === 'sending' ? 'Sending…' : 'Send'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

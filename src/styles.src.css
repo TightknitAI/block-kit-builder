@@ -1,0 +1,91 @@
+/**
+ * Stylesheet entry for block-kit-builder.
+ *
+ * Built to dist/styles.css via the package's `build` script. Consumers
+ * import the compiled file:
+ *
+ *   import 'block-kit-builder/styles.css';
+ *
+ * The compiled CSS uses CSS custom properties (--background, --primary,
+ * --border, etc.) for theming. Consumers must provide values for these
+ * vars — the standard shadcn/ui token set works as-is.
+ */
+
+/* Tailwind v4 split imports. Skip the `preflight` layer so the package
+   does not re-reset the host document's `*`, `body`, headings, etc.
+   Studio loads this stylesheet from a route module; in an SPA it stays
+   parsed for the rest of the session, so a global preflight here would
+   affect every other page after a single visit. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Bundle slack-blocks-to-jsx's own stylesheet so the preview component
+   gets its button / mention / divider styling out of the box. The
+   library's CSS is namespaced under #slack_blocks_to_jsx so it doesn't
+   leak into consumer styles. */
+@import "slack-blocks-to-jsx/dist/style.css";
+
+/* Scan only this package's own source files. The compiled output should
+   contain every utility we use anywhere in the package. */
+@source "./**/*.{ts,tsx}";
+
+/* Map utility classes to consumer-provided CSS variables. Mirrors the
+   standard shadcn/ui token contract. Each var() carries a fallback so the
+   builder still renders acceptably when the consumer hasn't defined the
+   shadcn token set; when the consumer does provide tokens, those values
+   cascade through normally — including class-based dark mode (e.g.
+   `<html class="dark">`) — without the package fighting them. */
+@theme inline {
+  --color-background: hsl(var(--background, 0 0% 100%));
+  --color-foreground: hsl(var(--foreground, 222.2 84% 4.9%));
+  --color-card: hsl(var(--card, 0 0% 100%));
+  --color-card-foreground: hsl(var(--card-foreground, 222.2 84% 4.9%));
+  --color-popover: hsl(var(--popover, 0 0% 100%));
+  --color-popover-foreground: hsl(var(--popover-foreground, 222.2 84% 4.9%));
+  --color-primary: hsl(var(--primary, 231.7 48.6% 54.1%));
+  --color-primary-foreground: hsl(var(--primary-foreground, 210 40% 98%));
+  --color-secondary: hsl(var(--secondary, 210 40% 96%));
+  --color-secondary-foreground: hsl(var(--secondary-foreground, 222.2 47.4% 11.2%));
+  --color-muted: hsl(var(--muted, 210 40% 96%));
+  --color-muted-foreground: hsl(var(--muted-foreground, 215.4 16.3% 46.9%));
+  --color-accent: hsl(var(--accent, 210 40% 96%));
+  --color-accent-foreground: hsl(var(--accent-foreground, 222.2 47.4% 11.2%));
+  --color-destructive: hsl(var(--destructive, 0 84.2% 60.2%));
+  --color-destructive-foreground: hsl(var(--destructive-foreground, 210 40% 98%));
+  --color-border: hsl(var(--border, 214.3 31.8% 91.4%));
+  --color-input: hsl(var(--input, 214.3 31.8% 91.4%));
+  --color-ring: hsl(var(--ring, 231.7 48.6% 54.1%));
+
+  --radius-lg: var(--radius, 0.5rem);
+  --radius-md: calc(var(--radius, 0.5rem) - 2px);
+  --radius-sm: calc(var(--radius, 0.5rem) - 4px);
+}
+
+/* TipTap rich text editor: nested-list marker cycle that matches
+   slack-blocks-to-jsx's preview rendering (decimal → lower-alpha →
+   lower-roman, repeating every three levels up to Slack's max indent
+   of 8). Keep bullet lists uniform discs to match the preview. */
+.bkb-rich-editor ol {
+  list-style-type: decimal;
+}
+.bkb-rich-editor ol ol {
+  list-style-type: lower-alpha;
+}
+.bkb-rich-editor ol ol ol {
+  list-style-type: lower-roman;
+}
+.bkb-rich-editor ol ol ol ol {
+  list-style-type: decimal;
+}
+.bkb-rich-editor ol ol ol ol ol {
+  list-style-type: lower-alpha;
+}
+.bkb-rich-editor ol ol ol ol ol ol {
+  list-style-type: lower-roman;
+}
+.bkb-rich-editor ol ol ol ol ol ol ol {
+  list-style-type: decimal;
+}
+.bkb-rich-editor ol ol ol ol ol ol ol ol {
+  list-style-type: lower-alpha;
+}
