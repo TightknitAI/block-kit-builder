@@ -1,7 +1,7 @@
 # block-kit-builder
 
 [![CI](https://github.com/TightknitAI/block-kit-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/TightknitAI/block-kit-builder/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/block-kit-builder.svg)](https://www.npmjs.com/package/block-kit-builder)
+[![npm version](https://img.shields.io/npm/v/@tightknitai/block-kit-builder.svg)](https://www.npmjs.com/package/@tightknitai/block-kit-builder)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 A drag-and-drop, no-code-friendly visual builder for Slack Block Kit messages, packaged as an **integration-agnostic React component**.
@@ -11,7 +11,7 @@ The package owns the entire builder UX — palette, sortable preview surface, pe
 ## Install
 
 ```bash
-pnpm add block-kit-builder
+pnpm add @tightknitai/block-kit-builder
 ```
 
 Peer deps: `react`, `react-dom`, `slack-web-api-client`.
@@ -19,8 +19,8 @@ Peer deps: `react`, `react-dom`, `slack-web-api-client`.
 ## Usage
 
 ```tsx
-import { BlockKitBuilder } from "block-kit-builder";
-import "block-kit-builder/styles.css";
+import { BlockKitBuilder } from "@tightknitai/block-kit-builder";
+import "@tightknitai/block-kit-builder/styles.css";
 
 export function MyBuilderPage() {
   return (
@@ -72,7 +72,7 @@ import {
   toSlackBlocks,           // strips builder-only fields (e.g. header `level`) before sending
   encodeBlocksToString,    // base64url-encode a blocks array (for URL state)
   decodeBlocksFromString,
-} from "block-kit-builder";
+} from "@tightknitai/block-kit-builder";
 
 import type {
   SupportedBlock,
@@ -83,7 +83,7 @@ import type {
   ChannelOption,
   SendAsUserStatus,
   PreviewHooks,
-} from "block-kit-builder";
+} from "@tightknitai/block-kit-builder";
 ```
 
 ## Backend
@@ -96,10 +96,10 @@ Defense-in-depth: blocks are validated against [slack-block-kit-validator](https
 
 ## Styling
 
-Ships a compiled stylesheet at `block-kit-builder/styles.css`. The styles use CSS custom properties (`--background`, `--primary`, `--border`, etc.) for theming. Consumers must provide values for these vars — the standard shadcn/ui token set works as-is.
+Ships a compiled stylesheet at `@tightknitai/block-kit-builder/styles.css`. The styles use CSS custom properties (`--background`, `--primary`, `--border`, etc.) for theming. Consumers must provide values for these vars — the standard shadcn/ui token set works as-is.
 
 ```ts
-import "block-kit-builder/styles.css";
+import "@tightknitai/block-kit-builder/styles.css";
 ```
 
 ## License

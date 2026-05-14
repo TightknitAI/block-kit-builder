@@ -1,6 +1,6 @@
+import { CARD_ACTIONS_MAX } from '@tightknitai/slack-block-kit-validator';
 import { Plus, Trash2 } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import { CARD_ACTIONS_MAX } from 'slack-block-kit-validator';
 import type { ImageElement, Button as SlackButton } from 'slack-web-api-client';
 import { Button } from '../../lib/ui/button';
 import { Input } from '../../lib/ui/input';

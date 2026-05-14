@@ -4,7 +4,7 @@
  * Built to dist/styles.css via the package's `build` script. Consumers
  * import the compiled file:
  *
- *   import 'block-kit-builder/styles.css';
+ *   import '@tightknitai/block-kit-builder/styles.css';
  *
  * The compiled CSS uses CSS custom properties (--background, --primary,
  * --border, etc.) for theming. Consumers must provide values for these

@@ -1,5 +1,5 @@
+import { validateBlockKit } from '@tightknitai/slack-block-kit-validator';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { validateBlockKit } from 'slack-block-kit-validator';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '../lib/ui/sheet';
 import type { SupportedBlock } from '../types';
 

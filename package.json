@@ -1,5 +1,5 @@
 {
-  "name": "block-kit-builder",
+  "name": "@tightknitai/block-kit-builder",
   "version": "0.1.0-alpha.0",
   "description": "A drag-and-drop, no-code-friendly visual builder for Slack Block Kit messages. Integration-agnostic React component.",
   "type": "module",
@@ -54,7 +54,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.563.0",
     "nanoid": "^5.1.7",
-    "slack-block-kit-validator": "file:../slack-block-kit-validator",
+    "@tightknitai/slack-block-kit-validator": "^0.1.0-alpha.0",
     "slack-blocks-to-jsx": "^1.0.4",
     "tailwind-merge": "^2.6.0"
   },

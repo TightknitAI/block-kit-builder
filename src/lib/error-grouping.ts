@@ -1,4 +1,4 @@
-import type { Surface } from 'slack-block-kit-validator';
+import type { Surface } from '@tightknitai/slack-block-kit-validator';
 import type { BuilderBlock, PreviewSurface } from '../types';
 
 /**

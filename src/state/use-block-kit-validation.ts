@@ -1,5 +1,5 @@
+import { validateBlockKit } from '@tightknitai/slack-block-kit-validator';
 import { useEffect, useState } from 'react';
-import { validateBlockKit } from 'slack-block-kit-validator';
 import { type GroupedErrors, groupValidatorErrors, toValidatorSurface } from '../lib/error-grouping';
 import { toSlackBlocks } from '../lib/to-slack-blocks';
 import type { BuilderBlock, PreviewSurface } from '../types';
