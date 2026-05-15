@@ -14,7 +14,7 @@ The package owns the entire builder UX — palette, sortable preview surface, pe
 pnpm add @tightknitai/block-kit-builder
 ```
 
-Peer deps: `react`, `react-dom`, `slack-web-api-client`.
+Peer deps: `react`, `react-dom`.
 
 ## Usage
 
