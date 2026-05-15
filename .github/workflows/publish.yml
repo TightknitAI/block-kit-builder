@@ -20,6 +20,8 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm run lint
       - run: pnpm run typecheck
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
       - run: pnpm run build:clean
       - run: pnpm publish --provenance --access public --no-git-checks
