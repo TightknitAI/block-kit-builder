@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "block-kitchen-demo",
+  "compatibility_date": "2026-05-16",
+  // Pure static-assets Worker — no `main` script. Build output of
+  // `pnpm demo:build` lands in `demo/dist/`.
+  "assets": {
+    "directory": "./demo/dist"
+  }
+}
