@@ -279,6 +279,15 @@ export function App() {
                 >
                   npm
                 </a>
+                {' · by '}
+                <a
+                  href="https://tightknit.ai"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: 'inherit', textDecoration: 'underline' }}
+                >
+                  Tightknit
+                </a>
               </div>
             </div>
           </div>
