@@ -50,7 +50,8 @@ const SURFACE_OPTIONS: {
  * @param props.onPreviewThemeChange - called when the user picks a theme
  * @param props.previewSurface - which Slack surface to approximate
  * @param props.onPreviewSurfaceChange - called when the user picks a surface
- * @param props.showSurfaceControl - render the surface dropdown (default true)
+ * @param props.allowedSurfaces - surfaces shown in the dropdown. When the
+ *   list has 0 or 1 entry the dropdown is hidden entirely.
  * @param props.showThemeControl - render the theme dropdown (default true)
  * @param props.errorCount - number of validation errors
  * @returns the rendered toolbar
@@ -66,7 +67,7 @@ export function Toolbar({
   onPreviewThemeChange,
   previewSurface,
   onPreviewSurfaceChange,
-  showSurfaceControl = true,
+  allowedSurfaces,
   showThemeControl = true,
   errorCount
 }: {
@@ -80,12 +81,14 @@ export function Toolbar({
   onPreviewThemeChange: (theme: PreviewTheme) => void;
   previewSurface: PreviewSurface;
   onPreviewSurfaceChange: (surface: PreviewSurface) => void;
-  showSurfaceControl?: boolean;
+  allowedSurfaces: readonly PreviewSurface[];
   showThemeControl?: boolean;
   errorCount: number;
 }) {
   const activeTheme = THEME_OPTIONS.find((t) => t.value === previewTheme) ?? THEME_OPTIONS[0];
   const activeSurface = SURFACE_OPTIONS.find((s) => s.value === previewSurface) ?? SURFACE_OPTIONS[0];
+  const surfaceOptions = SURFACE_OPTIONS.filter((s) => allowedSurfaces.includes(s.value));
+  const showSurfaceControl = surfaceOptions.length > 1;
 
   return (
     <div className="flex items-center justify-between gap-2 border-b bg-background px-3 py-2">
@@ -100,7 +103,7 @@ export function Toolbar({
               </Button>
             </PopoverTrigger>
             <PopoverContent align="start" className="w-36 p-1">
-              {SURFACE_OPTIONS.map(({ value, label, Icon }) => {
+              {surfaceOptions.map(({ value, label, Icon }) => {
                 const isActive = value === previewSurface;
                 return (
                   <button

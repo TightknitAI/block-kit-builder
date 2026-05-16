@@ -39,10 +39,18 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
     loadChannels,
     loadSendAsUserStatus,
     onSend,
-    showSurfaceControl = true,
+    allowedBlockTypes,
+    allowedSurfaces: allowedSurfacesProp,
     showThemeControl = true,
     defaultPreviewTheme = 'light'
   } = props;
+
+  // Default to message-only when omitted (or passed empty). The toolbar
+  // needs at least one entry to seed `previewSurface`; it hides the
+  // dropdown when this resolves to a single surface.
+  const allowedSurfaces: readonly PreviewSurface[] =
+    allowedSurfacesProp && allowedSurfacesProp.length > 0 ? allowedSurfacesProp : ['message'];
+
   const { blocks, addBlock, updateBlock, removeBlock, duplicateBlock, reorderBlock, replaceAll } =
     useBlockKitBuilderState({ initialBlocks, onChange });
 
@@ -51,7 +59,7 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
   const [issuesOpen, setIssuesOpen] = useState(false);
   const [openBlockId, setOpenBlockId] = useState<string | null>(null);
   const [previewTheme, setPreviewTheme] = useState<PreviewTheme>(defaultPreviewTheme);
-  const [previewSurface, setPreviewSurface] = useState<PreviewSurface>('message');
+  const [previewSurface, setPreviewSurface] = useState<PreviewSurface>(allowedSurfaces[0]);
   const [activePaletteVariantId, setActivePaletteVariantId] = useState<string | null>(null);
 
   // Always validate against the `message` surface: that's where Send posts
@@ -127,11 +135,11 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
             onPreviewThemeChange={setPreviewTheme}
             previewSurface={previewSurface}
             onPreviewSurfaceChange={setPreviewSurface}
-            showSurfaceControl={showSurfaceControl}
+            allowedSurfaces={allowedSurfaces}
             showThemeControl={showThemeControl}
           />
           <div className="flex min-h-0 flex-1 items-stretch">
-            <Palette onAddBlock={(block) => addBlock(block)} />
+            <Palette onAddBlock={(block) => addBlock(block)} allowedBlockTypes={allowedBlockTypes} />
             <Surface
               blocks={blocks}
               workspaceName={workspaceName}

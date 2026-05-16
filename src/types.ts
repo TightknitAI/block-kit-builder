@@ -345,11 +345,20 @@ export interface BlockKitBuilderProps {
    */
   onSend: (payload: SendPayload) => Promise<SendResult>;
   /**
-   * Whether the toolbar exposes the preview-surface dropdown
-   * (Message / Modal / App Home). Defaults to `true`. When `false`,
-   * the surface is locked to {@link PreviewSurface} `'message'`.
+   * Which Slack block types appear in the palette. When omitted, every
+   * supported type is shown. When provided, the palette is filtered to
+   * the listed types — useful for restricting the builder to a curated
+   * subset (e.g. a message-only app might omit `input` and `alert`).
+   * An empty array renders an empty palette.
    */
-  showSurfaceControl?: boolean;
+  allowedBlockTypes?: readonly SupportedBlockType[];
+  /**
+   * Which Slack preview surfaces the toolbar exposes. Defaults to
+   * `['message']`, which locks the preview to Message and hides the
+   * surface dropdown. Pass two or more to show the dropdown with those
+   * options; the first entry becomes the initial selection.
+   */
+  allowedSurfaces?: readonly PreviewSurface[];
   /**
    * Whether the toolbar exposes the light/dark theme dropdown.
    * Defaults to `true`. When `false`, the theme is locked to

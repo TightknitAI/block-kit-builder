@@ -57,7 +57,8 @@ export function MyBuilderPage() {
 | `loadSendAsUserStatus` | `() => Promise<{ canSendAsUser: boolean; oauthUrl?: string }>` | yes | Whether the current user has a Slack user-token and can post as themselves. If `canSendAsUser` is false, `oauthUrl` is shown as a "Sign in with Slack" link. |
 | `onSend` | `(payload) => Promise<{ ok: boolean; error?: string }>` | yes | Called when the user submits the send dialog. Payload is `{ channelId, blocks, sendAsUser }`. |
 | `previewHooks` | `PreviewHooks` | no | Hooks forwarded to `slack-blocks-to-jsx`'s `<Message>` for resolving user / channel / emoji directives. |
-| `showSurfaceControl` | `boolean` | no | Defaults to `true`. When `false`, the surface is locked to `'message'`. |
+| `allowedBlockTypes` | `SupportedBlockType[]` | no | Allowlist of block types shown in the palette. Defaults to all supported types. |
+| `allowedSurfaces` | `PreviewSurface[]` | no | Allowlist of preview surfaces (`'message'`, `'modal'`, `'app_home'`). Defaults to `['message']` — surface dropdown is hidden when only one surface is allowed. The first entry is the initial selection. |
 | `showThemeControl` | `boolean` | no | Defaults to `true`. When `false`, the theme is locked to `'light'`. |
 | `defaultPreviewTheme` | `'light' \| 'dark'` | no | Pass the host app's current theme so the preview opens matched to the consuming app's appearance. |
 
