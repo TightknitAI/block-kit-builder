@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a defect in the block-kit-builder package.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. Please fill in the sections below so we can reproduce and triage quickly.
+
+        For security vulnerabilities, please use [private vulnerability reporting](https://github.com/TightknitAI/block-kit-builder/security/advisories/new) instead.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A clear and concise description of what the bug is.
+      placeholder: When I drag a header block above a divider, the preview duplicates the header.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps. A CodeSandbox or repo link is ideal.
+      placeholder: |
+        1. Render `<BlockKitBuilder />` with `initialBlocks={[...]}`
+        2. Drag the header block...
+        3. Observe the preview pane
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: The preview should show one header block.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include screenshots, console errors, or stack traces if relevant.
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: The version of `@tightknitai/block-kit-builder` you are using.
+      placeholder: 0.1.0-alpha.0
+    validations:
+      required: true
+  - type: input
+    id: react-version
+    attributes:
+      label: React version
+      placeholder: 19.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Other (specify in additional context)
+        - Not applicable (SSR / build-time issue)
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Anything else that might help — bundler, framework (Next.js, Vite, Remix), TypeScript version, etc.
