@@ -1,5 +1,6 @@
 import { useDraggable } from '@dnd-kit/core';
 import { ChevronDown, ChevronRight, GripVertical, Search } from 'lucide-react';
+import type * as React from 'react';
 import { useMemo, useState } from 'react';
 import { cn } from '../lib/cn';
 import type { PaletteSection as PaletteSectionDef, PaletteVariant } from '../lib/default-blocks';
@@ -90,13 +91,20 @@ export function Palette({
   sections,
   defaultOpenSections = true,
   showSearch = true,
-  searchPlaceholder = 'Search blocks…'
+  searchPlaceholder = 'Search blocks…',
+  variant = 'aside'
 }: {
   onAddBlock: (block: SupportedBlock) => void;
   sections: readonly PaletteSectionDef[];
   defaultOpenSections?: DefaultOpenSections;
   showSearch?: boolean;
   searchPlaceholder?: string;
+  /**
+   * `'aside'` — persistent left rail (default). Fixed width with right border.
+   * `'sheet'` — full-width content for mobile bottom-sheet hosting. No
+   *   own borders or width constraints so it fills the sheet body.
+   */
+  variant?: 'aside' | 'sheet';
 }) {
   const [query, setQuery] = useState('');
   const visibleSections = useMemo(
@@ -104,25 +112,41 @@ export function Palette({
     [sections, query, showSearch]
   );
   const queryActive = showSearch && query.trim().length > 0;
+  const isSheet = variant === 'sheet';
 
   return (
-    <aside className="flex min-h-0 w-72 shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r bg-muted/20">
+    <aside
+      className={cn(
+        'flex min-h-0 flex-col overflow-x-hidden overflow-y-auto',
+        isSheet ? 'w-full flex-1 bg-background' : 'w-72 shrink-0 border-r bg-muted/20'
+      )}
+    >
       {showSearch ? (
-        <div className="sticky top-0 z-10 border-b bg-muted/20 px-3 pt-3 pb-2 backdrop-blur">
+        <div
+          className={cn(
+            'sticky top-0 z-10 border-b px-3 pt-3 pb-2 backdrop-blur',
+            isSheet ? 'bg-background' : 'bg-muted/20'
+          )}
+        >
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Search
+              className={cn(
+                'pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground',
+                isSheet ? 'h-4 w-4' : 'h-3.5 w-3.5'
+              )}
+            />
             <Input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={searchPlaceholder}
               aria-label={searchPlaceholder}
-              className="h-8 pl-7 text-sm"
+              className={cn(isSheet ? 'h-10 pl-8 text-base' : 'h-8 pl-7 text-sm')}
             />
           </div>
         </div>
       ) : null}
-      <div className="flex flex-col p-3">
+      <div className={cn('flex flex-col', isSheet ? 'px-2 pb-6' : 'p-3')}>
         {visibleSections.length === 0 ? (
           <p className="px-1 py-2 text-xs text-muted-foreground">No blocks match.</p>
         ) : (
@@ -133,6 +157,7 @@ export function Palette({
               defaultOpen={isDefaultOpen(section.name, defaultOpenSections)}
               forceOpen={queryActive}
               onAddBlock={onAddBlock}
+              variant={variant}
             />
           ))
         )}
@@ -151,17 +176,20 @@ function PaletteSection({
   section,
   defaultOpen,
   forceOpen,
-  onAddBlock
+  onAddBlock,
+  variant = 'aside'
 }: {
   section: PaletteSectionDef;
   defaultOpen: boolean;
   forceOpen: boolean;
   onAddBlock: (block: SupportedBlock) => void;
+  variant?: 'aside' | 'sheet';
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const Icon = section.icon;
   const isOpen = open || forceOpen;
   const Caret = isOpen ? ChevronDown : ChevronRight;
+  const isSheet = variant === 'sheet';
 
   return (
     <div className="mt-3 flex flex-col first:mt-0">
@@ -169,16 +197,23 @@ function PaletteSection({
         type="button"
         aria-expanded={isOpen}
         onClick={() => setOpen((v) => !v)}
-        className="flex cursor-pointer appearance-none items-center gap-1.5 rounded border-0 bg-transparent px-1 py-1 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className={cn(
+          'flex cursor-pointer appearance-none items-center gap-1.5 rounded border-0 bg-transparent text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+          isSheet ? 'px-2 py-2 min-h-10' : 'px-1 py-1'
+        )}
       >
-        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-foreground">{section.name}</span>
-        <Caret className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+        <Icon className={cn('shrink-0 text-muted-foreground', isSheet ? 'h-5 w-5' : 'h-4 w-4')} />
+        <span
+          className={cn('min-w-0 flex-1 truncate font-semibold text-foreground', isSheet ? 'text-sm' : 'text-[13px]')}
+        >
+          {section.name}
+        </span>
+        <Caret className={cn('shrink-0 text-muted-foreground', isSheet ? 'h-4 w-4' : 'h-3.5 w-3.5')} />
       </button>
       {isOpen ? (
         <div className="mt-0.5 flex flex-col">
-          {section.variants.map((variant) => (
-            <PaletteItem key={variant.id} variant={variant} onAdd={() => onAddBlock(variant.factory())} />
+          {section.variants.map((v) => (
+            <PaletteItem key={v.id} variant={v} onAdd={() => onAddBlock(v.factory())} mode={variant} />
           ))}
         </div>
       ) : null}
@@ -194,10 +229,43 @@ function PaletteSection({
  * @param props.onAdd - called when the chevron button is clicked
  * @returns the rendered palette row
  */
-function PaletteItem({ variant, onAdd }: { variant: PaletteVariant; onAdd: () => void }) {
+function PaletteItem({
+  variant,
+  onAdd,
+  mode = 'aside'
+}: {
+  variant: PaletteVariant;
+  onAdd: () => void;
+  mode?: 'aside' | 'sheet';
+}) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } = useDraggable({
     id: `${PALETTE_DRAG_PREFIX}${variant.id}`
   });
+
+  const isSheet = mode === 'sheet';
+
+  if (isSheet) {
+    // In the mobile sheet the row IS the tap target — no separate grip /
+    // chevron split. Touch DnD is unreliable on mixed scrollers anyway, so
+    // we lean on tap-to-add as the primary input here.
+    return (
+      <button
+        ref={setNodeRef as unknown as React.Ref<HTMLButtonElement>}
+        type="button"
+        aria-label={`Add ${variant.label}`}
+        onClick={onAdd}
+        className={cn(
+          'group flex w-full min-h-11 cursor-pointer items-center gap-3 rounded-md border border-transparent bg-background px-3 py-2 text-left text-sm font-medium text-foreground transition-colors hover:border-border hover:bg-accent active:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+          isDragging && 'opacity-50'
+        )}
+      >
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+          <ChevronRight className="h-4 w-4" />
+        </span>
+        <span className="min-w-0 flex-1 truncate">{variant.label}</span>
+      </button>
+    );
+  }
 
   return (
     <div

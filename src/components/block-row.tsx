@@ -110,7 +110,11 @@ export function BlockRow({
   const preview = <SlackBlockPreview block={builderBlock.block} hooks={previewHooks} theme={previewTheme} />;
 
   return (
-    <div ref={setNodeRef} style={style} className={cn('group relative hover:z-10', isDragging && 'opacity-40')}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn('group relative mb-2 last:mb-0 hover:z-10 md:mb-0', isDragging && 'opacity-40')}
+    >
       {showDropIndicator ? (
         <div
           aria-hidden="true"
@@ -169,7 +173,7 @@ export function BlockRow({
                 {preview}
               </div>
             </PopoverTrigger>
-            <PopoverContent className="w-[32rem]" align="start">
+            <PopoverContent className="w-[min(32rem,calc(100vw-1.5rem))] sm:w-[32rem]" align="start">
               <BlockEditor
                 block={builderBlock.block}
                 errors={errors}
@@ -178,15 +182,19 @@ export function BlockRow({
             </PopoverContent>
           </Popover>
         )}
-        <span className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 bg-background px-1.5 text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 hidden bg-background px-1.5 text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 md:block">
           {BLOCK_TYPE_LABELS[builderBlock.block.type]}
         </span>
+        {/* Desktop action toolbar. Hover-reveal floating above the block —
+            crowded but only one is visible at a time so the overlap is
+            invisible. Hidden on mobile in favor of the inline row below. */}
         <div
           className={cn(
-            'absolute -top-3 right-2 z-10 flex items-center gap-0.5 rounded-md border bg-background p-0.5 shadow-sm transition-opacity',
-            // Reveal on hover, on focus inside the row (so Tab-stops on the
+            // Hidden on mobile in favor of the inline row below; on desktop
+            // reveal on hover, on focus inside the row (so Tab-stops on the
             // floating buttons themselves keep them visible), and when there
             // are validation errors worth surfacing immediately.
+            'absolute -top-3 right-2 z-10 hidden items-center gap-0.5 rounded-md border bg-background p-0.5 shadow-sm transition-opacity md:flex',
             hasErrors ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'
           )}
         >
@@ -289,6 +297,57 @@ export function BlockRow({
             </TooltipTrigger>
             <TooltipContent side="top">Delete</TooltipContent>
           </Tooltip>
+        </div>
+      </div>
+      {/* Mobile-only inline action bar. Lives in the flow under the block
+          preview so it never overlaps content (the floating desktop bar
+          gets in its own way when every row shows it). Type label sits on
+          the left, action triplet on the right. */}
+      <div className="mt-1 flex items-center justify-between gap-2 rounded-md border border-dashed bg-muted/40 px-2 py-1 md:hidden">
+        <span className="truncate text-[11px] font-medium text-muted-foreground">
+          {BLOCK_TYPE_LABELS[builderBlock.block.type]}
+        </span>
+        <div className="flex items-center gap-1">
+          {hasErrors ? (
+            <button
+              type="button"
+              aria-label={`Show ${errors!.length} validation ${errors!.length === 1 ? 'issue' : 'issues'}`}
+              onClick={() => onOpenChange?.(true)}
+              className="flex h-9 w-9 items-center justify-center rounded text-destructive hover:bg-destructive/10"
+            >
+              <AlertTriangle className="h-4 w-4" />
+            </button>
+          ) : null}
+          <button
+            type="button"
+            aria-label="Edit block"
+            onClick={() => {
+              if (isRichText) {
+                setInlineEditing(true);
+              } else {
+                onOpenChange?.(true);
+              }
+            }}
+            className="flex h-9 w-9 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Duplicate block"
+            onClick={() => onDuplicate(builderBlock.id)}
+            className="flex h-9 w-9 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            <Copy className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Delete block"
+            onClick={() => onDelete(builderBlock.id)}
+            className="flex h-9 w-9 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>

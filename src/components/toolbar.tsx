@@ -9,6 +9,7 @@ import {
   Home,
   MessageSquare,
   Moon,
+  Plus,
   Send,
   Sun,
   Trash2
@@ -50,6 +51,7 @@ const DEFAULT_DOCS_LABEL = 'Docs';
  * @param props.onOpenJson - opens the JSON drawer
  * @param props.onOpenIssues - opens the issues sheet
  * @param props.onOpenSend - opens the send dialog
+ * @param props.onOpenPalette - opens the mobile palette sheet
  * @param props.canSend - whether the Send button should be enabled
  * @param props.canClear - whether the Clear button should be enabled
  * @param props.previewTheme - current preview theme
@@ -70,6 +72,7 @@ export function Toolbar({
   onOpenJson,
   onOpenIssues,
   onOpenSend,
+  onOpenPalette,
   canSend,
   canClear,
   previewTheme,
@@ -85,6 +88,7 @@ export function Toolbar({
   onOpenJson: () => void;
   onOpenIssues: () => void;
   onOpenSend: () => void;
+  onOpenPalette?: () => void;
   canSend: boolean;
   canClear: boolean;
   previewTheme: PreviewTheme;
@@ -109,14 +113,27 @@ export function Toolbar({
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
 
   return (
-    <div className="flex items-center justify-between gap-2 border-b bg-background px-3 py-2">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b bg-background px-2 py-1.5 sm:px-3 sm:py-2">
+      <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
+        {onOpenPalette ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onOpenPalette}
+            className="md:hidden"
+            aria-label="Add a block"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Blocks</span>
+          </Button>
+        ) : null}
         {showSurfaceControl ? (
           <Popover open={surfaceMenuOpen} onOpenChange={setSurfaceMenuOpen}>
             <PopoverTrigger asChild>
               <Button type="button" variant="ghost" size="sm" aria-label={`Preview surface: ${activeSurface.label}`}>
                 <activeSurface.Icon className="h-3.5 w-3.5" />
-                {activeSurface.label}
+                <span className="hidden sm:inline">{activeSurface.label}</span>
                 <ChevronDown className="h-3.5 w-3.5 opacity-60" />
               </Button>
             </PopoverTrigger>
@@ -138,7 +155,7 @@ export function Toolbar({
             <PopoverTrigger asChild>
               <Button type="button" variant="ghost" size="sm" aria-label={`Preview theme: ${activeTheme.label}`}>
                 <activeTheme.Icon className="h-3.5 w-3.5" />
-                {activeTheme.label}
+                <span className="hidden sm:inline">{activeTheme.label}</span>
                 <ChevronDown className="h-3.5 w-3.5 opacity-60" />
               </Button>
             </PopoverTrigger>
@@ -160,7 +177,8 @@ export function Toolbar({
             href={docsHref}
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground no-underline transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="hidden h-8 items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground no-underline transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:inline-flex"
+            aria-label={`${docsLabel} (opens in a new tab)`}
           >
             <BookOpen className="h-3.5 w-3.5" />
             {docsLabel}
@@ -168,7 +186,7 @@ export function Toolbar({
           </a>
         ) : null}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {errorCount > 0 ? (
           <Button
             type="button"
@@ -176,9 +194,12 @@ export function Toolbar({
             size="sm"
             onClick={onOpenIssues}
             className="text-destructive hover:text-destructive"
+            aria-label={`${errorCount} ${errorCount === 1 ? 'issue' : 'issues'}`}
           >
             <AlertTriangle className="h-3.5 w-3.5" />
-            {errorCount} {errorCount === 1 ? 'issue' : 'issues'}
+            <span>
+              {errorCount} <span className="hidden sm:inline">{errorCount === 1 ? 'issue' : 'issues'}</span>
+            </span>
           </Button>
         ) : null}
         <Button
@@ -188,13 +209,15 @@ export function Toolbar({
           onClick={onClear}
           disabled={!canClear}
           className="hover:bg-destructive/10 hover:text-destructive"
+          aria-label="Clear all blocks"
         >
           <Trash2 className="h-3.5 w-3.5" />
-          Clear
+          <span className="hidden sm:inline">Clear</span>
         </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={onOpenJson}>
+        <Button type="button" variant="ghost" size="sm" onClick={onOpenJson} aria-label="View JSON">
           <Code2 className="h-3.5 w-3.5" />
-          View JSON
+          <span className="hidden sm:inline">View JSON</span>
+          <span className="sm:hidden">JSON</span>
         </Button>
         <Button type="button" size="sm" onClick={onOpenSend} disabled={!canSend}>
           <Send className="h-3.5 w-3.5" />
