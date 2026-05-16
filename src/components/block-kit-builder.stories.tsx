@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
+import { defaultPalette, type PaletteSection } from '../lib/default-blocks';
 import type { SupportedBlock } from '../types';
 import { BlockKitBuilder } from './block-kit-builder';
 
@@ -70,10 +71,38 @@ export const AllSurfaces: Story = {
   }
 };
 
+const RESTRICTED_TYPES = new Set(['section', 'header', 'divider', 'markdown']);
+const RESTRICTED_PALETTE: readonly PaletteSection[] = defaultPalette.filter((s) => RESTRICTED_TYPES.has(s.blockType));
+
 export const RestrictedBlockTypes: Story = {
   args: {
     initialBlocks: STARTER_BLOCKS,
-    allowedBlockTypes: ['section', 'header', 'divider', 'markdown']
+    palette: RESTRICTED_PALETTE
+  }
+};
+
+const CUSTOM_VARIANT_PALETTE: readonly PaletteSection[] = [
+  ...defaultPalette,
+  {
+    name: 'Company presets',
+    blockType: 'section',
+    variants: [
+      {
+        id: 'help_footer',
+        label: 'help footer',
+        factory: () => ({
+          type: 'section',
+          text: { type: 'mrkdwn', text: 'Need help? Reach out in <#C0HELP>.' }
+        })
+      }
+    ]
+  }
+];
+
+export const CustomPalette: Story = {
+  args: {
+    initialBlocks: STARTER_BLOCKS,
+    palette: CUSTOM_VARIANT_PALETTE
   }
 };
 

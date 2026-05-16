@@ -1,4 +1,4 @@
-import { PALETTE_SECTIONS } from '../src/lib/default-blocks';
+import { defaultPalette } from '../src/lib/default-blocks';
 import { toSlackBlocks } from '../src/lib/to-slack-blocks';
 import { decodeBlocksFromString, encodeBlocksToString } from '../src/lib/url-state';
 import type { SupportedBlock } from '../src/types';
@@ -79,7 +79,7 @@ describe('url-state', () => {
 
 describe('palette factories', () => {
   it('every variant factory returns a block whose type matches its section', () => {
-    for (const section of PALETTE_SECTIONS) {
+    for (const section of defaultPalette) {
       for (const variant of section.variants) {
         const block = variant.factory();
         expect(block.type).toBe(section.blockType);
@@ -88,7 +88,7 @@ describe('palette factories', () => {
   });
 
   it('variant ids are unique across the palette', () => {
-    const ids = PALETTE_SECTIONS.flatMap((s) => s.variants.map((v) => v.id));
+    const ids = defaultPalette.flatMap((s) => s.variants.map((v) => v.id));
     expect(new Set(ids).size).toBe(ids.length);
   });
 });

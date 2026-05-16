@@ -59,11 +59,45 @@ export function MyBuilderPage() {
 | `loadSendAsUserStatus` | `() => Promise<{ canSendAsUser: boolean; oauthUrl?: string }>` | yes | Whether the current user has a Slack user-token and can post as themselves. If `canSendAsUser` is false, `oauthUrl` is shown as a "Sign in with Slack" link. |
 | `onSend` | `(payload) => Promise<{ ok: boolean; error?: string }>` | yes | Called when the user submits the send dialog. Payload is `{ channelId, blocks, sendAsUser }`. |
 | `previewHooks` | `PreviewHooks` | no | Hooks forwarded to `slack-blocks-to-jsx`'s `<Message>` for resolving user / channel / emoji directives. |
-| `allowedBlockTypes` | `SupportedBlockType[]` | no | Allowlist of block types shown in the palette. Defaults to all supported types. |
+| `palette` | `PaletteSection[]` | no | The left-hand palette of draggable variants. Defaults to `defaultPalette`. Spread it to filter, reorder, or add your own pre-configured variants — see [Customizing the palette](#customizing-the-palette). |
 | `allowedSurfaces` | `PreviewSurface[]` | no | Allowlist of preview surfaces (`'message'`, `'modal'`, `'app_home'`). Defaults to `['message']` — surface dropdown is hidden when only one surface is allowed. The first entry is the initial selection. |
 | `showThemeControl` | `boolean` | no | Defaults to `true`. When `false`, the theme is locked to `'light'`. |
 | `defaultPreviewTheme` | `'light' \| 'dark'` | no | Pass the host app's current theme so the preview opens matched to the consuming app's appearance. |
 | `theme` | `BrandTheme \| BrandPreset` | no | Branding tokens applied to the builder chrome (toolbar, palette, popovers, dialogs). Accepts a `Partial<BrandTokens>` map and optional `light`/`dark` overrides. See [Styling](#styling) below. |
+
+## Customizing the palette
+
+The default palette ships with curated presets for every supported block type. To narrow what's available, or add your own pre-configured variants (e.g. a "Help footer" section), pass a `palette` array. Define it at module scope (or wrap in `useMemo`) so it stays referentially stable across renders.
+
+```tsx
+import {
+  BlockKitBuilder,
+  defaultPalette,
+  type PaletteSection,
+} from "@tightknitai/block-kit-builder";
+
+const PALETTE: readonly PaletteSection[] = [
+  ...defaultPalette.filter((s) => s.blockType !== "input"),
+  {
+    name: "Company presets",
+    blockType: "section",
+    variants: [
+      {
+        id: "help_footer",
+        label: "help footer",
+        factory: () => ({
+          type: "section",
+          text: { type: "mrkdwn", text: "Need help? Reach out in <#C0HELP>." },
+        }),
+      },
+    ],
+  },
+];
+
+<BlockKitBuilder palette={PALETTE} {...rest} />;
+```
+
+Variant `id`s must be unique across the array — the drag-drop lookup keys by id.
 
 ## Boundary
 
@@ -76,12 +110,15 @@ import {
   toSlackBlocks,           // strips builder-only fields (e.g. header `level`) before sending
   encodeBlocksToString,    // base64url-encode a blocks array (for URL state)
   decodeBlocksFromString,
+  defaultPalette,          // the built-in palette — spread to customize
 } from "@tightknitai/block-kit-builder";
 
 import type {
   SupportedBlock,
   SupportedBlockType,
   BlockKitBuilderProps,
+  PaletteSection,
+  PaletteVariant,
   SendPayload,
   SendResult,
   ChannelOption,

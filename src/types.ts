@@ -11,6 +11,7 @@ import type {
   ViewInputBlock
 } from 'slack-web-api-client';
 import type { BrandPreset, BrandTheme } from './lib/brand-theme';
+import type { PaletteSection } from './lib/default-blocks';
 
 /**
  * The Slack Block Kit block types supported by the builder in v1.
@@ -346,13 +347,18 @@ export interface BlockKitBuilderProps {
    */
   onSend: (payload: SendPayload) => Promise<SendResult>;
   /**
-   * Which Slack block types appear in the palette. When omitted, every
-   * supported type is shown. When provided, the palette is filtered to
-   * the listed types — useful for restricting the builder to a curated
-   * subset (e.g. a message-only app might omit `input` and `alert`).
-   * An empty array renders an empty palette.
+   * The palette shown on the left-hand side. When omitted, the built-in
+   * `defaultPalette` is used. Pass a custom array (typically built by
+   * spreading and filtering `defaultPalette`, plus your own sections) to
+   * curate the variants and pre-configured presets your users can drag
+   * onto the surface. An empty array renders an empty palette.
+   *
+   * Variant ids must be unique across the array — the drag-drop lookup
+   * keys by id, so duplicates would shadow each other. The palette is
+   * also expected to be referentially stable across renders (wrap in
+   * `useMemo` or define at module scope).
    */
-  allowedBlockTypes?: readonly SupportedBlockType[];
+  palette?: readonly PaletteSection[];
   /**
    * Which Slack preview surfaces the toolbar exposes. Defaults to
    * `['message']`, which locks the preview to Message and hides the

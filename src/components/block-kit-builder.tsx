@@ -11,8 +11,8 @@ import {
   useSensors
 } from '@dnd-kit/core';
 import { GripVertical } from 'lucide-react';
-import { useCallback, useState } from 'react';
-import { VARIANT_BY_ID } from '../lib/default-blocks';
+import { useCallback, useMemo, useState } from 'react';
+import { buildVariantById, defaultPalette } from '../lib/default-blocks';
 import { TooltipProvider } from '../lib/ui/tooltip';
 import { useBlockKitBuilderState } from '../state/use-block-kit-builder-state';
 import { useBlockKitValidation } from '../state/use-block-kit-validation';
@@ -42,12 +42,15 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
     loadChannels,
     loadSendAsUserStatus,
     onSend,
-    allowedBlockTypes,
+    palette,
     allowedSurfaces: allowedSurfacesProp,
     showThemeControl = true,
     defaultPreviewTheme = 'light',
     theme
   } = props;
+
+  const paletteSections = palette ?? defaultPalette;
+  const variantById = useMemo(() => buildVariantById(paletteSections), [paletteSections]);
 
   // Default to message-only when omitted (or passed empty). The toolbar
   // needs at least one entry to seed `previewSurface`; it hides the
@@ -105,7 +108,7 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
 
       const variantId = parsePaletteDragId(active.id);
       if (variantId) {
-        const variant = VARIANT_BY_ID.get(variantId);
+        const variant = variantById.get(variantId);
         if (!variant) {
           return;
         }
@@ -122,14 +125,14 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
         }
       }
     },
-    [addBlock, blocks, reorderBlock]
+    [addBlock, blocks, reorderBlock, variantById]
   );
 
   const handleDragCancel = useCallback(() => {
     setActivePaletteVariantId(null);
   }, []);
 
-  const activePaletteVariant = activePaletteVariantId ? VARIANT_BY_ID.get(activePaletteVariantId) : null;
+  const activePaletteVariant = activePaletteVariantId ? variantById.get(activePaletteVariantId) : null;
 
   const blockPayloads = blocks.map((b) => b.block);
 
@@ -160,7 +163,7 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
               showThemeControl={showThemeControl}
             />
             <div className="flex min-h-0 flex-1 items-stretch">
-              <Palette onAddBlock={(block) => addBlock(block)} allowedBlockTypes={allowedBlockTypes} />
+              <Palette onAddBlock={(block) => addBlock(block)} sections={paletteSections} />
               <Surface
                 blocks={blocks}
                 workspaceName={workspaceName}
