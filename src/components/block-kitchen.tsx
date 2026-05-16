@@ -14,9 +14,9 @@ import { GripVertical } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { buildVariantById, defaultPalette } from '../lib/default-blocks';
 import { TooltipProvider } from '../lib/ui/tooltip';
-import { useBlockKitBuilderState } from '../state/use-block-kit-builder-state';
 import { useBlockKitValidation } from '../state/use-block-kit-validation';
-import type { BlockKitBuilderProps, PreviewSurface, PreviewTheme } from '../types';
+import { useBlockKitchenState } from '../state/use-block-kitchen-state';
+import type { BlockKitchenProps, PreviewSurface, PreviewTheme } from '../types';
 import { BrandThemeScope } from './brand-theme-scope';
 import { IssuesSheet } from './issues-sheet';
 import { JsonDrawer } from './json-drawer';
@@ -30,10 +30,10 @@ import { Toolbar } from './toolbar';
  * Renders the toolbar, palette, preview surface, popover editors, send
  * dialog, and View-JSON drawer. Integration-agnostic: all I/O is brokered
  * through props.
- * @param props - {@link BlockKitBuilderProps}
+ * @param props - {@link BlockKitchenProps}
  * @returns the rendered Block Kit Builder
  */
-export function BlockKitBuilder(props: BlockKitBuilderProps) {
+export function BlockKitchen(props: BlockKitchenProps) {
   const {
     workspaceName,
     initialBlocks,
@@ -58,8 +58,9 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
   const allowedSurfaces: readonly PreviewSurface[] =
     allowedSurfacesProp && allowedSurfacesProp.length > 0 ? allowedSurfacesProp : ['message'];
 
-  const { blocks, addBlock, updateBlock, removeBlock, duplicateBlock, reorderBlock, replaceAll } =
-    useBlockKitBuilderState({ initialBlocks, onChange });
+  const { blocks, addBlock, updateBlock, removeBlock, duplicateBlock, reorderBlock, replaceAll } = useBlockKitchenState(
+    { initialBlocks, onChange }
+  );
 
   const [jsonOpen, setJsonOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
@@ -146,7 +147,7 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <div className="bkb-root flex h-full w-full flex-col rounded-md border bg-background text-foreground">
+          <div className="bk-root flex h-full w-full flex-col rounded-md border bg-background text-foreground">
             <Toolbar
               onClear={() => replaceAll([])}
               onOpenJson={() => setJsonOpen(true)}

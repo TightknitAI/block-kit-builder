@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { defaultPalette, type PaletteSection } from '../lib/default-blocks';
 import type { SupportedBlock } from '../types';
-import { BlockKitBuilder } from './block-kit-builder';
+import { BlockKitchen } from './block-kitchen';
 
 const STARTER_BLOCKS: SupportedBlock[] = [
   {
@@ -21,8 +21,8 @@ const STARTER_BLOCKS: SupportedBlock[] = [
 ];
 
 const meta = {
-  title: 'BlockKitBuilder/BlockKitBuilder',
-  component: BlockKitBuilder,
+  title: 'BlockKitchen/BlockKitchen',
+  component: BlockKitchen,
   parameters: {
     layout: 'fullscreen',
     a11y: { test: 'todo' }
@@ -39,12 +39,12 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="bkb-root" style={{ height: '100vh', width: '100vw' }}>
+      <div className="bk-root" style={{ height: '100vh', width: '100vw' }}>
         <Story />
       </div>
     )
   ]
-} satisfies Meta<typeof BlockKitBuilder>;
+} satisfies Meta<typeof BlockKitchen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -169,7 +169,7 @@ export const BrandedDarkVariant: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark bkb-root" style={{ height: '100vh', width: '100vw', background: 'hsl(224 71% 4%)' }}>
+      <div className="dark bk-root" style={{ height: '100vh', width: '100vw', background: 'hsl(224 71% 4%)' }}>
         <Story />
       </div>
     )

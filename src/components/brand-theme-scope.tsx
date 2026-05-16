@@ -4,7 +4,7 @@ import { type BrandPreset, type BrandTheme, resolveBrandTheme, toCssDeclarations
 /**
  * Wraps the builder tree in a scoped `<style>` block that writes the
  * resolved brand CSS variables onto `:root`, gated by `:has()` on a
- * per-instance `data-bkb-scope` attribute. Writing the vars at `:root`
+ * per-instance `data-bk-scope` attribute. Writing the vars at `:root`
  * is necessary because Radix's `Portal` (used by every popover, dialog,
  * tooltip, and sheet in this package) renders into `document.body`
  * outside the React subtree — variables on an inner wrapper would
@@ -31,7 +31,7 @@ import { type BrandPreset, type BrandTheme, resolveBrandTheme, toCssDeclarations
  * 15.4+, Firefox 121+) and is already implied by the Tailwind v4
  * baseline this package builds against.
  * @param props - wrapper props
- * @param props.theme - the brand theme prop, forwarded from {@link BlockKitBuilder}
+ * @param props.theme - the brand theme prop, forwarded from {@link BlockKitchen}
  * @param props.children - the builder tree
  * @returns the children, optionally wrapped in a scoped theme block
  */
@@ -39,7 +39,7 @@ export function BrandThemeScope({ theme, children }: { theme?: BrandTheme | Bran
   // `useId` produces something like `:r0:` — strip the colons so the
   // string can safely sit inside an attribute selector.
   const rawId = useId();
-  const scopeId = useMemo(() => `bkb-${rawId.replace(/[:]/g, '')}`, [rawId]);
+  const scopeId = useMemo(() => `bk-${rawId.replace(/[:]/g, '')}`, [rawId]);
 
   const resolved = useMemo(() => resolveBrandTheme(theme), [theme]);
 
@@ -55,13 +55,13 @@ export function BrandThemeScope({ theme, children }: { theme?: BrandTheme | Bran
 
   const rules: string[] = [];
   if (lightDecl) {
-    rules.push(`:root:has([data-bkb-scope="${scopeId}"]) { ${lightDecl} }`);
+    rules.push(`:root:has([data-bk-scope="${scopeId}"]) { ${lightDecl} }`);
   }
   if (darkDecl) {
     // Match the .dark element itself wherever it sits in the ancestor
     // chain. Two variants cover all placements: an ancestor that
     // contains the scope, or the scope element itself carrying .dark.
-    const darkSelectors = [`.dark:has([data-bkb-scope="${scopeId}"])`, `.dark[data-bkb-scope="${scopeId}"]`].join(', ');
+    const darkSelectors = [`.dark:has([data-bk-scope="${scopeId}"])`, `.dark[data-bk-scope="${scopeId}"]`].join(', ');
     rules.push(`${darkSelectors} { ${darkDecl} }`);
   }
 
@@ -71,7 +71,7 @@ export function BrandThemeScope({ theme, children }: { theme?: BrandTheme | Bran
           values are filtered by isSafeCssValue; the scope id is
           derived from useId(). */}
       <style dangerouslySetInnerHTML={{ __html: rules.join(' ') }} />
-      <div data-bkb-scope={scopeId} style={{ display: 'contents' }}>
+      <div data-bk-scope={scopeId} style={{ display: 'contents' }}>
         {children}
       </div>
     </>

@@ -1,6 +1,6 @@
 {
-  "name": "@tightknitai/block-kit-builder",
-  "version": "0.3.0-alpha.0",
+  "name": "@tightknitai/block-kitchen",
+  "version": "0.4.0-alpha.0",
   "description": "A drag-and-drop, no-code-friendly visual builder for Slack Block Kit messages. Integration-agnostic React component.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -94,11 +94,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TightknitAI/block-kit-builder.git"
+    "url": "git+https://github.com/TightknitAI/block-kitchen.git"
   },
-  "homepage": "https://github.com/TightknitAI/block-kit-builder",
+  "homepage": "https://github.com/TightknitAI/block-kitchen",
   "bugs": {
-    "url": "https://github.com/TightknitAI/block-kit-builder/issues"
+    "url": "https://github.com/TightknitAI/block-kitchen/issues"
   },
   "author": "Tightknit <https://tightknit.ai>",
   "license": "MIT",

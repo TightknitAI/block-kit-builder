@@ -1,7 +1,7 @@
-# block-kit-builder
+# block-kitchen
 
-[![CI](https://github.com/TightknitAI/block-kit-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/TightknitAI/block-kit-builder/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/@tightknitai/block-kit-builder.svg)](https://www.npmjs.com/package/@tightknitai/block-kit-builder)
+[![CI](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml/badge.svg)](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@tightknitai/block-kitchen.svg)](https://www.npmjs.com/package/@tightknitai/block-kitchen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 A drag-and-drop, no-code-friendly visual builder for Slack Block Kit messages, packaged as an **integration-agnostic React component**.
@@ -13,7 +13,7 @@ The package owns the entire builder UX — palette, sortable preview surface, pe
 ## Install
 
 ```bash
-pnpm add @tightknitai/block-kit-builder
+pnpm add @tightknitai/block-kitchen
 ```
 
 Peer deps: `react`, `react-dom`.
@@ -21,12 +21,12 @@ Peer deps: `react`, `react-dom`.
 ## Usage
 
 ```tsx
-import { BlockKitBuilder } from "@tightknitai/block-kit-builder";
-import "@tightknitai/block-kit-builder/styles.css";
+import { BlockKitchen } from "@tightknitai/block-kitchen";
+import "@tightknitai/block-kitchen/styles.css";
 
 export function MyBuilderPage() {
   return (
-    <BlockKitBuilder
+    <BlockKitchen
       workspaceName="Acme Inc."
       loadChannels={async () => {
         const res = await fetch("/api/slack/channels");
@@ -71,10 +71,10 @@ The default palette ships with curated presets for every supported block type. T
 
 ```tsx
 import {
-  BlockKitBuilder,
+  BlockKitchen,
   defaultPalette,
   type PaletteSection,
-} from "@tightknitai/block-kit-builder";
+} from "@tightknitai/block-kitchen";
 
 const PALETTE: readonly PaletteSection[] = [
   ...defaultPalette.filter((s) => s.blockType !== "input"),
@@ -94,7 +94,7 @@ const PALETTE: readonly PaletteSection[] = [
   },
 ];
 
-<BlockKitBuilder palette={PALETTE} {...rest} />;
+<BlockKitchen palette={PALETTE} {...rest} />;
 ```
 
 Variant `id`s must be unique across the array — the drag-drop lookup keys by id.
@@ -111,12 +111,12 @@ import {
   encodeBlocksToString,    // base64url-encode a blocks array (for URL state)
   decodeBlocksFromString,
   defaultPalette,          // the built-in palette — spread to customize
-} from "@tightknitai/block-kit-builder";
+} from "@tightknitai/block-kitchen";
 
 import type {
   SupportedBlock,
   SupportedBlockType,
-  BlockKitBuilderProps,
+  BlockKitchenProps,
   PaletteSection,
   PaletteVariant,
   SendPayload,
@@ -124,7 +124,7 @@ import type {
   ChannelOption,
   SendAsUserStatus,
   PreviewHooks,
-} from "@tightknitai/block-kit-builder";
+} from "@tightknitai/block-kitchen";
 ```
 
 ## Backend
@@ -137,10 +137,10 @@ Defense-in-depth: blocks are validated against [slack-block-kit-validator](https
 
 ## Styling
 
-Ships a compiled stylesheet at `@tightknitai/block-kit-builder/styles.css`. The styles use CSS custom properties (`--background`, `--primary`, `--border`, etc.) for theming. Consumers must provide values for these vars — the standard shadcn/ui token set works as-is.
+Ships a compiled stylesheet at `@tightknitai/block-kitchen/styles.css`. The styles use CSS custom properties (`--background`, `--primary`, `--border`, etc.) for theming. Consumers must provide values for these vars — the standard shadcn/ui token set works as-is.
 
 ```ts
-import "@tightknitai/block-kit-builder/styles.css";
+import "@tightknitai/block-kitchen/styles.css";
 ```
 
 ### Branding (typed `theme` prop)
@@ -148,14 +148,14 @@ import "@tightknitai/block-kit-builder/styles.css";
 For consumers who don't already have a shadcn token set on `:root`, the `theme` prop is a typed shortcut that writes a subset of tokens directly:
 
 ```tsx
-import type { BrandTheme } from "@tightknitai/block-kit-builder";
+import type { BrandTheme } from "@tightknitai/block-kitchen";
 
 const brand: BrandTheme = {
   tokens: { primary: "262 83% 58%", radius: "0.75rem" },
   dark:   { primary: "263 70% 75%" }
 };
 
-<BlockKitBuilder theme={brand} {...rest} />
+<BlockKitchen theme={brand} {...rest} />
 ```
 
 - `tokens` applies in both light and dark contexts.

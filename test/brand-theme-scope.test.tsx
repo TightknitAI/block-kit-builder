@@ -10,7 +10,7 @@ describe('BrandThemeScope', () => {
     );
     // No <style> tag, no scope div — children render directly.
     expect(container.querySelector('style')).toBeNull();
-    expect(container.querySelector('[data-bkb-scope]')).toBeNull();
+    expect(container.querySelector('[data-bk-scope]')).toBeNull();
     expect(container.querySelector('[data-testid="child"]')).not.toBeNull();
   });
 
@@ -21,7 +21,7 @@ describe('BrandThemeScope', () => {
       </BrandThemeScope>
     );
     expect(container.querySelector('style')).toBeNull();
-    expect(container.querySelector('[data-bkb-scope]')).toBeNull();
+    expect(container.querySelector('[data-bk-scope]')).toBeNull();
   });
 
   it('emits a scoped <style> block targeting :root via :has() so portaled content inherits', () => {
@@ -35,17 +35,17 @@ describe('BrandThemeScope', () => {
     expect(styleEl).not.toBeNull();
     const css = styleEl?.textContent ?? '';
 
-    expect(css).toMatch(/:root:has\(\[data-bkb-scope="bkb-[^"]+"\]\)/);
+    expect(css).toMatch(/:root:has\(\[data-bk-scope="bk-[^"]+"\]\)/);
     expect(css).toContain('--primary: 0 100% 50%');
     expect(css).toContain('--radius: 0.5rem');
 
     // The wrapper div carries the matching scope id and is layout-neutral.
-    const wrapper = container.querySelector('[data-bkb-scope]') as HTMLElement | null;
+    const wrapper = container.querySelector('[data-bk-scope]') as HTMLElement | null;
     expect(wrapper).not.toBeNull();
     expect(wrapper?.style.display).toBe('contents');
 
-    const scopeId = wrapper?.getAttribute('data-bkb-scope') ?? '';
-    expect(css).toContain(`[data-bkb-scope="${scopeId}"]`);
+    const scopeId = wrapper?.getAttribute('data-bk-scope') ?? '';
+    expect(css).toContain(`[data-bk-scope="${scopeId}"]`);
   });
 
   it('emits a dark rule targeting the .dark element itself so it outranks upstream .dark baselines', () => {
@@ -62,8 +62,8 @@ describe('BrandThemeScope', () => {
     const css = container.querySelector('style')?.textContent ?? '';
     // .dark ancestor of the scope (covers <html class="dark">, <body class="dark">,
     // and any wrapping <div class="dark">), or .dark on the scope element itself.
-    expect(css).toMatch(/\.dark:has\(\[data-bkb-scope="bkb-[^"]+"\]\)/);
-    expect(css).toMatch(/\.dark\[data-bkb-scope="bkb-[^"]+"\]/);
+    expect(css).toMatch(/\.dark:has\(\[data-bk-scope="bk-[^"]+"\]\)/);
+    expect(css).toMatch(/\.dark\[data-bk-scope="bk-[^"]+"\]/);
     expect(css).toContain('--primary: 210 80% 60%');
   });
 
@@ -78,9 +78,9 @@ describe('BrandThemeScope', () => {
         </BrandThemeScope>
       </>
     );
-    const wrappers = container.querySelectorAll('[data-bkb-scope]');
+    const wrappers = container.querySelectorAll('[data-bk-scope]');
     expect(wrappers.length).toBe(2);
-    const ids = Array.from(wrappers).map((el) => el.getAttribute('data-bkb-scope'));
+    const ids = Array.from(wrappers).map((el) => el.getAttribute('data-bk-scope'));
     expect(new Set(ids).size).toBe(2);
   });
 });

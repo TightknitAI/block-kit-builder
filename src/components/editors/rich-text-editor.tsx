@@ -113,7 +113,7 @@ function RichTextWysiwygEditor({ block, onChange }: { block: RichTextBlock; onCh
     editorProps: {
       attributes: {
         class:
-          'bkb-rich-editor min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring [&_p]:my-1 [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:pl-5 [&_li]:my-0 [&_pre]:bg-muted [&_pre]:rounded [&_pre]:p-2 [&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:text-muted-foreground'
+          'bk-rich-editor min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-ring [&_p]:my-1 [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:pl-5 [&_li]:my-0 [&_pre]:bg-muted [&_pre]:rounded [&_pre]:p-2 [&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:text-muted-foreground'
       }
     },
     onUpdate: ({ editor: ed }) => handleUpdate(ed)

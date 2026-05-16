@@ -32,7 +32,7 @@ export interface PaletteSection {
 /**
  * The built-in palette. Mirrors the section ordering of Slack's real Block
  * Kit Builder, scoped to the v1 supported block types. Consumers can pass
- * this directly to `<BlockKitBuilder palette={...} />`, or spread and
+ * this directly to `<BlockKitchen palette={...} />`, or spread and
  * compose against it to add their own variants.
  */
 export const defaultPalette: readonly PaletteSection[] = [

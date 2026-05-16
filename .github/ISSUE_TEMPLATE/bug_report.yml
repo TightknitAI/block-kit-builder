@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a defect in the block-kit-builder package.
+description: Report a defect in the block-kitchen package.
 labels: ["bug"]
 body:
   - type: markdown
@@ -7,7 +7,7 @@ body:
       value: |
         Thanks for taking the time to file a bug. Please fill in the sections below so we can reproduce and triage quickly.
 
-        For security vulnerabilities, please use [private vulnerability reporting](https://github.com/TightknitAI/block-kit-builder/security/advisories/new) instead.
+        For security vulnerabilities, please use [private vulnerability reporting](https://github.com/TightknitAI/block-kitchen/security/advisories/new) instead.
   - type: textarea
     id: summary
     attributes:
@@ -22,7 +22,7 @@ body:
       label: Steps to reproduce
       description: Minimal steps. A CodeSandbox or repo link is ideal.
       placeholder: |
-        1. Render `<BlockKitBuilder />` with `initialBlocks={[...]}`
+        1. Render `<BlockKitchen />` with `initialBlocks={[...]}`
         2. Drag the header block...
         3. Observe the preview pane
     validations:
@@ -45,7 +45,7 @@ body:
     id: package-version
     attributes:
       label: Package version
-      description: The version of `@tightknitai/block-kit-builder` you are using.
+      description: The version of `@tightknitai/block-kitchen` you are using.
       placeholder: 0.1.0-alpha.0
     validations:
       required: true

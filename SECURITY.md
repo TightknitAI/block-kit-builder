@@ -8,7 +8,7 @@ This package is published from `main`. Security fixes are released against the l
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Report vulnerabilities privately via GitHub's [private vulnerability reporting](https://github.com/TightknitAI/block-kit-builder/security/advisories/new). This routes directly to the maintainers and is not publicly visible.
+Report vulnerabilities privately via GitHub's [private vulnerability reporting](https://github.com/TightknitAI/block-kitchen/security/advisories/new). This routes directly to the maintainers and is not publicly visible.
 
 Include:
 
@@ -23,7 +23,7 @@ You should receive an acknowledgement within 5 business days. We will keep you i
 
 In scope:
 
-- The `@tightknitai/block-kit-builder` package and its build output
+- The `@tightknitai/block-kitchen` package and its build output
 - Code in this repository (`src/`, build configuration)
 
 Out of scope:

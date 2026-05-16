@@ -23,7 +23,7 @@ function wrap(block: SupportedBlock): BuilderBlock {
  * @param params.onChange - notified on any state change with Slack payloads
  * @returns state slice + mutators
  */
-export function useBlockKitBuilderState({
+export function useBlockKitchenState({
   initialBlocks,
   onChange
 }: {

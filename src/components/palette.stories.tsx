@@ -5,7 +5,7 @@ import { defaultPalette, type PaletteSection } from '../lib/default-blocks';
 import { Palette } from './palette';
 
 const meta = {
-  title: 'BlockKitBuilder/Palette',
+  title: 'BlockKitchen/Palette',
   component: Palette,
   args: {
     onAddBlock: fn(),
@@ -14,7 +14,7 @@ const meta = {
   decorators: [
     (Story) => (
       <DndContext>
-        <div className="bkb-root flex h-[600px] border bg-background text-foreground">
+        <div className="bk-root flex h-[600px] border bg-background text-foreground">
           <Story />
         </div>
       </DndContext>

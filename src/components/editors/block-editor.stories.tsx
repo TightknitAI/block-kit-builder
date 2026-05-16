@@ -21,7 +21,7 @@ function variant(id: string): SupportedBlock {
 }
 
 const meta = {
-  title: 'BlockKitBuilder/BlockEditor',
+  title: 'BlockKitchen/BlockEditor',
   component: BlockEditor,
   parameters: {
     layout: 'centered',
@@ -51,7 +51,7 @@ const meta = {
   decorators: [
     (Story) => (
       <TooltipProvider delayDuration={200}>
-        <div className="bkb-root w-[32rem] max-h-[80vh] overflow-y-auto rounded-md border bg-popover p-4 text-popover-foreground shadow-md">
+        <div className="bk-root w-[32rem] max-h-[80vh] overflow-y-auto rounded-md border bg-popover p-4 text-popover-foreground shadow-md">
           <Story />
         </div>
       </TooltipProvider>

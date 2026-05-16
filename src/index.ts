@@ -1,4 +1,4 @@
-export { BlockKitBuilder } from './components/block-kit-builder';
+export { BlockKitchen } from './components/block-kitchen';
 export type {
   BrandPreset,
   BrandTheme,
@@ -14,7 +14,7 @@ export {
 export type {
   AlertBlock,
   AlertLevel,
-  BlockKitBuilderProps,
+  BlockKitchenProps,
   BuilderBlock,
   CardBlock,
   CarouselBlock,

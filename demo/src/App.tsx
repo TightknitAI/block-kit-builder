@@ -1,11 +1,11 @@
 import {
-  BlockKitBuilder,
+  BlockKitchen,
   type ChannelOption,
   type SendAsUserStatus,
   type SendPayload,
   type SendResult,
   type SupportedBlock
-} from '@tightknitai/block-kit-builder';
+} from '@tightknitai/block-kitchen';
 import { useState } from 'react';
 
 const MOCK_CHANNELS: ChannelOption[] = [
@@ -61,7 +61,7 @@ export function App() {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 16, gap: 12 }}>
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 600 }}>@tightknitai/block-kit-builder — local demo</div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>@tightknitai/block-kitchen — local demo</div>
             <div style={{ fontSize: 12, opacity: 0.7 }}>
               Library imported from <code>../src/index.ts</code> — edits to library source hot-reload here.
             </div>
@@ -83,7 +83,7 @@ export function App() {
           </button>
         </header>
         <div style={{ flex: 1, minHeight: 0 }}>
-          <BlockKitBuilder
+          <BlockKitchen
             workspaceName="Acme Inc."
             initialBlocks={INITIAL_BLOCKS}
             loadChannels={loadChannels}

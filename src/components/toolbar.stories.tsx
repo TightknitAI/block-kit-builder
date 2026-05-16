@@ -4,7 +4,7 @@ import { TooltipProvider } from '../lib/ui/tooltip';
 import { Toolbar } from './toolbar';
 
 const meta = {
-  title: 'BlockKitBuilder/Toolbar',
+  title: 'BlockKitchen/Toolbar',
   component: Toolbar,
   parameters: { layout: 'fullscreen' },
   args: {
@@ -24,7 +24,7 @@ const meta = {
   decorators: [
     (Story) => (
       <TooltipProvider delayDuration={0}>
-        <div className="bkb-root border-b">
+        <div className="bk-root border-b">
           <Story />
         </div>
       </TooltipProvider>

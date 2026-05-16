@@ -1,10 +1,10 @@
 /**
- * Stylesheet entry for block-kit-builder.
+ * Stylesheet entry for block-kitchen.
  *
  * Built to dist/styles.css via the package's `build` script. Consumers
  * import the compiled file:
  *
- *   import '@tightknitai/block-kit-builder/styles.css';
+ *   import '@tightknitai/block-kitchen/styles.css';
  *
  * The compiled CSS uses CSS custom properties (--background, --primary,
  * --border, etc.) for theming. Consumers must provide values for these
@@ -69,18 +69,18 @@
    back to `currentColor`, which inherits the text color — visually
    correct in light mode (dark text → dark borders) but very wrong in
    dark mode, where light foreground text turns every border near-white.
-   Scope this default to elements we own: `.bkb-root` and its descendants,
-   plus `.bkb-portal-content` (the marker class on every Radix Portal
+   Scope this default to elements we own: `.bk-root` and its descendants,
+   plus `.bk-portal-content` (the marker class on every Radix Portal
    container in this package, so popovers/dialogs/tooltips/sheets get
-   the same default even though they render outside `.bkb-root`). */
-.bkb-root,
-.bkb-root *,
-.bkb-root *::before,
-.bkb-root *::after,
-.bkb-portal-content,
-.bkb-portal-content *,
-.bkb-portal-content *::before,
-.bkb-portal-content *::after {
+   the same default even though they render outside `.bk-root`). */
+.bk-root,
+.bk-root *,
+.bk-root *::before,
+.bk-root *::after,
+.bk-portal-content,
+.bk-portal-content *,
+.bk-portal-content *::before,
+.bk-portal-content *::after {
   border-color: hsl(var(--border, 214.3 31.8% 91.4%));
 }
 
@@ -119,27 +119,27 @@
    slack-blocks-to-jsx's preview rendering (decimal → lower-alpha →
    lower-roman, repeating every three levels up to Slack's max indent
    of 8). Keep bullet lists uniform discs to match the preview. */
-.bkb-rich-editor ol {
+.bk-rich-editor ol {
   list-style-type: decimal;
 }
-.bkb-rich-editor ol ol {
+.bk-rich-editor ol ol {
   list-style-type: lower-alpha;
 }
-.bkb-rich-editor ol ol ol {
+.bk-rich-editor ol ol ol {
   list-style-type: lower-roman;
 }
-.bkb-rich-editor ol ol ol ol {
+.bk-rich-editor ol ol ol ol {
   list-style-type: decimal;
 }
-.bkb-rich-editor ol ol ol ol ol {
+.bk-rich-editor ol ol ol ol ol {
   list-style-type: lower-alpha;
 }
-.bkb-rich-editor ol ol ol ol ol ol {
+.bk-rich-editor ol ol ol ol ol ol {
   list-style-type: lower-roman;
 }
-.bkb-rich-editor ol ol ol ol ol ol ol {
+.bk-rich-editor ol ol ol ol ol ol ol {
   list-style-type: decimal;
 }
-.bkb-rich-editor ol ol ol ol ol ol ol ol {
+.bk-rich-editor ol ol ol ol ol ol ol ol {
   list-style-type: lower-alpha;
 }

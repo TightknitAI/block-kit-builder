@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* The block-kit-builder library is built separately by the package's
+/* The block-kitchen library is built separately by the package's
    build:css script, but in dev we import its source styles directly so
    the demo gets HMR. The library scans its own source files via
    `@source` declarations in `src/styles.src.css`. */
