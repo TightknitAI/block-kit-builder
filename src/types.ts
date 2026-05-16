@@ -249,7 +249,7 @@ export interface BuilderBlock {
 }
 
 /**
- * Channel record returned by {@link BlockKitBuilderProps.loadChannels}.
+ * Channel record returned by {@link BlockKitchenProps.loadChannels}.
  */
 export interface ChannelOption {
   id: string;
@@ -257,7 +257,7 @@ export interface ChannelOption {
 }
 
 /**
- * User-token status returned by {@link BlockKitBuilderProps.loadSendAsUserStatus}.
+ * User-token status returned by {@link BlockKitchenProps.loadSendAsUserStatus}.
  * If `canSendAsUser` is false, `oauthUrl` is required so the UI can show a
  * "Sign in with Slack" link.
  */
@@ -267,7 +267,7 @@ export interface SendAsUserStatus {
 }
 
 /**
- * Payload passed to {@link BlockKitBuilderProps.onSend}.
+ * Payload passed to {@link BlockKitchenProps.onSend}.
  */
 export interface SendPayload {
   channelId: string;
@@ -276,7 +276,7 @@ export interface SendPayload {
 }
 
 /**
- * Result returned from {@link BlockKitBuilderProps.onSend}.
+ * Result returned from {@link BlockKitchenProps.onSend}.
  * `error` is a human-readable message; the dialog renders it as-is.
  */
 export interface SendResult {
@@ -307,11 +307,11 @@ export type PreviewTheme = 'light' | 'dark';
 export type PreviewSurface = 'message' | 'modal' | 'app_home';
 
 /**
- * Props for the top-level {@link BlockKitBuilder} component.
+ * Props for the top-level {@link BlockKitchen} component.
  * The package is integration-agnostic: every I/O concern is brokered
  * through these props. The component never makes a network call itself.
  */
-export interface BlockKitBuilderProps {
+export interface BlockKitchenProps {
   /**
    * Workspace name shown in the preview chrome to mimic a Slack message header.
    * Cosmetic only.
@@ -377,14 +377,14 @@ export interface BlockKitBuilderProps {
    * current theme (e.g. from `next-themes` or your own theme hook) so
    * the preview opens matched to the consuming app's appearance. The
    * user can still override via the toolbar dropdown if
-   * {@link BlockKitBuilderProps.showThemeControl} is `true`.
+   * {@link BlockKitchenProps.showThemeControl} is `true`.
    */
   defaultPreviewTheme?: PreviewTheme;
   /**
    * Branding tokens applied to the builder chrome (toolbar, palette,
    * popover editors, send dialog, JSON drawer, issues sheet). The
    * Slack preview itself is rendered by `slack-blocks-to-jsx` with its
-   * native Slack styling regardless — use {@link BlockKitBuilderProps.defaultPreviewTheme}
+   * native Slack styling regardless — use {@link BlockKitchenProps.defaultPreviewTheme}
    * for preview light/dark.
    *
    * Pass a preset name as sugar for `{ preset }`, or an object with
@@ -395,7 +395,7 @@ export interface BlockKitBuilderProps {
    *
    * @example
    * ```tsx
-   * <BlockKitBuilder
+   * <BlockKitchen
    *   theme={{
    *     tokens: { primary: '262 83% 58%', radius: '0.75rem' },
    *     dark: { primary: '263 70% 65%' }

@@ -1,5 +1,5 @@
 /**
- * Brand theme resolver for the BlockKitBuilder chrome.
+ * Brand theme resolver for the BlockKitchen chrome.
  *
  * Consumers can already brand the builder by overriding the shadcn/ui
  * CSS custom properties declared in `styles.src.css` (the lower-level

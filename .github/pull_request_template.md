@@ -15,9 +15,9 @@
 
      ```tsx
      // Before
-     <BlockKitBuilder showSurfaceControl />
+     <BlockKitchen showSurfaceControl />
      // After
-     <BlockKitBuilder allowedSurfaces={['message', 'modal', 'app_home']} />
+     <BlockKitchen allowedSurfaces={['message', 'modal', 'app_home']} />
      ```
 -->
 

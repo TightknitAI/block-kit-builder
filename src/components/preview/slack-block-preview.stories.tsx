@@ -3,7 +3,7 @@ import type { SupportedBlock } from '../../types';
 import { SlackBlockPreview } from './slack-block-preview';
 
 const meta = {
-  title: 'BlockKitBuilder/SlackBlockPreview',
+  title: 'BlockKitchen/SlackBlockPreview',
   component: SlackBlockPreview,
   parameters: { layout: 'centered' },
   argTypes: {
@@ -19,7 +19,7 @@ const meta = {
       const isDark = args.theme === 'dark';
       return (
         <div
-          className="bkb-root"
+          className="bk-root"
           style={{
             width: 600,
             padding: 24,

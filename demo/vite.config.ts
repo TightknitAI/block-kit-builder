@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@tightknitai/block-kit-builder': resolve(__dirname, '../src/index.ts')
+      '@tightknitai/block-kitchen': resolve(__dirname, '../src/index.ts')
     },
     dedupe: ['react', 'react-dom']
   },
