@@ -59,6 +59,16 @@ export const ThemeControlHidden: Story = {
   args: { showThemeControl: false }
 };
 
+export const DocsLinkHidden: Story = {
+  args: { docsLink: false }
+};
+
+export const DocsLinkCustom: Story = {
+  args: {
+    docsLink: { href: 'https://example.com/handbook/blocks', label: 'Handbook' }
+  }
+};
+
 export const ClickSendInvokesHandler: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);

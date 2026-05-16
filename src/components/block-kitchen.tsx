@@ -48,6 +48,7 @@ export function BlockKitchen(props: BlockKitchenProps) {
     defaultOpenSections,
     allowedSurfaces: allowedSurfacesProp,
     showThemeControl = true,
+    docsLink,
     defaultPreviewTheme = 'light',
     theme
   } = props;
@@ -165,6 +166,7 @@ export function BlockKitchen(props: BlockKitchenProps) {
               onPreviewSurfaceChange={setPreviewSurface}
               allowedSurfaces={allowedSurfaces}
               showThemeControl={showThemeControl}
+              docsLink={docsLink}
             />
             <div className="flex min-h-0 flex-1 items-stretch">
               <Palette
