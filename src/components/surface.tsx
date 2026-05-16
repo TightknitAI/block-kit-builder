@@ -70,7 +70,6 @@ export function Surface({
   // verticalListSortingStrategy's row shift instead.
   const showEndDropZone = isPaletteDrag && isOver && blocks.length > 0;
 
-  const isModal = previewSurface === 'modal';
   const blocksList = (
     <div
       ref={setNodeRef}
