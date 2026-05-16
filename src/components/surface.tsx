@@ -43,6 +43,7 @@ export function Surface({
   onUpdate,
   onDuplicate,
   onDelete,
+  onReorder,
   isPaletteDrag = false
 }: {
   blocks: BuilderBlock[];
@@ -59,6 +60,8 @@ export function Surface({
   onUpdate: (id: string, block: SupportedBlock) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
+  /** Move a block to a new index. Powers the keyboard-accessible move up / move down buttons. */
+  onReorder?: (id: string, toIndex: number) => void;
   /** True while a palette item is being dragged (vs. reordering an existing block). */
   isPaletteDrag?: boolean;
 }) {
@@ -87,7 +90,7 @@ export function Surface({
         <EmptyState isDark={isDark} isPaletteDrag={isPaletteDrag} isOver={isOver} />
       ) : (
         <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
-          {blocks.map((block) => (
+          {blocks.map((block, idx) => (
             <BlockRow
               key={block.id}
               builderBlock={block}
@@ -99,6 +102,9 @@ export function Surface({
               onUpdate={onUpdate}
               onDuplicate={onDuplicate}
               onDelete={onDelete}
+              index={idx}
+              total={blocks.length}
+              onReorder={onReorder}
               isPaletteDrag={isPaletteDrag}
             />
           ))}
@@ -109,7 +115,10 @@ export function Surface({
   );
 
   return (
-    <div className={cn('flex flex-1 flex-col p-6', isDark ? 'bg-[#0e0f12]' : 'bg-[#f4f4f4]')}>
+    <main
+      aria-label="Block preview"
+      className={cn('flex flex-1 flex-col p-6', isDark ? 'bg-[#0e0f12]' : 'bg-[#f4f4f4]')}
+    >
       <div className="mx-auto w-full max-w-2xl">
         {previewSurface === 'modal' ? (
           <ModalFrame isDark={isDark}>{blocksList}</ModalFrame>
@@ -123,7 +132,7 @@ export function Surface({
           </MessageFrame>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -194,6 +203,12 @@ function MessageFrame({
  * @returns the rendered modal frame
  */
 function ModalFrame({ isDark, children }: { isDark: boolean; children: ReactNode }) {
+  // The X / Cancel / Submit affordances are visual chrome — they exist to
+  // make the preview look like a real Slack modal. They aren't wired to
+  // anything, so render them as `<span aria-hidden>` to keep them out of
+  // the focus order and the accessibility tree (a keyboard or screen
+  // reader user activating a "Submit" button that did nothing would be a
+  // worse experience than not seeing the chrome at all).
   return (
     <div
       className={cn(
@@ -208,43 +223,33 @@ function ModalFrame({ isDark, children }: { isDark: boolean; children: ReactNode
         )}
       >
         <h2 className={cn('text-base font-bold', isDark ? 'text-white' : 'text-[#1d1c1d]')}>Modal title</h2>
-        <button
-          type="button"
-          aria-label="Close"
+        <span
+          aria-hidden="true"
           className={cn(
             'flex h-6 w-6 items-center justify-center rounded',
-            isDark
-              ? 'text-white/60 hover:bg-white/10 hover:text-white'
-              : 'text-[#616061] hover:bg-[#f3f3f3] hover:text-[#1d1c1d]'
+            isDark ? 'text-white/60' : 'text-[#616061]'
           )}
         >
           <X className="h-4 w-4" />
-        </button>
+        </span>
       </div>
       {children}
       <div
+        aria-hidden="true"
         className={cn(
           'flex items-center justify-end gap-2 border-t px-5 py-3',
           isDark ? 'border-[#2c2d30]' : 'border-[#e8e8e8]'
         )}
       >
-        <button
-          type="button"
+        <span
           className={cn(
-            'cursor-pointer rounded-sm border px-3 py-1.5 text-sm font-medium',
-            isDark
-              ? 'border-white/20 bg-transparent text-white hover:bg-white/5'
-              : 'border-[#e8e8e8] bg-white text-[#1d1c1d] hover:bg-[#f3f3f3]'
+            'rounded-sm border px-3 py-1.5 text-sm font-medium',
+            isDark ? 'border-white/20 bg-transparent text-white' : 'border-[#e8e8e8] bg-white text-[#1d1c1d]'
           )}
         >
           Cancel
-        </button>
-        <button
-          type="button"
-          className="cursor-pointer rounded-sm bg-[#007a5a] px-3 py-1.5 text-sm font-bold text-white hover:bg-[#148567]"
-        >
-          Submit
-        </button>
+        </span>
+        <span className="rounded-sm bg-[#007a5a] px-3 py-1.5 text-sm font-bold text-white">Submit</span>
       </div>
     </div>
   );

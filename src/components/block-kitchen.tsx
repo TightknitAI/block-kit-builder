@@ -188,6 +188,7 @@ export function BlockKitchen(props: BlockKitchenProps) {
                 onUpdate={updateBlock}
                 onDuplicate={duplicateBlock}
                 onDelete={removeBlock}
+                onReorder={reorderBlock}
                 isPaletteDrag={activePaletteVariant !== null}
               />
             </div>

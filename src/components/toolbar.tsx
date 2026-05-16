@@ -13,6 +13,8 @@ import {
   Sun,
   Trash2
 } from 'lucide-react';
+import type { ComponentType, KeyboardEvent } from 'react';
+import { useRef, useState } from 'react';
 import { cn } from '../lib/cn';
 import { Button } from '../lib/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../lib/ui/popover';
@@ -101,68 +103,55 @@ export function Toolbar({
   const docsHref = docsLink === false ? null : (docsLink?.href ?? DEFAULT_DOCS_HREF);
   const docsLabel = docsLink === false ? null : (docsLink?.label ?? DEFAULT_DOCS_LABEL);
 
+  // Controlled open state so we can close the menus after a selection — the
+  // `role="menuitemradio"` semantics imply activation dismisses the menu.
+  const [surfaceMenuOpen, setSurfaceMenuOpen] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+
   return (
     <div className="flex items-center justify-between gap-2 border-b bg-background px-3 py-2">
       <div className="flex items-center gap-2">
         {showSurfaceControl ? (
-          <Popover>
+          <Popover open={surfaceMenuOpen} onOpenChange={setSurfaceMenuOpen}>
             <PopoverTrigger asChild>
-              <Button type="button" variant="ghost" size="sm">
+              <Button type="button" variant="ghost" size="sm" aria-label={`Preview surface: ${activeSurface.label}`}>
                 <activeSurface.Icon className="h-3.5 w-3.5" />
                 {activeSurface.label}
                 <ChevronDown className="h-3.5 w-3.5 opacity-60" />
               </Button>
             </PopoverTrigger>
             <PopoverContent align="start" className="w-36 p-1">
-              {surfaceOptions.map(({ value, label, Icon }) => {
-                const isActive = value === previewSurface;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => onPreviewSurfaceChange(value)}
-                    className={cn(
-                      'flex w-full cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-foreground',
-                      isActive ? 'text-foreground' : 'text-muted-foreground'
-                    )}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span className="flex-1">{label}</span>
-                    {isActive ? <Check className="h-3.5 w-3.5" /> : null}
-                  </button>
-                );
-              })}
+              <Menu<PreviewSurface>
+                ariaLabel="Preview surface"
+                options={surfaceOptions}
+                value={previewSurface}
+                onChange={(next) => {
+                  onPreviewSurfaceChange(next);
+                  setSurfaceMenuOpen(false);
+                }}
+              />
             </PopoverContent>
           </Popover>
         ) : null}
         {showThemeControl ? (
-          <Popover>
+          <Popover open={themeMenuOpen} onOpenChange={setThemeMenuOpen}>
             <PopoverTrigger asChild>
-              <Button type="button" variant="ghost" size="sm">
+              <Button type="button" variant="ghost" size="sm" aria-label={`Preview theme: ${activeTheme.label}`}>
                 <activeTheme.Icon className="h-3.5 w-3.5" />
                 {activeTheme.label}
                 <ChevronDown className="h-3.5 w-3.5 opacity-60" />
               </Button>
             </PopoverTrigger>
             <PopoverContent align="start" className="w-32 p-1">
-              {THEME_OPTIONS.map(({ value, label, Icon }) => {
-                const isActive = value === previewTheme;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => onPreviewThemeChange(value)}
-                    className={cn(
-                      'flex w-full cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-foreground',
-                      isActive ? 'text-foreground' : 'text-muted-foreground'
-                    )}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span className="flex-1">{label}</span>
-                    {isActive ? <Check className="h-3.5 w-3.5" /> : null}
-                  </button>
-                );
-              })}
+              <Menu<PreviewTheme>
+                ariaLabel="Preview theme"
+                options={THEME_OPTIONS}
+                value={previewTheme}
+                onChange={(next) => {
+                  onPreviewThemeChange(next);
+                  setThemeMenuOpen(false);
+                }}
+              />
             </PopoverContent>
           </Popover>
         ) : null}
@@ -212,6 +201,79 @@ export function Toolbar({
           Send
         </Button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Single-select dropdown menu rendered inside a Popover. Adds proper
+ * `role="menu"` / `role="menuitem"` semantics and arrow-key navigation
+ * between options. Avoiding `@radix-ui/react-dropdown-menu` keeps this
+ * dependency-free; the wrapping `Popover` already handles outside-click
+ * dismiss, focus return, and Escape.
+ */
+function Menu<T extends string>({
+  ariaLabel,
+  options,
+  value,
+  onChange
+}: {
+  ariaLabel: string;
+  options: readonly { value: T; label: string; Icon: ComponentType<{ className?: string }> }[];
+  value: T;
+  onChange: (next: T) => void;
+}) {
+  const itemsRef = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const moveFocus = (from: number, delta: number) => {
+    const len = options.length;
+    if (len === 0) return;
+    const next = (from + delta + len) % len;
+    itemsRef.current[next]?.focus();
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>, idx: number) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      moveFocus(idx, 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveFocus(idx, -1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      itemsRef.current[0]?.focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      itemsRef.current[options.length - 1]?.focus();
+    }
+  };
+
+  return (
+    <div role="menu" aria-label={ariaLabel} className="flex flex-col">
+      {options.map(({ value: optValue, label, Icon }, idx) => {
+        const isActive = optValue === value;
+        return (
+          <button
+            key={optValue}
+            ref={(el) => {
+              itemsRef.current[idx] = el;
+            }}
+            type="button"
+            role="menuitemradio"
+            aria-checked={isActive}
+            onClick={() => onChange(optValue)}
+            onKeyDown={(e) => handleKeyDown(e, idx)}
+            className={cn(
+              'flex w-full cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-foreground focus-visible:bg-accent focus-visible:text-foreground focus-visible:outline-none',
+              isActive ? 'text-foreground' : 'text-muted-foreground'
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            <span className="flex-1">{label}</span>
+            {isActive ? <Check className="h-3.5 w-3.5" /> : null}
+          </button>
+        );
+      })}
     </div>
   );
 }
