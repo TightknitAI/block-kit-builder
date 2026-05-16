@@ -1,10 +1,12 @@
 import {
+  type CollisionDetection,
   closestCenter,
   DndContext,
   type DragEndEvent,
   DragOverlay,
   type DragStartEvent,
   PointerSensor,
+  pointerWithin,
   useSensor,
   useSensors
 } from '@dnd-kit/core';
@@ -70,6 +72,22 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
+  // Pick the block directly under the cursor when possible so the drop
+  // target tracks the cursor rather than whichever droppable's geometric
+  // center is nearest. The surface (a tall droppable) used to win against
+  // small block rows under closestCenter, which made it look like every
+  // palette drop appended to the end. Fall back to closestCenter so the
+  // bottom of the surface still resolves to a valid target when the
+  // cursor sits past the last block.
+  const collisionDetection = useCallback<CollisionDetection>((args) => {
+    const pointerHits = pointerWithin(args);
+    if (pointerHits.length > 0) {
+      const blockHit = pointerHits.find((c) => c.id !== SURFACE_DROPPABLE_ID);
+      return blockHit ? [blockHit] : pointerHits;
+    }
+    return closestCenter(args);
+  }, []);
+
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const variantId = parsePaletteDragId(event.active.id);
     setActivePaletteVariantId(variantId);
@@ -117,7 +135,7 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
     <TooltipProvider delayDuration={200}>
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={collisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
@@ -152,6 +170,7 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
               onUpdate={updateBlock}
               onDuplicate={duplicateBlock}
               onDelete={removeBlock}
+              isPaletteDrag={activePaletteVariant !== null}
             />
           </div>
         </div>

@@ -42,7 +42,8 @@ export function Surface({
   onOpenBlockChange,
   onUpdate,
   onDuplicate,
-  onDelete
+  onDelete,
+  isPaletteDrag = false
 }: {
   blocks: BuilderBlock[];
   workspaceName?: string;
@@ -58,9 +59,16 @@ export function Surface({
   onUpdate: (id: string, block: SupportedBlock) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
+  /** True while a palette item is being dragged (vs. reordering an existing block). */
+  isPaletteDrag?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: SURFACE_DROPPABLE_ID });
   const isDark = previewTheme === 'dark';
+
+  // Show the end-of-list insertion bar when the cursor is past the last
+  // block while dragging a palette item. For reorder we rely on
+  // verticalListSortingStrategy's row shift instead.
+  const showEndDropZone = isPaletteDrag && isOver && blocks.length > 0;
 
   const isModal = previewSurface === 'modal';
   const blocksList = (
@@ -70,11 +78,15 @@ export function Surface({
         'flex min-h-[240px] flex-col py-2 transition-colors',
         isModal ? 'px-5' : 'px-2',
         isDark ? 'bg-[#1a1d21]' : 'bg-white',
-        isOver && (isDark ? 'bg-[#2c3036]' : 'bg-[#f0f4ff]')
+        isPaletteDrag &&
+          (isDark
+            ? 'bg-[#22262c] outline-2 outline-primary/40 -outline-offset-2 outline-dashed'
+            : 'bg-[#f5f8ff] outline-2 outline-primary/40 -outline-offset-2 outline-dashed'),
+        isPaletteDrag && isOver && (isDark ? 'bg-[#2c3036]' : 'bg-[#eaf0ff]')
       )}
     >
       {blocks.length === 0 ? (
-        <EmptyState isDark={isDark} />
+        <EmptyState isDark={isDark} isPaletteDrag={isPaletteDrag} isOver={isOver} />
       ) : (
         <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
           {blocks.map((block) => (
@@ -89,8 +101,10 @@ export function Surface({
               onUpdate={onUpdate}
               onDuplicate={onDuplicate}
               onDelete={onDelete}
+              isPaletteDrag={isPaletteDrag}
             />
           ))}
+          {showEndDropZone ? <DropIndicator /> : null}
         </SortableContext>
       )}
     </div>
@@ -313,31 +327,61 @@ function AppHomeFrame({
  * Placeholder shown inside the preview surface when the draft has no
  * blocks. Uses Slack-style explicit colors keyed off `isDark` so the
  * empty state visually matches the rest of the preview chrome and stays
- * consistent regardless of the host app's light/dark theme.
+ * consistent regardless of the host app's light/dark theme. While a
+ * palette item is being dragged the copy switches to a "Drop here" cue
+ * and the icon container brightens to confirm the empty surface itself
+ * is the drop target.
  * @param props - empty state props
  * @param props.isDark - whether the dark Slack canvas is active
+ * @param props.isPaletteDrag - whether a palette block is currently being dragged
+ * @param props.isOver - whether the cursor is currently over the surface
  * @returns the rendered placeholder
  */
-function EmptyState({ isDark }: { isDark: boolean }) {
+function EmptyState({ isDark, isPaletteDrag, isOver }: { isDark: boolean; isPaletteDrag: boolean; isOver: boolean }) {
+  const active = isPaletteDrag && isOver;
   return (
     <div
       className={cn(
-        'flex flex-1 flex-col items-center justify-center gap-3 px-6 py-10 text-center',
-        isDark ? 'text-white/60' : 'text-[#616061]'
+        'flex flex-1 flex-col items-center justify-center gap-3 px-6 py-10 text-center transition-colors',
+        active ? 'text-primary' : isDark ? 'text-white/60' : 'text-[#616061]'
       )}
     >
       <span
         className={cn(
-          'flex h-12 w-12 items-center justify-center rounded-full',
-          isDark ? 'bg-white/5' : 'bg-[#f3f3f3]'
+          'flex h-12 w-12 items-center justify-center rounded-full transition-colors',
+          active ? 'bg-primary/15 text-primary' : isDark ? 'bg-white/5' : 'bg-[#f3f3f3]'
         )}
       >
         <LayoutGrid className="h-6 w-6" />
       </span>
       <div className="flex flex-col gap-0.5">
-        <p className={cn('text-sm font-semibold', isDark ? 'text-white' : 'text-[#1d1c1d]')}>Start adding blocks!</p>
-        <p className="text-xs">Drag a block from the left, or click one to add it here.</p>
+        <p
+          className={cn(
+            'text-sm font-semibold transition-colors',
+            active ? 'text-primary' : isDark ? 'text-white' : 'text-[#1d1c1d]'
+          )}
+        >
+          {active ? 'Drop to add block' : 'Start adding blocks!'}
+        </p>
+        <p className="text-xs">
+          {active ? 'Release to insert it here.' : 'Drag a block from the left, or click one to add it here.'}
+        </p>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Insertion bar shown at the cursor's drop target while a palette item
+ * is being dragged. A 2px primary-colored line spanning the row width
+ * with a small filled caret on the leading edge so the user can see
+ * exactly where the new block will land.
+ * @returns the rendered drop indicator
+ */
+function DropIndicator() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none relative my-1 h-0.5 w-full rounded-full bg-primary">
+      <span className="-left-1 -top-[3px] absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_0_2px_var(--color-background)]" />
     </div>
   );
 }
