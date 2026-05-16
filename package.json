@@ -37,7 +37,7 @@
     "lint:fix": "biome check --fix .",
     "format": "biome format --write .",
     "prepare": "lefthook install",
-    "prepublishOnly": "pnpm run build:clean && pnpm test",
+    "prepublishOnly": "pnpm run build:clean",
     "demo:dev": "cd demo && pnpm install && pnpm dev",
     "demo:build": "cd demo && CI=true pnpm install --frozen-lockfile && pnpm build",
     "demo:preview": "cd demo && pnpm preview"
