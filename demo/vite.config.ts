@@ -8,7 +8,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@tightknitai/block-kit-builder': resolve(__dirname, '../src/index.ts')
-    }
+    },
+    dedupe: ['react', 'react-dom']
   },
   server: {
     port: 5173,
