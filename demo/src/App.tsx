@@ -8,7 +8,12 @@ import {
   type Template,
   TemplatePicker
 } from '@tightknitai/block-kitchen';
-import { useEffect, useState } from 'react';
+import {
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useState
+} from 'react';
 
 const MOCK_CHANNELS: ChannelOption[] = [
   { id: 'C0001', name: 'general' },
@@ -130,6 +135,10 @@ async function onSend(payload: SendPayload): Promise<SendResult> {
   return { ok: true };
 }
 
+const ASIDE_MIN = 280;
+const ASIDE_MAX = 640;
+const ASIDE_DEFAULT = 380;
+
 export function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
@@ -159,6 +168,44 @@ export function App() {
   const handleSelectTemplate = (template: Template) => {
     setBlocks(template.blocks);
     setBuilderKey((n) => n + 1);
+  };
+
+  const [asideWidth, setAsideWidth] = useState<number>(ASIDE_DEFAULT);
+
+  const handleResizePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const startX = e.clientX;
+    const startW = asideWidth;
+    const move = (ev: PointerEvent) => {
+      const next = Math.min(ASIDE_MAX, Math.max(ASIDE_MIN, startW + (startX - ev.clientX)));
+      setAsideWidth(next);
+    };
+    const up = () => {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  };
+
+  const handleResizeKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setAsideWidth((w) => Math.min(ASIDE_MAX, w + 16));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setAsideWidth((w) => Math.max(ASIDE_MIN, w - 16));
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setAsideWidth(ASIDE_MAX);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setAsideWidth(ASIDE_MIN);
+    }
   };
 
   return (
@@ -205,7 +252,7 @@ export function App() {
           </button>
         </header>
         <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 12 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: '1 1 360px', minWidth: 0 }}>
             <BlockKitchen
               key={builderKey}
               workspaceName="Acme Inc."
@@ -221,13 +268,36 @@ export function App() {
           <aside
             className="bk-root"
             style={{
-              width: 380,
-              flexShrink: 0,
+              flex: `0 1 ${asideWidth}px`,
+              minWidth: ASIDE_MIN,
+              maxWidth: ASIDE_MAX,
+              position: 'relative',
               borderRadius: 6,
               border: '1px solid hsl(var(--border))',
               overflow: 'hidden'
             }}
           >
+            <div
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize templates panel"
+              aria-valuemin={ASIDE_MIN}
+              aria-valuemax={ASIDE_MAX}
+              aria-valuenow={asideWidth}
+              tabIndex={0}
+              onPointerDown={handleResizePointerDown}
+              onKeyDown={handleResizeKeyDown}
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: -3,
+                width: 6,
+                cursor: 'col-resize',
+                zIndex: 1,
+                touchAction: 'none'
+              }}
+            />
             <TemplatePicker
               templates={TEMPLATES}
               heading="Templates"
