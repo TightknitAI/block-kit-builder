@@ -63,6 +63,7 @@ export function MyBuilderPage() {
 | `allowedSurfaces` | `PreviewSurface[]` | no | Allowlist of preview surfaces (`'message'`, `'modal'`, `'app_home'`). Defaults to `['message']` — surface dropdown is hidden when only one surface is allowed. The first entry is the initial selection. |
 | `showThemeControl` | `boolean` | no | Defaults to `true`. When `false`, the theme is locked to `'light'`. |
 | `defaultPreviewTheme` | `'light' \| 'dark'` | no | Pass the host app's current theme so the preview opens matched to the consuming app's appearance. |
+| `theme` | `BrandTheme \| BrandPreset` | no | Branding tokens applied to the builder chrome (toolbar, palette, popovers, dialogs). Accepts a `Partial<BrandTokens>` map and optional `light`/`dark` overrides. See [Styling](#styling) below. |
 
 ## Boundary
 
@@ -104,6 +105,32 @@ Ships a compiled stylesheet at `@tightknitai/block-kit-builder/styles.css`. The 
 ```ts
 import "@tightknitai/block-kit-builder/styles.css";
 ```
+
+### Branding (typed `theme` prop)
+
+For consumers who don't already have a shadcn token set on `:root`, the `theme` prop is a typed shortcut that writes a subset of tokens directly:
+
+```tsx
+import type { BrandTheme } from "@tightknitai/block-kit-builder";
+
+const brand: BrandTheme = {
+  tokens: { primary: "262 83% 58%", radius: "0.75rem" },
+  dark:   { primary: "263 70% 75%" }
+};
+
+<BlockKitBuilder theme={brand} {...rest} />
+```
+
+- `tokens` applies in both light and dark contexts.
+- `light` and `dark` override per mode; the dark variant kicks in under a standard `.dark` ancestor class (next-themes default).
+- Color tokens take HSL component strings (`"262 83% 58%"`), matching the underlying CSS variable contract; `radius` takes a CSS length.
+- Scope is the builder chrome only. The embedded Slack preview keeps its native Slack styling regardless of `theme`; use `defaultPreviewTheme` for the preview's light/dark toggle.
+
+The lower-level CSS-variable contract above keeps working; the `theme` prop simply layers on top of it.
+
+### Typography
+
+Fonts are deliberately not part of `BrandTheme`. The builder sets no `font-family` of its own (aside from `font-mono` on the JSON viewer, which is intentional), so it inherits whatever the host page declares on `<html>` or `<body>`. Set your brand typography globally and the builder will pick it up automatically — no additional configuration needed. The Slack preview surface continues to render with Slack's own typography via `slack-blocks-to-jsx`.
 
 ## License
 

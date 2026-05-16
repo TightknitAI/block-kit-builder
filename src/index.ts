@@ -1,4 +1,9 @@
 export { BlockKitBuilder } from './components/block-kit-builder';
+export type {
+  BrandPreset,
+  BrandTheme,
+  BrandTokens
+} from './lib/brand-theme';
 export { toSlackBlocks } from './lib/to-slack-blocks';
 export {
   decodeBlocksFromString,

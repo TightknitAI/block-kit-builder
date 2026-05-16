@@ -10,6 +10,7 @@ import type {
   Button as SlackButton,
   ViewInputBlock
 } from 'slack-web-api-client';
+import type { BrandPreset, BrandTheme } from './lib/brand-theme';
 
 /**
  * The Slack Block Kit block types supported by the builder in v1.
@@ -373,4 +374,29 @@ export interface BlockKitBuilderProps {
    * {@link BlockKitBuilderProps.showThemeControl} is `true`.
    */
   defaultPreviewTheme?: PreviewTheme;
+  /**
+   * Branding tokens applied to the builder chrome (toolbar, palette,
+   * popover editors, send dialog, JSON drawer, issues sheet). The
+   * Slack preview itself is rendered by `slack-blocks-to-jsx` with its
+   * native Slack styling regardless — use {@link BlockKitBuilderProps.defaultPreviewTheme}
+   * for preview light/dark.
+   *
+   * Pass a preset name as sugar for `{ preset }`, or an object with
+   * `tokens` (applied in both modes) and optional `light`/`dark`
+   * overrides. The existing CSS-variable override path (importing the
+   * stylesheet and setting `--primary`, etc. on your own selector)
+   * continues to work; this prop is a typed shortcut on top of it.
+   *
+   * @example
+   * ```tsx
+   * <BlockKitBuilder
+   *   theme={{
+   *     tokens: { primary: '262 83% 58%', radius: '0.75rem' },
+   *     dark: { primary: '263 70% 65%' }
+   *   }}
+   *   {...rest}
+   * />
+   * ```
+   */
+  theme?: BrandTheme | BrandPreset;
 }
