@@ -1,5 +1,6 @@
 import 'slack-blocks-to-jsx/dist/style.css';
 
+import { useEffect, useRef } from 'react';
 import type { Block } from 'slack-blocks-to-jsx';
 import { Message } from 'slack-blocks-to-jsx';
 import type { PreviewHooks, PreviewTheme, SupportedBlock } from '../../types';
@@ -30,6 +31,25 @@ export function SlackBlockPreview({
   hooks?: PreviewHooks;
   theme?: PreviewTheme;
 }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // slack-blocks-to-jsx renders an SVG-only collapse toggle in image and
+  // video blocks without an aria-label, which violates axe's `button-name`
+  // rule and is unreachable to screen readers. Post-mount we add a label
+  // to any such buttons we find under our wrapper.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    for (const wrapper of root.querySelectorAll<HTMLElement>(
+      '.slack_blocks_to_jsx__image_media_trigger, .slack_blocks_to_jsx__video_title'
+    )) {
+      for (const btn of wrapper.querySelectorAll<HTMLButtonElement>('button:not([aria-label])')) {
+        const title = wrapper.querySelector('.slack_blocks_to_jsx__image_title')?.textContent?.trim();
+        btn.setAttribute('aria-label', title ? `Toggle ${title}` : 'Toggle media');
+      }
+    }
+  });
+
   return (
     // The library scopes all of its CSS under `#slack_blocks_to_jsx` and
     // depends on the `slack_blocks_to_jsx styles_enabled` classes plus the
@@ -37,7 +57,7 @@ export function SlackBlockPreview({
     // (e.g. button reset + `bg-green-primary` for primary). `<Message
     // withoutWrapper>` skips that wrapper entirely, so we re-create it
     // here without the avatar / timestamp chrome.
-    <div id="slack_blocks_to_jsx" data-theme={theme} className="slack_blocks_to_jsx styles_enabled">
+    <div ref={rootRef} id="slack_blocks_to_jsx" data-theme={theme} className="slack_blocks_to_jsx styles_enabled">
       <Message
         time={new Date()}
         name=""
