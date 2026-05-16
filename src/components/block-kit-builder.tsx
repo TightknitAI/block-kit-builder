@@ -17,6 +17,7 @@ import { TooltipProvider } from '../lib/ui/tooltip';
 import { useBlockKitBuilderState } from '../state/use-block-kit-builder-state';
 import { useBlockKitValidation } from '../state/use-block-kit-validation';
 import type { BlockKitBuilderProps, PreviewSurface, PreviewTheme } from '../types';
+import { BrandThemeScope } from './brand-theme-scope';
 import { IssuesSheet } from './issues-sheet';
 import { JsonDrawer } from './json-drawer';
 import { Palette, parsePaletteDragId } from './palette';
@@ -44,7 +45,8 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
     allowedBlockTypes,
     allowedSurfaces: allowedSurfacesProp,
     showThemeControl = true,
-    defaultPreviewTheme = 'light'
+    defaultPreviewTheme = 'light',
+    theme
   } = props;
 
   // Default to message-only when omitted (or passed empty). The toolbar
@@ -132,78 +134,80 @@ export function BlockKitBuilder(props: BlockKitBuilderProps) {
   const blockPayloads = blocks.map((b) => b.block);
 
   return (
-    <TooltipProvider delayDuration={200}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={collisionDetection}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
-      >
-        <div className="bkb-root flex h-full w-full flex-col rounded-md border bg-background text-foreground">
-          <Toolbar
-            onClear={() => replaceAll([])}
-            onOpenJson={() => setJsonOpen(true)}
-            onOpenIssues={() => setIssuesOpen(true)}
-            onOpenSend={() => setSendOpen(true)}
-            canSend={blocks.length > 0}
-            canClear={blocks.length > 0}
-            errorCount={validation.total}
-            previewTheme={previewTheme}
-            onPreviewThemeChange={setPreviewTheme}
-            previewSurface={previewSurface}
-            onPreviewSurfaceChange={setPreviewSurface}
-            allowedSurfaces={allowedSurfaces}
-            showThemeControl={showThemeControl}
-          />
-          <div className="flex min-h-0 flex-1 items-stretch">
-            <Palette onAddBlock={(block) => addBlock(block)} allowedBlockTypes={allowedBlockTypes} />
-            <Surface
-              blocks={blocks}
-              workspaceName={workspaceName}
-              previewHooks={previewHooks}
+    <BrandThemeScope theme={theme}>
+      <TooltipProvider delayDuration={200}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={collisionDetection}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <div className="bkb-root flex h-full w-full flex-col rounded-md border bg-background text-foreground">
+            <Toolbar
+              onClear={() => replaceAll([])}
+              onOpenJson={() => setJsonOpen(true)}
+              onOpenIssues={() => setIssuesOpen(true)}
+              onOpenSend={() => setSendOpen(true)}
+              canSend={blocks.length > 0}
+              canClear={blocks.length > 0}
+              errorCount={validation.total}
               previewTheme={previewTheme}
+              onPreviewThemeChange={setPreviewTheme}
               previewSurface={previewSurface}
-              errorsByBlockId={validation.byBlockId}
-              openBlockId={openBlockId}
-              onOpenBlockChange={setOpenBlockId}
-              onUpdate={updateBlock}
-              onDuplicate={duplicateBlock}
-              onDelete={removeBlock}
-              isPaletteDrag={activePaletteVariant !== null}
+              onPreviewSurfaceChange={setPreviewSurface}
+              allowedSurfaces={allowedSurfaces}
+              showThemeControl={showThemeControl}
             />
-          </div>
-        </div>
-        <DragOverlay dropAnimation={null}>
-          {activePaletteVariant ? (
-            <div className="flex items-center gap-1.5 rounded border bg-background px-1.5 py-1 text-xs text-foreground shadow-md">
-              <GripVertical className="h-3 w-3 shrink-0" />
-              <span className="truncate">{activePaletteVariant.label}</span>
+            <div className="flex min-h-0 flex-1 items-stretch">
+              <Palette onAddBlock={(block) => addBlock(block)} allowedBlockTypes={allowedBlockTypes} />
+              <Surface
+                blocks={blocks}
+                workspaceName={workspaceName}
+                previewHooks={previewHooks}
+                previewTheme={previewTheme}
+                previewSurface={previewSurface}
+                errorsByBlockId={validation.byBlockId}
+                openBlockId={openBlockId}
+                onOpenBlockChange={setOpenBlockId}
+                onUpdate={updateBlock}
+                onDuplicate={duplicateBlock}
+                onDelete={removeBlock}
+                isPaletteDrag={activePaletteVariant !== null}
+              />
             </div>
-          ) : null}
-        </DragOverlay>
-        <JsonDrawer open={jsonOpen} onOpenChange={setJsonOpen} blocks={blockPayloads} onApply={replaceAll} />
-        <SendDialog
-          open={sendOpen}
-          onOpenChange={setSendOpen}
-          blocks={blockPayloads}
-          loadChannels={loadChannels}
-          loadSendAsUserStatus={loadSendAsUserStatus}
-          onSend={onSend}
-          errorCount={validation.total}
-          onShowIssues={() => {
-            setSendOpen(false);
-            setIssuesOpen(true);
-          }}
-        />
-        <IssuesSheet
-          open={issuesOpen}
-          onOpenChange={setIssuesOpen}
-          blocks={blocks}
-          validation={validation}
-          onJumpToBlock={(id) => setOpenBlockId(id)}
-        />
-      </DndContext>
-    </TooltipProvider>
+          </div>
+          <DragOverlay dropAnimation={null}>
+            {activePaletteVariant ? (
+              <div className="flex items-center gap-1.5 rounded border bg-background px-1.5 py-1 text-xs text-foreground shadow-md">
+                <GripVertical className="h-3 w-3 shrink-0" />
+                <span className="truncate">{activePaletteVariant.label}</span>
+              </div>
+            ) : null}
+          </DragOverlay>
+          <JsonDrawer open={jsonOpen} onOpenChange={setJsonOpen} blocks={blockPayloads} onApply={replaceAll} />
+          <SendDialog
+            open={sendOpen}
+            onOpenChange={setSendOpen}
+            blocks={blockPayloads}
+            loadChannels={loadChannels}
+            loadSendAsUserStatus={loadSendAsUserStatus}
+            onSend={onSend}
+            errorCount={validation.total}
+            onShowIssues={() => {
+              setSendOpen(false);
+              setIssuesOpen(true);
+            }}
+          />
+          <IssuesSheet
+            open={issuesOpen}
+            onOpenChange={setIssuesOpen}
+            blocks={blocks}
+            validation={validation}
+            onJumpToBlock={(id) => setOpenBlockId(id)}
+          />
+        </DndContext>
+      </TooltipProvider>
+    </BrandThemeScope>
   );
 }

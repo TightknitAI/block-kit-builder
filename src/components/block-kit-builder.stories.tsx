@@ -84,6 +84,77 @@ export const DarkPreviewDefault: Story = {
   }
 };
 
+export const Branded: Story = {
+  args: {
+    initialBlocks: STARTER_BLOCKS,
+    theme: {
+      tokens: {
+        primary: '262 83% 58%',
+        primaryForeground: '0 0% 100%',
+        ring: '262 83% 58%',
+        radius: '0.75rem'
+      }
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Brand tokens reshape the builder chrome (primary buttons, focus rings, corner radius). The Slack preview keeps its faithful Slack styling because `slack-blocks-to-jsx` is scoped under its own CSS namespace.'
+      }
+    }
+  }
+};
+
+export const BrandedDarkVariant: Story = {
+  args: {
+    initialBlocks: STARTER_BLOCKS,
+    defaultPreviewTheme: 'dark',
+    theme: {
+      tokens: { radius: '0.75rem' },
+      light: { primary: '262 83% 58%' },
+      // A full dark token set so the chrome reads as a coherent
+      // brand-aware theme — not just a primary color sitting on top of
+      // generic shadcn-dark defaults. Lifted brightness on the primary
+      // for contrast on dark surfaces.
+      dark: {
+        primary: '263 70% 75%',
+        primaryForeground: '224 71% 4%',
+        background: '224 71% 4%',
+        foreground: '210 40% 98%',
+        card: '224 71% 4%',
+        cardForeground: '210 40% 98%',
+        popover: '224 71% 4%',
+        popoverForeground: '210 40% 98%',
+        secondary: '215 28% 17%',
+        secondaryForeground: '210 40% 98%',
+        muted: '215 28% 17%',
+        mutedForeground: '217 11% 65%',
+        accent: '215 28% 17%',
+        accentForeground: '210 40% 98%',
+        border: '215 28% 17%',
+        input: '215 28% 17%',
+        ring: '263 70% 75%'
+      }
+    }
+  },
+  decorators: [
+    (Story) => (
+      <div className="dark bkb-root" style={{ height: '100vh', width: '100vw', background: 'hsl(224 71% 4%)' }}>
+        <Story />
+      </div>
+    )
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A complete branded dark theme. `tokens` carries values that apply in both modes (here, just `radius`), while `light` and `dark` carry per-mode overrides. The chrome reads as a coherent brand-aware dark surface; the Slack preview keeps its faithful Slack rendering.'
+      }
+    }
+  }
+};
+
 export const ClearButtonResetsBlocks: Story = {
   args: {
     initialBlocks: STARTER_BLOCKS
