@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   AppWindow,
+  BookOpen,
   Check,
   ChevronDown,
   Code2,
@@ -36,6 +37,9 @@ const SURFACE_OPTIONS: {
   { value: 'app_home', label: 'App Home', Icon: Home }
 ];
 
+const DEFAULT_DOCS_HREF = 'https://docs.slack.dev/reference/block-kit/blocks';
+const DEFAULT_DOCS_LABEL = 'Docs';
+
 /**
  * Top toolbar with the preview theme picker, View JSON escape hatch, and
  * the Send action.
@@ -53,6 +57,9 @@ const SURFACE_OPTIONS: {
  * @param props.allowedSurfaces - surfaces shown in the dropdown. When the
  *   list has 0 or 1 entry the dropdown is hidden entirely.
  * @param props.showThemeControl - render the theme dropdown (default true)
+ * @param props.docsLink - customize or hide the Docs link. `false` hides it;
+ *   an object overrides `href` and/or `label`. Defaults to the Slack Block
+ *   Kit reference docs.
  * @param props.errorCount - number of validation errors
  * @returns the rendered toolbar
  */
@@ -69,6 +76,7 @@ export function Toolbar({
   onPreviewSurfaceChange,
   allowedSurfaces,
   showThemeControl = true,
+  docsLink,
   errorCount
 }: {
   onClear: () => void;
@@ -83,12 +91,15 @@ export function Toolbar({
   onPreviewSurfaceChange: (surface: PreviewSurface) => void;
   allowedSurfaces: readonly PreviewSurface[];
   showThemeControl?: boolean;
+  docsLink?: false | { href?: string; label?: string };
   errorCount: number;
 }) {
   const activeTheme = THEME_OPTIONS.find((t) => t.value === previewTheme) ?? THEME_OPTIONS[0];
   const activeSurface = SURFACE_OPTIONS.find((s) => s.value === previewSurface) ?? SURFACE_OPTIONS[0];
   const surfaceOptions = SURFACE_OPTIONS.filter((s) => allowedSurfaces.includes(s.value));
   const showSurfaceControl = surfaceOptions.length > 1;
+  const docsHref = docsLink === false ? null : (docsLink?.href ?? DEFAULT_DOCS_HREF);
+  const docsLabel = docsLink === false ? null : (docsLink?.label ?? DEFAULT_DOCS_LABEL);
 
   return (
     <div className="flex items-center justify-between gap-2 border-b bg-background px-3 py-2">
@@ -155,15 +166,18 @@ export function Toolbar({
             </PopoverContent>
           </Popover>
         ) : null}
-        <a
-          href="https://docs.slack.dev/reference/block-kit/blocks"
-          target="_blank"
-          rel="noreferrer noopener"
-          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground hover:underline"
-        >
-          Docs
-          <ExternalLink className="h-3 w-3 opacity-70" />
-        </a>
+        {docsHref ? (
+          <a
+            href={docsHref}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground no-underline transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            {docsLabel}
+            <ExternalLink className="h-3 w-3 opacity-50" />
+          </a>
+        ) : null}
       </div>
       <div className="flex items-center gap-2">
         {errorCount > 0 ? (

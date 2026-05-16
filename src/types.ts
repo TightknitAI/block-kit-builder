@@ -443,6 +443,17 @@ export interface BlockKitchenProps {
    */
   showThemeControl?: boolean;
   /**
+   * Customizes or hides the "Docs" link in the toolbar.
+   * - `undefined` (default) — links to the Slack Block Kit reference docs
+   * - `false` — hides the link entirely
+   * - `{ href }` — overrides the URL (label defaults to `'Docs'`)
+   * - `{ href, label }` — overrides both
+   *
+   * Useful when embedding Block Kitchen inside a product that ships its
+   * own documentation, or for localizing the label.
+   */
+  docsLink?: false | { href?: string; label?: string };
+  /**
    * Initial preview theme. Defaults to `'light'`. Pass the host app's
    * current theme (e.g. from `next-themes` or your own theme hook) so
    * the preview opens matched to the consuming app's appearance. The
