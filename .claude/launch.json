@@ -4,14 +4,14 @@
     {
       "name": "demo",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--dir", "demo", "dev"],
-      "port": 5173
+      "runtimeArgs": ["--dir", "demo", "exec", "vite", "--port", "5273", "--strictPort"],
+      "port": 5273
     },
     {
       "name": "storybook",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["storybook"],
-      "port": 6006
+      "runtimeArgs": ["exec", "storybook", "dev", "-p", "6007", "--no-open"],
+      "port": 6007
     }
   ]
 }

@@ -4,7 +4,9 @@ import {
   type SendAsUserStatus,
   type SendPayload,
   type SendResult,
-  type SupportedBlock
+  type SupportedBlock,
+  type Template,
+  TemplatePicker
 } from '@tightknitai/block-kitchen';
 import { useState } from 'react';
 
@@ -25,10 +27,85 @@ const INITIAL_BLOCKS: SupportedBlock[] = [
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: 'Drag blocks from the palette on the left, edit them inline, then click *Send* to see the mock send dialog.'
+      text: 'Pick a template on the right to load it here, or drag blocks from the palette to start from scratch.'
     }
   },
   { type: 'divider' }
+];
+
+const TEMPLATES: Template[] = [
+  {
+    id: 'approval-request',
+    name: 'Approval request',
+    description: 'Header + body + approve/reject actions.',
+    category: 'Approvals',
+    surface: 'message',
+    blocks: [
+      { type: 'header', text: { type: 'plain_text', text: 'Approval needed' } },
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: '*Sarah* requested time off from *Mar 12* to *Mar 18*.' }
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Approve' },
+            style: 'primary',
+            value: 'approve'
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Reject' },
+            style: 'danger',
+            value: 'reject'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'product-release',
+    name: 'Product release',
+    description: 'Announce a new release with a CTA.',
+    category: 'Notifications',
+    surface: 'message',
+    blocks: [
+      { type: 'header', text: { type: 'plain_text', text: 'We just shipped v2.5' } },
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: 'New: bulk edit, keyboard shortcuts, and a redesigned inbox.' }
+      }
+    ]
+  },
+  {
+    id: 'daily-standup',
+    name: 'Daily standup',
+    description: 'Yesterday / Today / Blockers prompts.',
+    category: 'Polls and surveys',
+    surface: 'message',
+    blocks: [
+      { type: 'header', text: { type: 'plain_text', text: 'Daily standup' } },
+      { type: 'section', text: { type: 'mrkdwn', text: '*Yesterday:* ...' } },
+      { type: 'section', text: { type: 'mrkdwn', text: '*Today:* ...' } },
+      { type: 'section', text: { type: 'mrkdwn', text: '*Blockers:* ...' } }
+    ]
+  },
+  {
+    id: 'modal-confirm',
+    name: 'Confirm delete',
+    description: 'Modal confirmation before a destructive action.',
+    category: 'Approvals',
+    surface: 'modal',
+    blocks: [
+      { type: 'header', text: { type: 'plain_text', text: 'Are you sure?' } },
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: 'This action cannot be undone.' }
+      }
+    ]
+  }
 ];
 
 async function loadChannels(): Promise<ChannelOption[]> {
@@ -55,6 +132,20 @@ async function onSend(payload: SendPayload): Promise<SendResult> {
 
 export function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  // Lifted draft blocks. The builder reads them on mount; updating this
+  // state alone won't refresh an already-mounted builder, so we pair it
+  // with `builderKey` below.
+  const [blocks, setBlocks] = useState<SupportedBlock[]>(INITIAL_BLOCKS);
+  // Bumped on every template selection so React unmounts and re-mounts
+  // <BlockKitchen>, causing it to re-read `initialBlocks={blocks}`.
+  // (`initialBlocks` is intentionally a mount-time prop; this `key`
+  // pattern is the supported way to programmatically reset the draft.)
+  const [builderKey, setBuilderKey] = useState(0);
+
+  const handleSelectTemplate = (template: Template) => {
+    setBlocks(template.blocks);
+    setBuilderKey((n) => n + 1);
+  };
 
   return (
     <div className={theme === 'dark' ? 'dark' : ''} style={{ height: '100%' }}>
@@ -63,7 +154,7 @@ export function App() {
           <div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>@tightknitai/block-kitchen — local demo</div>
             <div style={{ fontSize: 12, opacity: 0.7 }}>
-              Library imported from <code>../src/index.ts</code> — edits to library source hot-reload here.
+              Click a template on the right to load it into the builder.
             </div>
           </div>
           <button
@@ -82,15 +173,37 @@ export function App() {
             Demo page theme: {theme}
           </button>
         </header>
-        <div style={{ flex: 1, minHeight: 0 }}>
-          <BlockKitchen
-            workspaceName="Acme Inc."
-            initialBlocks={INITIAL_BLOCKS}
-            loadChannels={loadChannels}
-            loadSendAsUserStatus={loadSendAsUserStatus}
-            onSend={onSend}
-            defaultPreviewTheme={theme}
-          />
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <BlockKitchen
+              key={builderKey}
+              workspaceName="Acme Inc."
+              initialBlocks={blocks}
+              onChange={setBlocks}
+              loadChannels={loadChannels}
+              loadSendAsUserStatus={loadSendAsUserStatus}
+              onSend={onSend}
+              defaultPreviewTheme={theme}
+              allowedSurfaces={['message', 'modal', 'app_home']}
+            />
+          </div>
+          <aside
+            className="bk-root"
+            style={{
+              width: 380,
+              flexShrink: 0,
+              borderRadius: 6,
+              border: '1px solid hsl(var(--border))',
+              overflow: 'hidden'
+            }}
+          >
+            <TemplatePicker
+              templates={TEMPLATES}
+              heading="Templates"
+              theme={theme}
+              onSelect={handleSelectTemplate}
+            />
+          </aside>
         </div>
       </div>
     </div>

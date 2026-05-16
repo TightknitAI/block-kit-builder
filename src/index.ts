@@ -1,4 +1,5 @@
 export { BlockKitchen } from './components/block-kitchen';
+export { TemplatePicker } from './components/template-picker';
 export type {
   BrandPreset,
   BrandTheme,
@@ -39,5 +40,6 @@ export type {
   SupportedHeaderBlock,
   TableBlock,
   TableCell,
-  TableColumnSetting
+  TableColumnSetting,
+  Template
 } from './types';
