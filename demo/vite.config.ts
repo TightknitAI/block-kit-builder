@@ -18,7 +18,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom']
   },
   server: {
-    port: 5173,
-    strictPort: true
+    port: process.env.PORT ? Number(process.env.PORT) : 5173,
+    strictPort: !process.env.PORT
   }
 });

@@ -4,8 +4,9 @@
     {
       "name": "demo",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--dir", "demo", "exec", "vite", "--port", "5273", "--strictPort"],
-      "port": 5273
+      "runtimeArgs": ["--dir", "demo", "exec", "vite"],
+      "port": 5273,
+      "autoPort": true
     },
     {
       "name": "storybook",

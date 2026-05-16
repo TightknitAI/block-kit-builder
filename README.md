@@ -3,10 +3,13 @@
 [![CI](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml/badge.svg)](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@tightknitai/block-kitchen.svg)](https://www.npmjs.com/package/@tightknitai/block-kitchen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Live demo](https://img.shields.io/badge/demo-live-6366f1)](https://block-kitchen.tightknit.dev)
 
 A drag-and-drop, no-code-friendly visual builder for Slack Block Kit messages, packaged as an **integration-agnostic React component**.
 
 Inspired by [Slack's Block Kit Builder](https://app.slack.com/block-kit-builder), reimagined as an embeddable React component you can drop into your own app.
+
+**[Try the live demo →](https://block-kitchen.tightknit.dev)** (mocked Slack — drag, drop, edit, preview)
 
 The package owns the entire builder UX — palette, sortable preview surface, per-block popover editors, send dialog. It knows nothing about how channels are listed, who the user is, or how messages are sent. The consumer wires those concerns through callback props. A working end-to-end app is shown in [block-kit-builder-template](https://github.com/TightknitAI/block-kit-builder-template).
 
