@@ -17,6 +17,9 @@ export interface PaletteVariant {
 /**
  * One section in the palette. Sections group variants under a block-type
  * heading, matching Slack's organization (Section, Divider, Image, etc).
+ *
+ * Variant ids must be unique across the entire palette — the drag-drop
+ * variant lookup keys by id, so a duplicate would shadow the earlier one.
  */
 export interface PaletteSection {
   /** Visible heading for the section. */
@@ -27,10 +30,12 @@ export interface PaletteSection {
 }
 
 /**
- * The palette layout. Mirrors the section ordering of Slack's real Block
- * Kit Builder, scoped to the v1 supported block types.
+ * The built-in palette. Mirrors the section ordering of Slack's real Block
+ * Kit Builder, scoped to the v1 supported block types. Consumers can pass
+ * this directly to `<BlockKitBuilder palette={...} />`, or spread and
+ * compose against it to add their own variants.
  */
-export const PALETTE_SECTIONS: readonly PaletteSection[] = [
+export const defaultPalette: readonly PaletteSection[] = [
   {
     name: 'Rich Text',
     blockType: 'rich_text',
@@ -920,12 +925,15 @@ export const PALETTE_SECTIONS: readonly PaletteSection[] = [
 ] as const;
 
 /**
- * Lookup table mapping a variant id back to its definition. Used by the
- * DnD drop handler to resolve a `palette:${id}` drag back to a factory.
+ * Builds a lookup table mapping a variant id to its definition for a
+ * resolved palette. Used by the DnD drop handler to resolve a
+ * `palette:${id}` drag back to a factory.
+ * @param sections - the palette in use (defaults or a consumer-provided one)
+ * @returns a map keyed by variant id
  */
-export const VARIANT_BY_ID: ReadonlyMap<string, PaletteVariant> = new Map(
-  PALETTE_SECTIONS.flatMap((section) => section.variants.map((v) => [v.id, v] as const))
-);
+export function buildVariantById(sections: readonly PaletteSection[]): ReadonlyMap<string, PaletteVariant> {
+  return new Map(sections.flatMap((section) => section.variants.map((v) => [v.id, v] as const)));
+}
 
 /**
  * Human-readable label for a supported block type. Used in the per-block
