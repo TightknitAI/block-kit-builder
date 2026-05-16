@@ -4,6 +4,15 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from '../lib/ui/she
 import type { SupportedBlock } from '../types';
 
 /**
+ * Upper bound on the JSON textarea we accept. A pasted multi-megabyte
+ * payload would freeze the tab inside `JSON.parse` before the validator
+ * gets a look; 1 MiB is well above any realistic Slack Block Kit message
+ * (Slack itself caps blocks at 50 per message and ~3000 chars per text
+ * field).
+ */
+const MAX_JSON_BYTES = 1024 * 1024;
+
+/**
  * Side drawer that exposes the current draft as raw JSON in a full-height
  * code-editor-style textarea. Edits flow live: every valid parse updates
  * the preview immediately; parse and validation errors are shown inline
@@ -59,6 +68,11 @@ export function JsonDrawer({
 
   const handleChange = (next: string) => {
     setValue(next);
+    if (next.length > MAX_JSON_BYTES) {
+      setParseError(`JSON exceeds the ${Math.round(MAX_JSON_BYTES / 1024)} KiB editor limit.`);
+      setValidationErrors([]);
+      return;
+    }
     let parsed: unknown;
     try {
       parsed = JSON.parse(next);

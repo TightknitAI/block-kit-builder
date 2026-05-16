@@ -1,6 +1,16 @@
 import type { SupportedBlock } from '../types';
 
 /**
+ * Upper bound on the encoded string length we accept on decode. Block
+ * Kit JSON in practice is well under 100 KB; we cap at 1 MiB of encoded
+ * input so a pathologically large URL hash cannot freeze the tab in
+ * `atob` + `JSON.parse` before the validator gets a look. Encoded
+ * (base64url) is ~33% larger than the binary, so this bounds the decoded
+ * JSON at roughly 768 KiB.
+ */
+const MAX_ENCODED_BYTES = 1024 * 1024;
+
+/**
  * Encodes a block list to a base64url string suitable for use as a URL
  * search param. The consumer chooses where to put it (search param, hash,
  * localStorage, etc).
@@ -30,6 +40,9 @@ export function encodeBlocksToString(blocks: SupportedBlock[]): string {
  */
 export function decodeBlocksFromString(encoded: string | undefined | null): SupportedBlock[] | null {
   if (!encoded) {
+    return null;
+  }
+  if (encoded.length > MAX_ENCODED_BYTES) {
     return null;
   }
   try {

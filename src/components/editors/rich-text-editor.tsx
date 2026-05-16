@@ -27,6 +27,7 @@ import { Button } from '../../lib/ui/button';
 import { Input } from '../../lib/ui/input';
 import { Label } from '../../lib/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '../../lib/ui/popover';
+import { isSafeHref } from '../../lib/url-safety';
 import { RichTextStructuredEditor } from './rich-text-structured-editor';
 import type { BlockEditorProps } from './types';
 
@@ -106,6 +107,15 @@ function RichTextWysiwygEditor({ block, onChange }: { block: RichTextBlock; onCh
         openOnClick: false,
         autolink: true,
         defaultProtocol: 'https',
+        // Pin TipTap's link allowlist to the same set as our shared
+        // `isSafeHref` helper. The upstream default also includes
+        // ftp/cid/callto which we don't expect inside Slack content.
+        protocols: ['http', 'https', 'mailto', 'tel', 'sms', 'xmpp'],
+        // Belt-and-suspenders: even if a downstream contributor widens
+        // `protocols` later, our isSafeHref guard rejects everything
+        // outside the safe-link set. setLink and toggleLink both gate
+        // on this hook before applying the mark.
+        isAllowedUri: (url) => isSafeHref(url),
         HTMLAttributes: { rel: 'noreferrer noopener', target: '_blank' }
       })
     ],
@@ -284,10 +294,12 @@ function LinkPopover({ editor }: { editor: Editor }) {
   const currentHref = (editor.getAttributes('link').href as string | undefined) ?? '';
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState(currentHref);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
       setUrl(currentHref);
+      setError(null);
     }
   }, [open, currentHref]);
 
@@ -295,9 +307,14 @@ function LinkPopover({ editor }: { editor: Editor }) {
     const trimmed = url.trim();
     if (!trimmed) {
       editor.chain().focus().unsetLink().run();
-    } else {
-      editor.chain().focus().extendMarkRange('link').setLink({ href: trimmed }).run();
+      setOpen(false);
+      return;
     }
+    if (!isSafeHref(trimmed)) {
+      setError('Only http(s), mailto, tel, sms, and xmpp links are allowed.');
+      return;
+    }
+    editor.chain().focus().extendMarkRange('link').setLink({ href: trimmed }).run();
     setOpen(false);
   };
 
@@ -325,7 +342,12 @@ function LinkPopover({ editor }: { editor: Editor }) {
             id="rt-link-url"
             value={url}
             placeholder="https://example.com"
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              if (error) {
+                setError(null);
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -333,6 +355,7 @@ function LinkPopover({ editor }: { editor: Editor }) {
               }
             }}
           />
+          {error && <p className="text-[11px] text-destructive">{error}</p>}
           <div className="flex justify-between">
             {active ? (
               <Button
