@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.2-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.6.1-alpha.0...block-kitchen-v0.6.2-alpha.0) (2026-05-16)
+
+
+### Features
+
+* **mobile:** make the builder fully responsive ([#65](https://github.com/TightknitAI/block-kitchen/issues/65)) ([5bee7cd](https://github.com/TightknitAI/block-kitchen/commit/5bee7cd39e0ee0c8520185cdf2c6500eb00037e2))
+* **templates:** ship richer default template gallery as library export ([#56](https://github.com/TightknitAI/block-kitchen/issues/56)) ([a0c4886](https://github.com/TightknitAI/block-kitchen/commit/a0c488621900dd1db43bea27f0a3e6e89f7fed0f))
+
+
+### Bug Fixes
+
+* **a11y:** keyboard-accessible block reordering + tighter focus order ([#60](https://github.com/TightknitAI/block-kitchen/issues/60)) ([01aa7e9](https://github.com/TightknitAI/block-kitchen/commit/01aa7e96ba57955219349a44b1d40ddfea22fa7b))
+* **demo:** move templates collapse button to inner edge ([#59](https://github.com/TightknitAI/block-kitchen/issues/59)) ([5c2967b](https://github.com/TightknitAI/block-kitchen/commit/5c2967b7b38742318828fbcd02ff7fca15842308))
+* **preview:** theme the preview canvas via --muted token ([#66](https://github.com/TightknitAI/block-kitchen/issues/66)) ([80d766e](https://github.com/TightknitAI/block-kitchen/commit/80d766e4a7fca101e2374a0d657c2ba646593df2))
+* **release:** drop test step from prepublishOnly ([#63](https://github.com/TightknitAI/block-kitchen/issues/63)) ([431ef49](https://github.com/TightknitAI/block-kitchen/commit/431ef49fa6c72a64bd6b06ef7f89da68fb82c08d))
+
 ## [0.6.1-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.6.0-alpha.0...block-kitchen-v0.6.1-alpha.0) (2026-05-16)
 
 
