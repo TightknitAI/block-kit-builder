@@ -76,7 +76,7 @@ export function Surface({
       ref={setNodeRef}
       className={cn(
         'flex min-h-[240px] flex-col py-2 transition-colors',
-        isModal ? 'px-5' : 'px-2',
+        isModal ? 'px-5' : 'px-4',
         isDark ? 'bg-[#1a1d21]' : 'bg-white',
         isPaletteDrag &&
           (isDark
