@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.5.1-alpha.0...block-kitchen-v0.5.2-alpha.0) (2026-05-16)
+
+
+### Features
+
+* add standalone TemplatePicker component ([#34](https://github.com/TightknitAI/block-kitchen/issues/34)) ([ef63a69](https://github.com/TightknitAI/block-kitchen/commit/ef63a697de8073b5c135d0fb54b4edf679dd4a81))
+
 ## [0.5.1-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.5.0-alpha.0...block-kitchen-v0.5.1-alpha.0) (2026-05-16)
 
 
