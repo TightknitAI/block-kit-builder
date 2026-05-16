@@ -433,7 +433,7 @@ export function App() {
                   style={{
                     position: 'absolute',
                     top: 8,
-                    right: 8,
+                    left: 8,
                     zIndex: 2,
                     width: 24,
                     height: 24,
