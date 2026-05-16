@@ -1,12 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { TextCursorInput } from 'lucide-react';
 import { useArgs } from 'storybook/preview-api';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import { buildVariantById, defaultPalette } from '../../lib/default-blocks';
+import { buildVariantById, defaultPalette, extraAlertVariant, legacyInputVariants } from '../../lib/default-blocks';
 import { TooltipProvider } from '../../lib/ui/tooltip';
 import type { SupportedBlock } from '../../types';
 import { BlockEditor } from './block-editor';
 
-const VARIANT_BY_ID = buildVariantById(defaultPalette);
+// Stories cover every editor code path — including element types that
+// only live in `legacyInputVariants` (single/multi users-select, the
+// individual datepicker/timepicker/datetimepicker inputs, etc.) and
+// the alert variant that was dropped from the default palette. Stitch
+// them into a story-only lookup so each story can still resolve its
+// payload by id.
+const VARIANT_BY_ID = buildVariantById([
+  ...defaultPalette,
+  {
+    name: '_storybook_legacy',
+    icon: TextCursorInput,
+    variants: [...legacyInputVariants, extraAlertVariant]
+  }
+]);
 
 /**
  * Resolves a palette variant id to a fresh block payload, so stories
@@ -77,19 +91,47 @@ export const SectionWithImageAccessory: Story = {
 };
 
 export const Header: Story = {
-  args: { block: variant('header_default') }
+  args: { block: variant('structure_header') }
 };
 
 export const Divider: Story = {
-  args: { block: variant('divider_plain') }
+  args: { block: variant('structure_divider') }
 };
 
 export const Context: Story = {
-  args: { block: variant('context_text_and_images') }
+  args: { block: variant('structure_context_text_images') }
 };
 
+// The actions editor only supports button elements today, so this
+// story exercises the multi-button code path directly. It used to
+// come from a palette variant; the new palette has a single
+// "Button" entry, but the multi-button editor flow still needs
+// coverage.
 export const Actions: Story = {
-  args: { block: variant('actions_multiple_buttons') }
+  args: {
+    block: {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Approve', emoji: true },
+          style: 'primary',
+          action_id: 'approve'
+        },
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Deny', emoji: true },
+          style: 'danger',
+          action_id: 'deny'
+        },
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Cancel', emoji: true },
+          action_id: 'cancel'
+        }
+      ]
+    }
+  }
 };
 
 export const Image: Story = {
@@ -121,7 +163,7 @@ export const Carousel: Story = {
 };
 
 export const ContextActions: Story = {
-  args: { block: variant('context_actions_feedback_and_remove') }
+  args: { block: variant('agents_feedback_remove') }
 };
 
 /* ----------------------------- Input variants ----------------------------- */

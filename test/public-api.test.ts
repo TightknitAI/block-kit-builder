@@ -1,4 +1,4 @@
-import { defaultPalette } from '../src/lib/default-blocks';
+import { defaultPalette, extraAlertVariant, legacyInputVariants } from '../src/lib/default-blocks';
 import { toSlackBlocks } from '../src/lib/to-slack-blocks';
 import { decodeBlocksFromString, encodeBlocksToString } from '../src/lib/url-state';
 import type { SupportedBlock } from '../src/types';
@@ -78,11 +78,16 @@ describe('url-state', () => {
 });
 
 describe('palette factories', () => {
-  it('every variant factory returns a block whose type matches its section', () => {
+  it('every variant factory returns a valid block payload', () => {
     for (const section of defaultPalette) {
       for (const variant of section.variants) {
         const block = variant.factory();
-        expect(block.type).toBe(section.blockType);
+        // Sections like "Structure" and "Card and Carousel" intentionally
+        // mix multiple block types, so we no longer assert that a
+        // section maps to a single `type`. A truthy `type` is enough to
+        // confirm the factory built a block-shaped payload.
+        expect(typeof block.type).toBe('string');
+        expect(block.type.length).toBeGreaterThan(0);
       }
     }
   });
@@ -90,5 +95,12 @@ describe('palette factories', () => {
   it('variant ids are unique across the palette', () => {
     const ids = defaultPalette.flatMap((s) => s.variants.map((v) => v.id));
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('legacy input variants keep building input blocks', () => {
+    for (const variant of legacyInputVariants) {
+      expect(variant.factory().type).toBe('input');
+    }
+    expect(extraAlertVariant.factory().type).toBe('alert');
   });
 });

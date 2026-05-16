@@ -1,46 +1,10 @@
 import { useDraggable } from '@dnd-kit/core';
-import {
-  AlertTriangle,
-  AlignLeft,
-  ChevronDown,
-  ChevronRight,
-  CreditCard,
-  FileText,
-  GalleryHorizontal,
-  GripVertical,
-  Heading1,
-  Image as ImageIcon,
-  Info,
-  MessageSquareMore,
-  Minus,
-  MousePointerClick,
-  Pilcrow,
-  Search,
-  Table as TableIcon,
-  TextCursorInput
-} from 'lucide-react';
-import { type ComponentType, type SVGProps, useMemo, useState } from 'react';
+import { ChevronDown, ChevronRight, GripVertical, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { cn } from '../lib/cn';
 import type { PaletteSection as PaletteSectionDef, PaletteVariant } from '../lib/default-blocks';
 import { Input } from '../lib/ui/input';
-import type { SupportedBlock, SupportedBlockType } from '../types';
-
-const SECTION_ICONS: Record<SupportedBlockType, ComponentType<SVGProps<SVGSVGElement>>> = {
-  section: AlignLeft,
-  header: Heading1,
-  divider: Minus,
-  context: Info,
-  actions: MousePointerClick,
-  image: ImageIcon,
-  markdown: FileText,
-  rich_text: Pilcrow,
-  table: TableIcon,
-  alert: AlertTriangle,
-  card: CreditCard,
-  carousel: GalleryHorizontal,
-  context_actions: MessageSquareMore,
-  input: TextCursorInput
-};
+import type { SupportedBlock } from '../types';
 
 /**
  * The DnD draggable id format for palette items, e.g. `palette:section_mrkdwn`.
@@ -100,11 +64,12 @@ function filterSections(sections: readonly PaletteSectionDef[], query: string): 
 /**
  * The left-side palette of available block variants, organized into
  * collapsible sections that mirror Slack's real Block Kit Builder
- * ("Section", "Header", "Divider", "Image", "Context", "Actions"). Each
- * variant is a draggable preset that inserts a default-shaped block when
- * dropped on the surface. A search input at the top filters variants by
- * label across all sections; an active query temporarily expands every
- * matching section regardless of its collapsed state.
+ * (Agents, Markdown, Section, Actions, Input, Structure, Rich Text,
+ * Image, Card and Carousel, Table). Each variant is a draggable preset
+ * that inserts a default-shaped block when dropped on the surface. A
+ * search input at the top filters variants by label across all sections;
+ * an active query temporarily expands every matching section regardless
+ * of its collapsed state.
  * @param props - palette props
  * @param props.onAddBlock - called when a palette item is added via its
  *   chevron button (appends the block to the bottom of the preview)
@@ -141,7 +106,7 @@ export function Palette({
   const queryActive = showSearch && query.trim().length > 0;
 
   return (
-    <aside className="flex min-h-0 w-60 shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r bg-muted/20">
+    <aside className="flex min-h-0 w-72 shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r bg-muted/20">
       {showSearch ? (
         <div className="sticky top-0 z-10 border-b bg-muted/20 px-3 pt-3 pb-2 backdrop-blur">
           <div className="relative">
@@ -194,7 +159,7 @@ function PaletteSection({
   onAddBlock: (block: SupportedBlock) => void;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const Icon = SECTION_ICONS[section.blockType];
+  const Icon = section.icon;
   const isOpen = open || forceOpen;
   const Caret = isOpen ? ChevronDown : ChevronRight;
 
