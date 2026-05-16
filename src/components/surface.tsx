@@ -75,8 +75,7 @@ export function Surface({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex min-h-[240px] flex-col py-2 transition-colors',
-        isModal ? 'px-5' : 'px-4',
+        'flex min-h-[240px] flex-col px-5 py-2 transition-colors',
         isDark ? 'bg-[#1a1d21]' : 'bg-white',
         isPaletteDrag &&
           (isDark
@@ -158,7 +157,7 @@ function MessageFrame({
       )}
     >
       <div
-        className={cn('flex items-center gap-2 px-4 pt-3 pb-1 text-xs', isDark ? 'text-white/60' : 'text-[#616061]')}
+        className={cn('flex items-center gap-2 px-5 pt-3 pb-1 text-xs', isDark ? 'text-white/60' : 'text-[#616061]')}
       >
         <span
           className={cn(
@@ -279,7 +278,7 @@ function AppHomeFrame({
       )}
     >
       <div
-        className={cn('flex items-center gap-3 border-b px-4 py-3', isDark ? 'border-[#2c2d30]' : 'border-[#e8e8e8]')}
+        className={cn('flex items-center gap-3 border-b px-5 py-3', isDark ? 'border-[#2c2d30]' : 'border-[#e8e8e8]')}
       >
         <span
           className={cn(
@@ -295,7 +294,7 @@ function AppHomeFrame({
       </div>
       <div
         className={cn(
-          'flex items-center gap-4 border-b px-4 text-sm',
+          'flex items-center gap-4 border-b px-5 text-sm',
           isDark ? 'border-[#2c2d30]' : 'border-[#e8e8e8]'
         )}
       >
