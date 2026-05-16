@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/logo.png" alt="block-kitchen logo" width="160" height="160" />
+</p>
+
 # block-kitchen
 
 [![CI](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml/badge.svg)](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml)
