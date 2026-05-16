@@ -120,13 +120,13 @@ function PaletteItem({ variant, onAdd }: { variant: PaletteVariant; onAdd: () =>
     <div
       ref={setNodeRef}
       className={cn(
-        'group flex items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground',
+        'group flex items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground has-[:focus-visible]:bg-accent has-[:focus-visible]:text-foreground',
         isDragging && 'opacity-50'
       )}
     >
       <div
         ref={setActivatorNodeRef}
-        className="-my-1.5 flex flex-1 cursor-grab items-center gap-2 rounded py-1.5 active:cursor-grabbing focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="-my-1.5 flex flex-1 cursor-grab items-center gap-2 rounded py-1.5 active:cursor-grabbing focus-visible:outline-none"
         {...attributes}
         {...listeners}
       >
@@ -137,7 +137,7 @@ function PaletteItem({ variant, onAdd }: { variant: PaletteVariant; onAdd: () =>
         type="button"
         aria-label={`Add ${variant.label} to preview`}
         onClick={onAdd}
-        className="ml-auto flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent text-muted-foreground opacity-0 transition-opacity hover:border-border hover:bg-background hover:text-foreground group-hover:opacity-100"
+        className="ml-auto flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded border border-transparent text-muted-foreground opacity-0 transition-opacity hover:border-border hover:bg-background hover:text-foreground group-hover:opacity-100 group-has-[:focus-visible]:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
         <ChevronRight className="h-3.5 w-3.5" />
       </button>
