@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { AlertTriangle, Copy, Pencil, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowUp, Copy, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { RichTextBlock } from 'slack-web-api-client';
 import { cn } from '../lib/cn';
@@ -59,6 +59,9 @@ export function BlockRow({
   onUpdate,
   onDuplicate,
   onDelete,
+  index,
+  total,
+  onReorder,
   isPaletteDrag = false
 }: {
   builderBlock: BuilderBlock;
@@ -73,6 +76,12 @@ export function BlockRow({
   onUpdate: (id: string, block: SupportedBlock) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
+  /** Zero-based index of this row in the surface; powers move up/down. */
+  index?: number;
+  /** Total number of rows on the surface; powers move up/down. */
+  total?: number;
+  /** Move this row to a new index. Wires up the keyboard-accessible move buttons. */
+  onReorder?: (id: string, toIndex: number) => void;
   /** True while a palette item is being dragged (vs. reordering an existing block). */
   isPaletteDrag?: boolean;
 }) {
@@ -143,6 +152,15 @@ export function BlockRow({
                 aria-label="Edit block"
                 {...sortableA11yAttrs}
                 {...listeners}
+                onKeyDown={(e) => {
+                  // The div trigger is keyboard-activatable via role="button" + tabIndex=0,
+                  // but Space on a non-button element scrolls the page by default. Toggle the
+                  // popover ourselves on Enter/Space and swallow the event so the page stays put.
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpenChange?.(!isOpen);
+                  }
+                }}
                 className={cn(
                   'block w-full cursor-grab rounded-sm transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing',
                   hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
@@ -166,7 +184,10 @@ export function BlockRow({
         <div
           className={cn(
             'absolute -top-3 right-2 z-10 flex items-center gap-0.5 rounded-md border bg-background p-0.5 shadow-sm transition-opacity',
-            hasErrors ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            // Reveal on hover, on focus inside the row (so Tab-stops on the
+            // floating buttons themselves keep them visible), and when there
+            // are validation errors worth surfacing immediately.
+            hasErrors ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'
           )}
         >
           {hasErrors ? (
@@ -176,7 +197,7 @@ export function BlockRow({
                   type="button"
                   aria-label={`Show ${errors!.length} validation ${errors!.length === 1 ? 'issue' : 'issues'}`}
                   onClick={() => onOpenChange?.(true)}
-                  className="flex h-6 w-6 items-center justify-center rounded text-destructive hover:bg-destructive/10"
+                  className="flex h-6 w-6 items-center justify-center rounded text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <AlertTriangle className="h-3.5 w-3.5" />
                 </button>
@@ -191,6 +212,38 @@ export function BlockRow({
               </TooltipContent>
             </Tooltip>
           ) : null}
+          {onReorder && typeof index === 'number' && typeof total === 'number' ? (
+            <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Move block up"
+                    disabled={index === 0}
+                    onClick={() => onReorder(builderBlock.id, index - 1)}
+                    className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                  >
+                    <ArrowUp className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Move up</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Move block down"
+                    disabled={index >= total - 1}
+                    onClick={() => onReorder(builderBlock.id, index + 1)}
+                    className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                  >
+                    <ArrowDown className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Move down</TooltipContent>
+              </Tooltip>
+            </>
+          ) : null}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -203,7 +256,7 @@ export function BlockRow({
                     onOpenChange?.(true);
                   }
                 }}
-                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </button>
@@ -216,7 +269,7 @@ export function BlockRow({
                 type="button"
                 aria-label="Duplicate block"
                 onClick={() => onDuplicate(builderBlock.id)}
-                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <Copy className="h-3.5 w-3.5" />
               </button>
@@ -229,7 +282,7 @@ export function BlockRow({
                 type="button"
                 aria-label="Delete block"
                 onClick={() => onDelete(builderBlock.id)}
-                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>

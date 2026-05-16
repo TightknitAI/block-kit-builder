@@ -127,6 +127,7 @@ export function JsonDrawer({
           </div>
           <textarea
             ref={textareaRef}
+            aria-label="Block Kit JSON"
             value={value}
             onChange={(e) => handleChange(e.target.value)}
             onScroll={(e) => {
