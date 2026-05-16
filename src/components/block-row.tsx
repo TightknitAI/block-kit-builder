@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { AlertTriangle, Copy, GripVertical, Pencil, Trash2 } from 'lucide-react';
+import { AlertTriangle, Copy, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { RichTextBlock } from 'slack-web-api-client';
 import { cn } from '../lib/cn';
@@ -32,8 +32,10 @@ const BLOCK_TYPE_LABELS: Record<SupportedBlockType, string> = {
 /**
  * A single row in the preview surface wrapping a block's preview render
  * plus a click-to-edit popover. Renders flush like a real Slack message:
- * no border or background by default. Hover surfaces a faint outline plus
- * a floating toolbar (drag, duplicate, delete) so editor chrome never
+ * no border or background by default. The row itself is the drag handle
+ * (Slack Block Builder pattern) — clicks under the 4px activation
+ * distance still open the editor. Hover surfaces a faint outline plus a
+ * floating toolbar (edit, duplicate, delete) so editor chrome never
  * leaks into the visual approximation.
  * @param props - row props
  * @param props.builderBlock - the block to render
@@ -77,6 +79,12 @@ export function BlockRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({
     id: builderBlock.id
   });
+  // The Popover trigger needs an explicit `role`/`tabIndex` on the div so
+  // biome's a11y check accepts `aria-label`; dnd-kit's `attributes` also
+  // sets those, so pull them off the spread to avoid TS's
+  // duplicate-prop warning. The values match (button / 0), so behavior
+  // is unchanged.
+  const { role: _dndRole, tabIndex: _dndTabIndex, ...sortableA11yAttrs } = attributes;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -116,8 +124,10 @@ export function BlockRow({
           type="button"
           aria-label="Edit block"
           onClick={() => setInlineEditing(true)}
+          {...attributes}
+          {...listeners}
           className={cn(
-            'block w-full cursor-pointer rounded-sm border-0 bg-transparent p-0 text-left transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring',
+            'block w-full cursor-grab rounded-sm border-0 bg-transparent p-0 text-left transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing',
             hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
           )}
         >
@@ -130,8 +140,10 @@ export function BlockRow({
               role="button"
               tabIndex={0}
               aria-label="Edit block"
+              {...sortableA11yAttrs}
+              {...listeners}
               className={cn(
-                'block w-full cursor-pointer rounded-sm transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring',
+                'block w-full cursor-grab rounded-sm transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing',
                 hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
               )}
             >
@@ -178,20 +190,6 @@ export function BlockRow({
             </TooltipContent>
           </Tooltip>
         ) : null}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label="Drag to reorder"
-              className="flex h-6 w-6 cursor-grab items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
-              {...attributes}
-              {...listeners}
-            >
-              <GripVertical className="h-3.5 w-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Drag to reorder</TooltipContent>
-        </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
             <button

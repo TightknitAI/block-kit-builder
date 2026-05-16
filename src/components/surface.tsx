@@ -153,7 +153,7 @@ function MessageFrame({
   return (
     <div
       className={cn(
-        'flex flex-col overflow-hidden rounded-md border',
+        'flex flex-col rounded-md border',
         isDark ? 'border-[#2c2d30] bg-[#1a1d21]' : 'border-[#e8e8e8] bg-white'
       )}
     >
@@ -199,7 +199,7 @@ function ModalFrame({ isDark, children }: { isDark: boolean; children: ReactNode
   return (
     <div
       className={cn(
-        'flex flex-col overflow-hidden rounded-lg border shadow-lg',
+        'flex flex-col rounded-lg border shadow-lg',
         isDark ? 'border-[#2c2d30] bg-[#1a1d21]' : 'border-[#e8e8e8] bg-white'
       )}
     >
@@ -274,7 +274,7 @@ function AppHomeFrame({
   return (
     <div
       className={cn(
-        'flex flex-col overflow-hidden rounded-md border',
+        'flex flex-col rounded-md border',
         isDark ? 'border-[#2c2d30] bg-[#1a1d21]' : 'border-[#e8e8e8] bg-white'
       )}
     >
