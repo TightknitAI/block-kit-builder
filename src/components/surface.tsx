@@ -117,7 +117,11 @@ export function Surface({
   return (
     <main
       aria-label="Block preview"
-      className={cn('flex flex-1 flex-col p-6', isDark ? 'bg-[#0e0f12]' : 'bg-[#f4f4f4]')}
+      // Outer canvas (the area framing the Slack chrome) follows the
+      // host theme's --muted token so brand presets reach it. The inner
+      // Slack frame keeps Slack's own canvas colors via isDark below,
+      // since that surface is mimicking Slack itself.
+      className={cn('flex flex-1 flex-col bg-muted p-6')}
     >
       <div className="mx-auto w-full max-w-2xl">
         {previewSurface === 'modal' ? (
