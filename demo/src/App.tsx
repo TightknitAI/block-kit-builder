@@ -1,5 +1,6 @@
 import {
   BlockKitchen,
+  type BrandPreset,
   type ChannelOption,
   type SendAsUserStatus,
   type SendPayload,
@@ -9,6 +10,15 @@ import {
   TemplatePicker
 } from '@tightknitai/block-kitchen';
 import { useEffect, useState } from 'react';
+
+const PRESET_OPTIONS: { value: BrandPreset; label: string }[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'slack', label: 'Slack' },
+  { value: 'ocean', label: 'Ocean' },
+  { value: 'sunset', label: 'Sunset' },
+  { value: 'mono', label: 'Mono' },
+  { value: 'cyberpunk', label: 'Cyberpunk' }
+];
 
 const MOCK_CHANNELS: ChannelOption[] = [
   { id: 'C0001', name: 'general' },
@@ -132,6 +142,7 @@ async function onSend(payload: SendPayload): Promise<SendResult> {
 
 export function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [preset, setPreset] = useState<BrandPreset>('default');
 
   // Mirror `theme` onto <html> so the .dark CSS-variable rule reaches
   // Radix portals (sheets, dialogs, popovers, tooltips). They mount
@@ -188,21 +199,55 @@ export function App() {
               </a>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
-            style={{
-              fontSize: 12,
-              padding: '6px 10px',
-              borderRadius: 6,
-              border: '1px solid hsl(var(--border))',
-              background: 'hsl(var(--background))',
-              color: 'hsl(var(--foreground))',
-              cursor: 'pointer'
-            }}
-          >
-            Demo page theme: {theme}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label
+              htmlFor="brand-preset-picker"
+              style={{
+                fontSize: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                color: 'hsl(var(--foreground))'
+              }}
+            >
+              Theme
+              <select
+                id="brand-preset-picker"
+                value={preset}
+                onChange={(e) => setPreset(e.target.value as BrandPreset)}
+                style={{
+                  fontSize: 12,
+                  padding: '6px 8px',
+                  borderRadius: 6,
+                  border: '1px solid hsl(var(--border))',
+                  background: 'hsl(var(--background))',
+                  color: 'hsl(var(--foreground))',
+                  cursor: 'pointer'
+                }}
+              >
+                {PRESET_OPTIONS.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
+              style={{
+                fontSize: 12,
+                padding: '6px 10px',
+                borderRadius: 6,
+                border: '1px solid hsl(var(--border))',
+                background: 'hsl(var(--background))',
+                color: 'hsl(var(--foreground))',
+                cursor: 'pointer'
+              }}
+            >
+              Mode: {theme}
+            </button>
+          </div>
         </header>
         <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -215,11 +260,12 @@ export function App() {
               loadSendAsUserStatus={loadSendAsUserStatus}
               onSend={onSend}
               defaultPreviewTheme={theme}
+              theme={preset}
               allowedSurfaces={['message', 'modal', 'app_home']}
             />
           </div>
           <aside
-            className="bk-root"
+            className="bk-root bk-demo-default"
             style={{
               width: 380,
               flexShrink: 0,

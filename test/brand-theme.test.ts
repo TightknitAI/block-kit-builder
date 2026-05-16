@@ -10,6 +10,37 @@ describe('resolveBrandTheme', () => {
     expect(resolveBrandTheme({ preset: 'default' })).toEqual({ light: {}, dark: {} });
   });
 
+  it('writes preset shared tokens to both modes and per-mode overrides to the matching map', () => {
+    // `sunset` defines `radius` in `tokens` (shared) and distinct
+    // `primary` values in `light` and `dark`.
+    const result = resolveBrandTheme('sunset');
+    expect(result.light['--radius']).toBe('1rem');
+    expect(result.dark['--radius']).toBe('1rem');
+    expect(result.light['--primary']).toBe('14 88% 55%');
+    expect(result.dark['--primary']).toBe('14 80% 65%');
+  });
+
+  it('lets user `tokens` override preset values for both modes', () => {
+    const result = resolveBrandTheme({
+      preset: 'sunset',
+      tokens: { primary: '120 100% 40%' }
+    });
+    expect(result.light['--primary']).toBe('120 100% 40%');
+    expect(result.dark['--primary']).toBe('120 100% 40%');
+    // preset's shared radius still applies — user didn't override it
+    expect(result.light['--radius']).toBe('1rem');
+  });
+
+  it('lets user `light`/`dark` override preset per-mode values', () => {
+    const result = resolveBrandTheme({
+      preset: 'sunset',
+      light: { primary: '120 100% 40%' }
+    });
+    expect(result.light['--primary']).toBe('120 100% 40%');
+    // dark is untouched by the user override, so the preset wins there
+    expect(result.dark['--primary']).toBe('14 80% 65%');
+  });
+
   it('writes `tokens` to both the light and dark maps', () => {
     const result = resolveBrandTheme({ tokens: { primary: '0 100% 50%', radius: '0.5rem' } });
     expect(result.light).toEqual({ '--primary': '0 100% 50%', '--radius': '0.5rem' });

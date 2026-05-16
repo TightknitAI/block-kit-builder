@@ -45,12 +45,13 @@ export type BrandTokens = Partial<{
 }>;
 
 /**
- * Curated preset names. Today only `'default'` exists (no overrides;
- * relies on the fallbacks in `styles.src.css`). Adding a preset later
- * is non-breaking — extend the string union and add an entry to
- * `PRESETS`.
+ * Curated preset names. `'default'` is a no-op (relies on the
+ * `styles.src.css` fallbacks). The other entries each define their own
+ * color palette and `radius`, demonstrating that brand presets can vary
+ * stylistic axes beyond color. Adding more later is non-breaking —
+ * extend the string union and add an entry to `PRESETS`.
  */
-export type BrandPreset = 'default';
+export type BrandPreset = 'default' | 'slack' | 'ocean' | 'sunset' | 'mono' | 'cyberpunk';
 
 /**
  * Brand theme shape.
@@ -94,10 +95,232 @@ const TOKEN_TO_CSS_VAR: Record<keyof BrandTokens, string> = {
   radius: '--radius'
 };
 
-const PRESETS: Record<BrandPreset, BrandTokens> = {
+/** Per-preset layer — partial brand theme without the `preset` field, so
+ *  a preset itself can carry shared `tokens` plus per-mode `light`/`dark`
+ *  overrides. Resolved before user-supplied tokens so consumers can still
+ *  layer their own values on top. */
+type PresetDefinition = {
+  tokens?: BrandTokens;
+  light?: BrandTokens;
+  dark?: BrandTokens;
+};
+
+const PRESETS: Record<BrandPreset, PresetDefinition> = {
   // No overrides — falls through to the fallbacks in styles.src.css so
   // we don't duplicate (and risk drifting from) the baseline values.
-  default: {}
+  default: {},
+  // Slack's aubergine brand with tighter corners. Mirrors the Slack
+  // chrome aesthetic — fitting since this builder is the Slack Block
+  // Kit builder, after all.
+  slack: {
+    tokens: { radius: '0.375rem' },
+    light: {
+      background: '0 0% 100%',
+      foreground: '292 30% 12%',
+      card: '0 0% 100%',
+      cardForeground: '292 30% 12%',
+      popover: '0 0% 100%',
+      popoverForeground: '292 30% 12%',
+      primary: '292 78% 24%',
+      primaryForeground: '0 0% 100%',
+      secondary: '292 30% 95%',
+      secondaryForeground: '292 78% 24%',
+      muted: '292 20% 96%',
+      mutedForeground: '292 12% 42%',
+      accent: '160 60% 36%',
+      accentForeground: '0 0% 100%',
+      border: '292 20% 88%',
+      input: '292 20% 88%',
+      ring: '292 78% 24%'
+    },
+    dark: {
+      background: '292 35% 8%',
+      foreground: '292 15% 92%',
+      card: '292 30% 11%',
+      cardForeground: '292 15% 92%',
+      popover: '292 30% 11%',
+      popoverForeground: '292 15% 92%',
+      primary: '292 50% 72%',
+      primaryForeground: '292 35% 8%',
+      secondary: '292 25% 18%',
+      secondaryForeground: '292 15% 92%',
+      muted: '292 22% 16%',
+      mutedForeground: '292 12% 65%',
+      accent: '160 50% 50%',
+      accentForeground: '292 35% 8%',
+      border: '292 22% 20%',
+      input: '292 22% 20%',
+      ring: '292 50% 72%'
+    }
+  },
+  // Cool blue, airy spacing, pillowy corners.
+  ocean: {
+    tokens: { radius: '0.75rem' },
+    light: {
+      background: '200 60% 98%',
+      foreground: '210 40% 14%',
+      card: '0 0% 100%',
+      cardForeground: '210 40% 14%',
+      popover: '0 0% 100%',
+      popoverForeground: '210 40% 14%',
+      primary: '205 90% 42%',
+      primaryForeground: '200 100% 98%',
+      secondary: '200 60% 94%',
+      secondaryForeground: '210 40% 14%',
+      muted: '200 50% 95%',
+      mutedForeground: '210 18% 44%',
+      accent: '180 70% 45%',
+      accentForeground: '200 100% 98%',
+      border: '205 40% 86%',
+      input: '205 40% 86%',
+      ring: '205 90% 42%'
+    },
+    dark: {
+      background: '215 45% 8%',
+      foreground: '200 30% 94%',
+      card: '215 40% 11%',
+      cardForeground: '200 30% 94%',
+      popover: '215 40% 11%',
+      popoverForeground: '200 30% 94%',
+      primary: '205 80% 65%',
+      primaryForeground: '215 45% 8%',
+      secondary: '215 35% 18%',
+      secondaryForeground: '200 30% 94%',
+      muted: '215 30% 16%',
+      mutedForeground: '200 20% 68%',
+      accent: '180 65% 55%',
+      accentForeground: '215 45% 8%',
+      border: '215 30% 22%',
+      input: '215 30% 22%',
+      ring: '205 80% 65%'
+    }
+  },
+  // Warm coral and amber, very round corners — cozy and inviting.
+  sunset: {
+    tokens: { radius: '1rem' },
+    light: {
+      background: '30 50% 98%',
+      foreground: '14 40% 16%',
+      card: '30 60% 99%',
+      cardForeground: '14 40% 16%',
+      popover: '30 60% 99%',
+      popoverForeground: '14 40% 16%',
+      primary: '14 88% 55%',
+      primaryForeground: '30 100% 98%',
+      secondary: '30 60% 94%',
+      secondaryForeground: '14 40% 16%',
+      muted: '30 45% 95%',
+      mutedForeground: '14 18% 44%',
+      accent: '38 95% 55%',
+      accentForeground: '14 40% 16%',
+      border: '20 40% 88%',
+      input: '20 40% 88%',
+      ring: '14 88% 55%'
+    },
+    dark: {
+      background: '15 32% 8%',
+      foreground: '30 40% 94%',
+      card: '15 30% 11%',
+      cardForeground: '30 40% 94%',
+      popover: '15 30% 11%',
+      popoverForeground: '30 40% 94%',
+      primary: '14 80% 65%',
+      primaryForeground: '15 32% 8%',
+      secondary: '15 25% 18%',
+      secondaryForeground: '30 40% 94%',
+      muted: '15 22% 16%',
+      mutedForeground: '30 20% 68%',
+      accent: '38 85% 60%',
+      accentForeground: '15 32% 8%',
+      border: '15 22% 22%',
+      input: '15 22% 22%',
+      ring: '14 80% 65%'
+    }
+  },
+  // Pure grayscale, sharp corners — minimalist editorial feel.
+  mono: {
+    tokens: { radius: '0' },
+    light: {
+      background: '0 0% 100%',
+      foreground: '0 0% 8%',
+      card: '0 0% 100%',
+      cardForeground: '0 0% 8%',
+      popover: '0 0% 100%',
+      popoverForeground: '0 0% 8%',
+      primary: '0 0% 12%',
+      primaryForeground: '0 0% 98%',
+      secondary: '0 0% 95%',
+      secondaryForeground: '0 0% 12%',
+      muted: '0 0% 96%',
+      mutedForeground: '0 0% 42%',
+      accent: '0 0% 90%',
+      accentForeground: '0 0% 12%',
+      border: '0 0% 86%',
+      input: '0 0% 86%',
+      ring: '0 0% 12%'
+    },
+    dark: {
+      background: '0 0% 6%',
+      foreground: '0 0% 95%',
+      card: '0 0% 9%',
+      cardForeground: '0 0% 95%',
+      popover: '0 0% 9%',
+      popoverForeground: '0 0% 95%',
+      primary: '0 0% 92%',
+      primaryForeground: '0 0% 8%',
+      secondary: '0 0% 16%',
+      secondaryForeground: '0 0% 95%',
+      muted: '0 0% 14%',
+      mutedForeground: '0 0% 65%',
+      accent: '0 0% 22%',
+      accentForeground: '0 0% 95%',
+      border: '0 0% 20%',
+      input: '0 0% 20%',
+      ring: '0 0% 92%'
+    }
+  },
+  // Neon magenta on near-black with cyan accents, almost-sharp corners.
+  cyberpunk: {
+    tokens: { radius: '0.125rem' },
+    light: {
+      background: '300 40% 97%',
+      foreground: '300 30% 12%',
+      card: '0 0% 100%',
+      cardForeground: '300 30% 12%',
+      popover: '0 0% 100%',
+      popoverForeground: '300 30% 12%',
+      primary: '320 95% 48%',
+      primaryForeground: '0 0% 100%',
+      secondary: '300 40% 94%',
+      secondaryForeground: '300 30% 12%',
+      muted: '300 30% 96%',
+      mutedForeground: '300 12% 42%',
+      accent: '180 90% 38%',
+      accentForeground: '0 0% 100%',
+      border: '300 30% 86%',
+      input: '300 30% 86%',
+      ring: '320 95% 48%'
+    },
+    dark: {
+      background: '270 30% 5%',
+      foreground: '300 30% 95%',
+      card: '270 28% 8%',
+      cardForeground: '300 30% 95%',
+      popover: '270 28% 8%',
+      popoverForeground: '300 30% 95%',
+      primary: '320 100% 65%',
+      primaryForeground: '270 30% 5%',
+      secondary: '270 25% 16%',
+      secondaryForeground: '300 30% 95%',
+      muted: '270 22% 14%',
+      mutedForeground: '300 18% 68%',
+      accent: '180 95% 55%',
+      accentForeground: '270 30% 5%',
+      border: '300 30% 22%',
+      input: '300 30% 22%',
+      ring: '320 100% 65%'
+    }
+  }
 };
 
 /**
@@ -169,13 +392,15 @@ function mergeTokens(target: Record<string, string>, source: BrandTokens | undef
  */
 export function resolveBrandTheme(input: BrandTheme | BrandPreset | undefined): ResolvedBrandTheme {
   const theme = toBrandTheme(input);
-  const presetTokens = theme.preset ? PRESETS[theme.preset] : undefined;
+  const preset = theme.preset ? PRESETS[theme.preset] : undefined;
 
   const light: Record<string, string> = {};
   const dark: Record<string, string> = {};
 
-  mergeTokens(light, presetTokens);
-  mergeTokens(dark, presetTokens);
+  mergeTokens(light, preset?.tokens);
+  mergeTokens(dark, preset?.tokens);
+  mergeTokens(light, preset?.light);
+  mergeTokens(dark, preset?.dark);
   mergeTokens(light, theme.tokens);
   mergeTokens(dark, theme.tokens);
   mergeTokens(light, theme.light);
