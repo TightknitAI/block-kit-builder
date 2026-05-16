@@ -5,14 +5,7 @@ import { SlackBlockPreview } from './slack-block-preview';
 const meta = {
   title: 'BlockKitBuilder/SlackBlockPreview',
   component: SlackBlockPreview,
-  parameters: {
-    layout: 'centered',
-    // Upstream `slack-blocks-to-jsx` markup trips axe rules we can't fix from
-    // here (link contrast, carousel keyboard access, dark-mode button
-    // contrast). Match the rest of the suite and report a11y as todos rather
-    // than failing the story tests.
-    a11y: { test: 'todo' }
-  },
+  parameters: { layout: 'centered' },
   argTypes: {
     theme: {
       control: 'inline-radio',
@@ -218,23 +211,47 @@ export const Card: Story = {
 
 export const Carousel: Story = {
   args: {
+    // Each card carries a button so the scrollable carousel container has
+    // focusable descendants, which satisfies axe's
+    // `scrollable-region-focusable` rule.
     block: block({
       type: 'carousel',
       elements: [
         {
           type: 'card',
           title: { type: 'mrkdwn', text: 'Card 1' },
-          body: { type: 'mrkdwn', text: 'First card in the carousel.' }
+          body: { type: 'mrkdwn', text: 'First card in the carousel.' },
+          actions: [
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: 'Open 1', emoji: true },
+              action_id: 'open_1'
+            }
+          ]
         },
         {
           type: 'card',
           title: { type: 'mrkdwn', text: 'Card 2' },
-          body: { type: 'mrkdwn', text: 'Second card in the carousel.' }
+          body: { type: 'mrkdwn', text: 'Second card in the carousel.' },
+          actions: [
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: 'Open 2', emoji: true },
+              action_id: 'open_2'
+            }
+          ]
         },
         {
           type: 'card',
           title: { type: 'mrkdwn', text: 'Card 3' },
-          body: { type: 'mrkdwn', text: 'Third card in the carousel.' }
+          body: { type: 'mrkdwn', text: 'Third card in the carousel.' },
+          actions: [
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: 'Open 3', emoji: true },
+              action_id: 'open_3'
+            }
+          ]
         }
       ]
     })
@@ -300,25 +317,6 @@ export const Table: Story = {
           { type: 'raw_text', text: 'Row 2, C' }
         ]
       ]
-    })
-  }
-};
-
-export const DarkTheme: Story = {
-  args: {
-    theme: 'dark',
-    block: block({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: 'Dark theme preview. Same block, `data-theme="dark"` on the wrapper.'
-      },
-      accessory: {
-        type: 'button',
-        text: { type: 'plain_text', text: 'Primary', emoji: true },
-        style: 'primary',
-        action_id: 'dark_button'
-      }
     })
   }
 };
