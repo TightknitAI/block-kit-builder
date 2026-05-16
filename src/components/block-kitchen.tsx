@@ -43,6 +43,9 @@ export function BlockKitchen(props: BlockKitchenProps) {
     loadSendAsUserStatus,
     onSend,
     palette,
+    showPaletteSearch,
+    paletteSearchPlaceholder,
+    defaultOpenSections,
     allowedSurfaces: allowedSurfacesProp,
     showThemeControl = true,
     defaultPreviewTheme = 'light',
@@ -164,7 +167,13 @@ export function BlockKitchen(props: BlockKitchenProps) {
               showThemeControl={showThemeControl}
             />
             <div className="flex min-h-0 flex-1 items-stretch">
-              <Palette onAddBlock={(block) => addBlock(block)} sections={paletteSections} />
+              <Palette
+                onAddBlock={(block) => addBlock(block)}
+                sections={paletteSections}
+                showSearch={showPaletteSearch}
+                searchPlaceholder={paletteSearchPlaceholder}
+                defaultOpenSections={defaultOpenSections}
+              />
               <Surface
                 blocks={blocks}
                 workspaceName={workspaceName}

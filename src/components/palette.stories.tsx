@@ -71,3 +71,85 @@ export const CustomPalette: Story = {
     expect(block.type).toBe('section');
   }
 };
+
+export const WithSearchQuery: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const search = await canvas.findByRole('searchbox', { name: /search blocks/i });
+    await userEvent.type(search, 'button');
+    // "button", "link button", "multiple buttons" all live under Actions.
+    await canvas.findByText('button');
+    await canvas.findByText('link button');
+    await canvas.findByText('multiple buttons');
+  }
+};
+
+export const AllCollapsed: Story = {
+  args: {
+    defaultOpenSections: false
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const dividerHeader = await canvas.findByRole('button', { name: /^divider$/i });
+    expect(dividerHeader).toHaveAttribute('aria-expanded', 'false');
+    expect(canvas.queryByRole('button', { name: /^add plain to preview$/i })).toBeNull();
+  }
+};
+
+export const OnlySectionOpen: Story = {
+  args: {
+    defaultOpenSections: ['Section']
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sectionHeader = await canvas.findByRole('button', { name: /^section$/i });
+    expect(sectionHeader).toHaveAttribute('aria-expanded', 'true');
+    const dividerHeader = await canvas.findByRole('button', { name: /^divider$/i });
+    expect(dividerHeader).toHaveAttribute('aria-expanded', 'false');
+  }
+};
+
+export const CollapseToggle: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const dividerHeader = await canvas.findByRole('button', { name: /^divider$/i });
+    expect(dividerHeader).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.click(dividerHeader);
+    expect(dividerHeader).toHaveAttribute('aria-expanded', 'false');
+    expect(canvas.queryByRole('button', { name: /^add plain to preview$/i })).toBeNull();
+    await userEvent.click(dividerHeader);
+    expect(dividerHeader).toHaveAttribute('aria-expanded', 'true');
+  }
+};
+
+export const NoMatchEmptyState: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const search = await canvas.findByRole('searchbox', { name: /search blocks/i });
+    await userEvent.type(search, 'zzzzzz');
+    await canvas.findByText(/no blocks match/i);
+  }
+};
+
+export const SearchHidden: Story = {
+  args: {
+    showSearch: false
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.queryByRole('searchbox')).toBeNull();
+    // Sections still render normally. Use "Divider" — its variant label
+    // ("plain") doesn't collide with the header text.
+    await canvas.findByRole('button', { name: /^divider$/i });
+  }
+};
+
+export const CustomSearchPlaceholder: Story = {
+  args: {
+    searchPlaceholder: 'Find a block…'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await canvas.findByRole('searchbox', { name: /find a block/i });
+  }
+};
