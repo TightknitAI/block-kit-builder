@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/TightknitAI/block-kitchen/security/advisories/new
     about: Please report security issues privately, not as a public issue.
   - name: Full-stack example app
-    url: https://github.com/TightknitAI/block-kit-builder-template
+    url: https://github.com/TightknitAI/block-kitchen-template
     about: Wiring questions about OAuth, channel listing, or sending belong in the template repo.
