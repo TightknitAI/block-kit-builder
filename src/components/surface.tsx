@@ -109,7 +109,7 @@ export function Surface({
   );
 
   return (
-    <div className="flex flex-1 flex-col bg-muted/30 p-6">
+    <div className={cn('flex flex-1 flex-col p-6', isDark ? 'bg-[#0e0f12]' : 'bg-[#f4f4f4]')}>
       <div className="mx-auto w-full max-w-2xl">
         {previewSurface === 'modal' ? (
           <ModalFrame isDark={isDark}>{blocksList}</ModalFrame>
