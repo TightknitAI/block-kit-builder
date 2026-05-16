@@ -20,7 +20,16 @@ export default defineConfig({
           name: 'unit',
           globals: true,
           environment: 'jsdom',
-          include: ['test/**/*.test.ts', 'test/**/*.test.tsx']
+          include: ['test/**/*.test.ts', 'test/**/*.test.tsx'],
+          // The published @tightknitai/slack-block-kit-validator dist uses
+          // extension-less ESM imports between its files. Node's ESM
+          // resolver rejects those; Vite's does not. Inlining the package
+          // routes its imports through Vite so the helper modules resolve.
+          server: {
+            deps: {
+              inline: ['@tightknitai/slack-block-kit-validator']
+            }
+          }
         }
       },
       {

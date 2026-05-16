@@ -5,7 +5,7 @@ import { Button } from './button';
 const meta = {
   title: 'UI/Button',
   component: Button,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', a11y: { test: 'error' } },
   args: { children: 'Click me', onClick: fn() },
   argTypes: {
     variant: {
