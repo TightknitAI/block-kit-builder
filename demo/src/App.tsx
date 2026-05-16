@@ -1,7 +1,6 @@
 import {
   BlockKitchen,
   type ChannelOption,
-  defaultTemplates,
   type SendAsUserStatus,
   type SendPayload,
   type SendResult,
@@ -10,6 +9,7 @@ import {
   TemplatePicker
 } from '@tightknitai/block-kitchen';
 import { useEffect, useState } from 'react';
+import { demoTemplates } from './templates';
 
 const MOCK_CHANNELS: ChannelOption[] = [
   { id: 'C0001', name: 'general' },
@@ -164,7 +164,7 @@ export function App() {
             }}
           >
             <TemplatePicker
-              templates={defaultTemplates}
+              templates={demoTemplates}
               heading="Templates"
               theme={theme}
               onSelect={handleSelectTemplate}

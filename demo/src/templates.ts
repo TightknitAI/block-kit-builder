@@ -1,28 +1,31 @@
-import type { SupportedBlock, Template } from '../types';
+import type { SupportedBlock, Template } from '@tightknitai/block-kitchen';
 
 /**
- * A curated showcase set of {@link Template}s consumed by the live demo,
- * Storybook fixtures, and any downstream app that wants a polished
- * starting gallery. The set is intentionally broad — between them the
- * templates exercise every supported block type and a wide slice of the
- * element catalog (every select type, all date/time pickers, every
- * text-input variant, file input, rich text input, feedback / icon
- * buttons, image accessories, overflow menus, button confirm dialogs).
+ * Demo-specific template gallery. The `block-kitchen` package intentionally
+ * does **not** ship templates of its own — templates are use-case examples
+ * (an "Expense approval" is for an approvals product, a "Daily standup" is
+ * for a team product) and belong in the consuming app's config, not the
+ * library bundle. This file is the demo's own config; downstream apps are
+ * expected to define their own set and pass it to `<TemplatePicker>`.
  *
- * Each template's `surface` is the surface its blocks were validated
- * against; the runtime validator enforces surface compatibility (e.g.
- * `alert` is modal-only, `table` / `markdown` / `carousel` /
- * `context_actions` are forbidden on modals, `table` / `markdown` /
- * `context_actions` are forbidden on app-home tabs), and the templates
- * here respect those rules.
+ * The set is intentionally broad to showcase the platform in the live demo
+ * — between them the templates exercise every supported block type and a
+ * wide slice of the element catalog (every select type, all date/time
+ * pickers, every text-input variant, file input, rich text input, feedback
+ * / icon buttons, image accessories, overflow menus, button confirm
+ * dialogs).
+ *
+ * Each template's `surface` is the surface its blocks were authored for;
+ * the runtime validator enforces surface compatibility (e.g. `alert` is
+ * modal-only, `table` / `markdown` / `carousel` / `context_actions` are
+ * forbidden on modals, `table` / `markdown` / `context_actions` are
+ * forbidden on app-home tabs), and the templates here respect those rules.
  */
 
 /**
- * Categories used to group templates in the {@link TemplatePicker}.
- * Exposed as a named constant so consumers can reference the same
- * strings when extending the set.
+ * Categories used to group templates in the demo's `<TemplatePicker>`.
  */
-export const TEMPLATE_CATEGORIES = {
+const TEMPLATE_CATEGORIES = {
   engineering: 'Engineering',
   approvals: 'Approvals',
   team: 'Team',
@@ -1254,9 +1257,9 @@ const TEAM_DASHBOARD_BLOCKS: SupportedBlock[] = [
 
 /**
  * The full curated template gallery. Order here is the order that the
- * {@link TemplatePicker} renders cards within each category section.
+ * picker renders cards within each category section.
  */
-export const defaultTemplates: readonly Template[] = [
+export const demoTemplates: readonly Template[] = [
   {
     id: 'pull-request-review',
     name: 'Pull request review',
