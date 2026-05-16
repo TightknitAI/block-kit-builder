@@ -6,7 +6,7 @@ export default defineConfig({
   dts: true,
   target: 'es2022',
   sourcemap: true,
-  clean: false,
+  clean: true,
   splitting: false,
   treeshake: true,
   external: ['react', 'react-dom', 'slack-web-api-client']

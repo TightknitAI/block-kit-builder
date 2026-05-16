@@ -5,13 +5,32 @@ export {
   encodeBlocksToString
 } from './lib/url-state';
 export type {
+  AlertBlock,
+  AlertLevel,
   BlockKitBuilderProps,
   BuilderBlock,
+  CardBlock,
+  CarouselBlock,
   ChannelOption,
+  ContextActionsBlock,
+  ContextActionsElement,
+  FeedbackButtonSubobject,
+  FeedbackButtonsElement,
+  HeaderLevel,
+  IconButtonElement,
+  IconButtonIcon,
+  InputBlock,
+  MarkdownBlock,
   PreviewHooks,
+  PreviewSurface,
+  PreviewTheme,
   SendAsUserStatus,
   SendPayload,
   SendResult,
   SupportedBlock,
-  SupportedBlockType
+  SupportedBlockType,
+  SupportedHeaderBlock,
+  TableBlock,
+  TableCell,
+  TableColumnSetting
 } from './types';

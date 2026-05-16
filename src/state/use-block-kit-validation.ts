@@ -1,5 +1,5 @@
 import { validateBlockKit } from '@tightknitai/slack-block-kit-validator';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type GroupedErrors, groupValidatorErrors, toValidatorSurface } from '../lib/error-grouping';
 import { toSlackBlocks } from '../lib/to-slack-blocks';
 import type { BuilderBlock, PreviewSurface } from '../types';
@@ -20,36 +20,48 @@ export interface ValidationState extends GroupedErrors {
 }
 
 /**
+ * Validates a block draft against {@link validateBlockKit}, scoped to the
+ * given preview surface. Pure; safe to call during render.
+ */
+function computeValidation(blocks: BuilderBlock[], surface: PreviewSurface): ValidationState {
+  const payload = toSlackBlocks(blocks.map((b) => b.block));
+  const result = validateBlockKit(payload, {
+    target: 'blocks',
+    surface: toValidatorSurface(surface)
+  });
+  const grouped = groupValidatorErrors(result.errors, blocks);
+  return {
+    valid: result.valid,
+    byBlockId: grouped.byBlockId,
+    general: grouped.general,
+    total: grouped.total
+  };
+}
+
+/**
  * Continuously validates the working draft against
  * {@link validateBlockKit}, scoped to the current preview surface.
- * Debounced so rapid edits don't thrash the AJV compiled validator.
+ *
+ * The first pass runs synchronously during initial render so consumers
+ * never see a stale `errorCount: 0` for an invalid `initialBlocks`.
+ * Subsequent passes are debounced so rapid edits don't thrash the AJV
+ * compiled validator.
  *
  * @param blocks - current builder blocks (id + payload)
  * @param surface - the preview surface (drives surface-compatibility checks)
  * @returns the current validation state, grouped by block id
  */
 export function useBlockKitValidation(blocks: BuilderBlock[], surface: PreviewSurface): ValidationState {
-  const [state, setState] = useState<ValidationState>(() => ({
-    valid: true,
-    byBlockId: new Map(),
-    general: [],
-    total: 0
-  }));
+  const [state, setState] = useState<ValidationState>(() => computeValidation(blocks, surface));
+  const isFirstRunRef = useRef(true);
 
   useEffect(() => {
+    if (isFirstRunRef.current) {
+      isFirstRunRef.current = false;
+      return;
+    }
     const handle = setTimeout(() => {
-      const payload = toSlackBlocks(blocks.map((b) => b.block));
-      const result = validateBlockKit(payload, {
-        target: 'blocks',
-        surface: toValidatorSurface(surface)
-      });
-      const grouped = groupValidatorErrors(result.errors, blocks);
-      setState({
-        valid: result.valid,
-        byBlockId: grouped.byBlockId,
-        general: grouped.general,
-        total: grouped.total
-      });
+      setState(computeValidation(blocks, surface));
     }, DEBOUNCE_MS);
     return () => clearTimeout(handle);
   }, [blocks, surface]);
