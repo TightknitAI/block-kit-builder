@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.5.0-alpha.0...block-kitchen-v0.5.1-alpha.0) (2026-05-16)
+
+
+### Features
+
+* **palette:** quick search + collapsible categories ([#35](https://github.com/TightknitAI/block-kitchen/issues/35)) ([62e9d00](https://github.com/TightknitAI/block-kitchen/commit/62e9d00f84f5ab46af7b2b4b50375febed6e43bf))
+
 ## [0.5.0-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.4.0-alpha.0...block-kitchen-v0.5.0-alpha.0) (2026-05-16)
 
 
