@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
 import { cn } from '../lib/cn';
-import { PALETTE_SECTIONS, type PaletteVariant } from '../lib/default-blocks';
+import type { PaletteSection, PaletteVariant } from '../lib/default-blocks';
 import type { SupportedBlock, SupportedBlockType } from '../types';
 
 const SECTION_ICONS: Record<SupportedBlockType, ComponentType<SVGProps<SVGSVGElement>>> = {
@@ -67,24 +67,19 @@ export function parsePaletteDragId(id: string | number): string | null {
  * @param props - palette props
  * @param props.onAddBlock - called when a palette item is added via its
  *   chevron button (appends the block to the bottom of the preview)
- * @param props.allowedBlockTypes - if provided, restricts the palette to
- *   sections whose block type is in the list. When omitted, every section
- *   is rendered.
+ * @param props.sections - the palette sections to render (the resolved
+ *   palette, either the built-in default or a consumer-provided one)
  * @returns the rendered palette aside
  */
 export function Palette({
   onAddBlock,
-  allowedBlockTypes
+  sections
 }: {
   onAddBlock: (block: SupportedBlock) => void;
-  allowedBlockTypes?: readonly SupportedBlockType[];
+  sections: readonly PaletteSection[];
 }) {
-  const sections = allowedBlockTypes
-    ? PALETTE_SECTIONS.filter((s) => allowedBlockTypes.includes(s.blockType))
-    : PALETTE_SECTIONS;
-
   return (
-    <aside className="flex min-h-0 w-60 shrink-0 flex-col overflow-y-auto border-r bg-muted/20 p-3">
+    <aside className="flex min-h-0 w-60 shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r bg-muted/20 p-3">
       {sections.map((section) => {
         const Icon = SECTION_ICONS[section.blockType];
         return (
@@ -126,7 +121,7 @@ function PaletteItem({ variant, onAdd }: { variant: PaletteVariant; onAdd: () =>
     >
       <div
         ref={setActivatorNodeRef}
-        className="-my-1.5 flex flex-1 cursor-grab items-center gap-2 rounded py-1.5 active:cursor-grabbing focus-visible:outline-none"
+        className="-my-1.5 flex min-w-0 flex-1 cursor-grab items-center gap-2 rounded py-1.5 active:cursor-grabbing focus-visible:outline-none"
         {...attributes}
         {...listeners}
       >

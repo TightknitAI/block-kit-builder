@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useArgs } from 'storybook/preview-api';
 import { expect, fn, userEvent, within } from 'storybook/test';
-import { VARIANT_BY_ID } from '../../lib/default-blocks';
+import { buildVariantById, defaultPalette } from '../../lib/default-blocks';
 import { TooltipProvider } from '../../lib/ui/tooltip';
 import type { SupportedBlock } from '../../types';
 import { BlockEditor } from './block-editor';
+
+const VARIANT_BY_ID = buildVariantById(defaultPalette);
 
 /**
  * Resolves a palette variant id to a fresh block payload, so stories

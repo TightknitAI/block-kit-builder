@@ -10,6 +10,8 @@ import type {
   Button as SlackButton,
   ViewInputBlock
 } from 'slack-web-api-client';
+import type { BrandPreset, BrandTheme } from './lib/brand-theme';
+import type { PaletteSection } from './lib/default-blocks';
 
 /**
  * The Slack Block Kit block types supported by the builder in v1.
@@ -345,13 +347,18 @@ export interface BlockKitBuilderProps {
    */
   onSend: (payload: SendPayload) => Promise<SendResult>;
   /**
-   * Which Slack block types appear in the palette. When omitted, every
-   * supported type is shown. When provided, the palette is filtered to
-   * the listed types — useful for restricting the builder to a curated
-   * subset (e.g. a message-only app might omit `input` and `alert`).
-   * An empty array renders an empty palette.
+   * The palette shown on the left-hand side. When omitted, the built-in
+   * `defaultPalette` is used. Pass a custom array (typically built by
+   * spreading and filtering `defaultPalette`, plus your own sections) to
+   * curate the variants and pre-configured presets your users can drag
+   * onto the surface. An empty array renders an empty palette.
+   *
+   * Variant ids must be unique across the array — the drag-drop lookup
+   * keys by id, so duplicates would shadow each other. The palette is
+   * also expected to be referentially stable across renders (wrap in
+   * `useMemo` or define at module scope).
    */
-  allowedBlockTypes?: readonly SupportedBlockType[];
+  palette?: readonly PaletteSection[];
   /**
    * Which Slack preview surfaces the toolbar exposes. Defaults to
    * `['message']`, which locks the preview to Message and hides the
@@ -373,4 +380,29 @@ export interface BlockKitBuilderProps {
    * {@link BlockKitBuilderProps.showThemeControl} is `true`.
    */
   defaultPreviewTheme?: PreviewTheme;
+  /**
+   * Branding tokens applied to the builder chrome (toolbar, palette,
+   * popover editors, send dialog, JSON drawer, issues sheet). The
+   * Slack preview itself is rendered by `slack-blocks-to-jsx` with its
+   * native Slack styling regardless — use {@link BlockKitBuilderProps.defaultPreviewTheme}
+   * for preview light/dark.
+   *
+   * Pass a preset name as sugar for `{ preset }`, or an object with
+   * `tokens` (applied in both modes) and optional `light`/`dark`
+   * overrides. The existing CSS-variable override path (importing the
+   * stylesheet and setting `--primary`, etc. on your own selector)
+   * continues to work; this prop is a typed shortcut on top of it.
+   *
+   * @example
+   * ```tsx
+   * <BlockKitBuilder
+   *   theme={{
+   *     tokens: { primary: '262 83% 58%', radius: '0.75rem' },
+   *     dark: { primary: '263 70% 65%' }
+   *   }}
+   *   {...rest}
+   * />
+   * ```
+   */
+  theme?: BrandTheme | BrandPreset;
 }

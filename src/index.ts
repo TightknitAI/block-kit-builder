@@ -1,4 +1,11 @@
 export { BlockKitBuilder } from './components/block-kit-builder';
+export type {
+  BrandPreset,
+  BrandTheme,
+  BrandTokens
+} from './lib/brand-theme';
+export type { PaletteSection, PaletteVariant } from './lib/default-blocks';
+export { defaultPalette } from './lib/default-blocks';
 export { toSlackBlocks } from './lib/to-slack-blocks';
 export {
   decodeBlocksFromString,
