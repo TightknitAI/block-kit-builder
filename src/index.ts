@@ -7,6 +7,7 @@ export type {
 } from './lib/brand-theme';
 export type { PaletteSection, PaletteVariant } from './lib/default-blocks';
 export { defaultPalette, extraAlertVariant, legacyInputVariants } from './lib/default-blocks';
+export { defaultTemplates, TEMPLATE_CATEGORIES } from './lib/default-templates';
 export { toSlackBlocks } from './lib/to-slack-blocks';
 export {
   decodeBlocksFromString,

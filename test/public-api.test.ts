@@ -1,7 +1,8 @@
 import { defaultPalette, extraAlertVariant, legacyInputVariants } from '../src/lib/default-blocks';
+import { defaultTemplates } from '../src/lib/default-templates';
 import { toSlackBlocks } from '../src/lib/to-slack-blocks';
 import { decodeBlocksFromString, encodeBlocksToString } from '../src/lib/url-state';
-import type { SupportedBlock } from '../src/types';
+import type { PreviewSurface, SupportedBlock } from '../src/types';
 
 describe('toSlackBlocks', () => {
   it('strips the builder-only `level` field from header blocks', () => {
@@ -139,5 +140,62 @@ describe('palette factories', () => {
       expect(variant.factory().type).toBe('input');
     }
     expect(extraAlertVariant.factory().type).toBe('alert');
+  });
+});
+
+describe('default templates', () => {
+  const ALLOWED_SURFACES: readonly PreviewSurface[] = ['message', 'modal', 'app_home'];
+
+  // Mirrors the surface-compatibility rules enforced at runtime by
+  // `@tightknitai/slack-block-kit-validator`'s `checkSurfaceCompatibility`
+  // helper. Kept inline so the test doesn't pull in the validator package
+  // at unit-test time.
+  const FORBIDDEN_BLOCKS_BY_SURFACE: Record<PreviewSurface, ReadonlySet<string>> = {
+    message: new Set(['alert', 'file']),
+    modal: new Set(['card', 'carousel', 'context_actions', 'file', 'markdown', 'plan', 'table', 'task_card']),
+    app_home: new Set(['alert', 'context_actions', 'file', 'markdown', 'plan', 'table', 'task_card'])
+  };
+
+  it('template ids are unique', () => {
+    const ids = defaultTemplates.map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('every template has at least one block', () => {
+    for (const template of defaultTemplates) {
+      expect(template.blocks.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("every template's surface is a recognized PreviewSurface", () => {
+    for (const template of defaultTemplates) {
+      expect(ALLOWED_SURFACES).toContain(template.surface);
+    }
+  });
+
+  it('no template uses a block type forbidden on its declared surface', () => {
+    for (const template of defaultTemplates) {
+      const forbidden = FORBIDDEN_BLOCKS_BY_SURFACE[template.surface];
+      for (let i = 0; i < template.blocks.length; i++) {
+        const block = template.blocks[i] as { type?: string; element?: { type?: string } };
+        if (block.type && forbidden.has(block.type)) {
+          throw new Error(
+            `Template "${template.id}" (surface "${template.surface}") uses forbidden block type "${block.type}" at index ${i}`
+          );
+        }
+        if (block.type === 'input' && block.element?.type === 'file_input' && template.surface !== 'modal') {
+          throw new Error(
+            `Template "${template.id}" (surface "${template.surface}") uses file_input outside a modal surface at index ${i}`
+          );
+        }
+      }
+    }
+  });
+
+  it("every template's blocks roundtrip through toSlackBlocks", () => {
+    for (const template of defaultTemplates) {
+      const out = toSlackBlocks(template.blocks as SupportedBlock[]);
+      expect(out.length).toBe(template.blocks.length);
+    }
   });
 });

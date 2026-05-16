@@ -1,6 +1,7 @@
 import {
   BlockKitchen,
   type ChannelOption,
+  defaultTemplates,
   type SendAsUserStatus,
   type SendPayload,
   type SendResult,
@@ -31,81 +32,6 @@ const INITIAL_BLOCKS: SupportedBlock[] = [
     }
   },
   { type: 'divider' }
-];
-
-const TEMPLATES: Template[] = [
-  {
-    id: 'approval-request',
-    name: 'Approval request',
-    description: 'Header + body + approve/reject actions.',
-    category: 'Approvals',
-    surface: 'message',
-    blocks: [
-      { type: 'header', text: { type: 'plain_text', text: 'Approval needed' } },
-      {
-        type: 'section',
-        text: { type: 'mrkdwn', text: '*Sarah* requested time off from *Mar 12* to *Mar 18*.' }
-      },
-      {
-        type: 'actions',
-        elements: [
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: 'Approve' },
-            style: 'primary',
-            value: 'approve'
-          },
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: 'Reject' },
-            style: 'danger',
-            value: 'reject'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'product-release',
-    name: 'Product release',
-    description: 'Announce a new release with a CTA.',
-    category: 'Notifications',
-    surface: 'message',
-    blocks: [
-      { type: 'header', text: { type: 'plain_text', text: 'We just shipped v2.5' } },
-      {
-        type: 'section',
-        text: { type: 'mrkdwn', text: 'New: bulk edit, keyboard shortcuts, and a redesigned inbox.' }
-      }
-    ]
-  },
-  {
-    id: 'daily-standup',
-    name: 'Daily standup',
-    description: 'Yesterday / Today / Blockers prompts.',
-    category: 'Polls and surveys',
-    surface: 'message',
-    blocks: [
-      { type: 'header', text: { type: 'plain_text', text: 'Daily standup' } },
-      { type: 'section', text: { type: 'mrkdwn', text: '*Yesterday:* ...' } },
-      { type: 'section', text: { type: 'mrkdwn', text: '*Today:* ...' } },
-      { type: 'section', text: { type: 'mrkdwn', text: '*Blockers:* ...' } }
-    ]
-  },
-  {
-    id: 'modal-confirm',
-    name: 'Confirm delete',
-    description: 'Modal confirmation before a destructive action.',
-    category: 'Approvals',
-    surface: 'modal',
-    blocks: [
-      { type: 'header', text: { type: 'plain_text', text: 'Are you sure?' } },
-      {
-        type: 'section',
-        text: { type: 'mrkdwn', text: 'This action cannot be undone.' }
-      }
-    ]
-  }
 ];
 
 async function loadChannels(): Promise<ChannelOption[]> {
@@ -238,7 +164,7 @@ export function App() {
             }}
           >
             <TemplatePicker
-              templates={TEMPLATES}
+              templates={defaultTemplates}
               heading="Templates"
               theme={theme}
               onSelect={handleSelectTemplate}
