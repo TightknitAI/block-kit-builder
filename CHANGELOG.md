@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.5.2-alpha.0...block-kitchen-v0.6.0-alpha.0) (2026-05-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* **palette:** consolidate variants to mirror Slack's Block Kit Builder ([#39](https://github.com/TightknitAI/block-kitchen/issues/39))
+
+### Features
+
+* **palette:** consolidate variants to mirror Slack's Block Kit Builder ([#39](https://github.com/TightknitAI/block-kitchen/issues/39)) ([b3950c5](https://github.com/TightknitAI/block-kitchen/commit/b3950c51acbb85623fbc632fbafc77db25ef9623))
+* **toolbar:** restyle docs link and make it configurable ([#41](https://github.com/TightknitAI/block-kitchen/issues/41)) ([74cf1d0](https://github.com/TightknitAI/block-kitchen/commit/74cf1d05d025d543bce76d0c6c50240c09c80a63))
+
+
+### Bug Fixes
+
+* **demo:** apply .dark to &lt;html&gt; so portals follow dark mode ([#42](https://github.com/TightknitAI/block-kitchen/issues/42)) ([c81d1a7](https://github.com/TightknitAI/block-kitchen/commit/c81d1a7723edfbe063bed60a2b601521ddb60dd4))
+
 ## [0.5.2-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.5.1-alpha.0...block-kitchen-v0.5.2-alpha.0) (2026-05-16)
 
 
