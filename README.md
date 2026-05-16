@@ -19,7 +19,7 @@ Inspired by [Slack's Block Kit Builder](https://app.slack.com/block-kit-builder)
   <img src="./assets/screenshot.png" alt="block-kitchen demo screenshot" width="900" />
 </p>
 
-The package owns the entire builder UX — palette, sortable preview surface, per-block popover editors, send dialog. It knows nothing about how channels are listed, who the user is, or how messages are sent. The consumer wires those concerns through callback props. A working end-to-end app is shown in [block-kit-builder-template](https://github.com/TightknitAI/block-kit-builder-template).
+The package owns the entire builder UX — palette, sortable preview surface, per-block popover editors, send dialog. It knows nothing about how channels are listed, who the user is, or how messages are sent. The consumer wires those concerns through callback props. A working end-to-end app is shown in [block-kitchen-template](https://github.com/TightknitAI/block-kitchen-template).
 
 ## Install
 
@@ -143,7 +143,7 @@ import type {
 
 ## Backend
 
-The builder is frontend-only. For a full app that handles OAuth, channel listing, and `chat.postMessage`, see [block-kit-builder-template](https://github.com/TightknitAI/block-kit-builder-template) — a Vite + React SPA on Cloudflare Workers that wires this package to [slack-hono](https://github.com/TightknitAI/slack-hono) on the backend.
+The builder is frontend-only. For a full app that handles OAuth, channel listing, and `chat.postMessage`, see [block-kitchen-template](https://github.com/TightknitAI/block-kitchen-template) — a Vite + React SPA on Cloudflare Workers that wires this package to [slack-hono](https://github.com/TightknitAI/slack-hono) on the backend.
 
 ## Validation
 
