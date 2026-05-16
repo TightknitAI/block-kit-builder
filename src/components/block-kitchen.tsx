@@ -5,15 +5,20 @@ import {
   type DragEndEvent,
   DragOverlay,
   type DragStartEvent,
+  KeyboardSensor,
   PointerSensor,
   pointerWithin,
+  TouchSensor,
   useSensor,
   useSensors
 } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { GripVertical } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { buildVariantById, defaultPalette } from '../lib/default-blocks';
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from '../lib/ui/sheet';
 import { TooltipProvider } from '../lib/ui/tooltip';
+import { useIsMobile } from '../lib/use-is-mobile';
 import { useBlockKitValidation } from '../state/use-block-kit-validation';
 import { useBlockKitchenState } from '../state/use-block-kitchen-state';
 import type { BlockKitchenProps, PreviewSurface, PreviewTheme } from '../types';
@@ -69,10 +74,13 @@ export function BlockKitchen(props: BlockKitchenProps) {
   const [jsonOpen, setJsonOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [issuesOpen, setIssuesOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const [openBlockId, setOpenBlockId] = useState<string | null>(null);
   const [previewTheme, setPreviewTheme] = useState<PreviewTheme>(defaultPreviewTheme);
   const [previewSurface, setPreviewSurface] = useState<PreviewSurface>(allowedSurfaces[0]);
   const [activePaletteVariantId, setActivePaletteVariantId] = useState<string | null>(null);
+
+  const isMobile = useIsMobile();
 
   // Always validate against the `message` surface: that's where Send posts
   // to. If we scoped validation to the preview surface, a user could switch
@@ -80,7 +88,14 @@ export function BlockKitchen(props: BlockKitchenProps) {
   // Send accept a payload Slack will reject.
   const validation = useBlockKitValidation(blocks, 'message');
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+  // Touch needs a 150ms press-and-hold to start a drag so scrolling the
+  // surface doesn't accidentally pick up a block. Pointer keeps the small
+  // 4px distance threshold so mouse clicks still open the editor cleanly.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   // Pick the block directly under the cursor when possible so the drop
   // target tracks the cursor rather than whichever droppable's geometric
@@ -151,12 +166,13 @@ export function BlockKitchen(props: BlockKitchenProps) {
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <div className="bk-root flex h-full w-full flex-col rounded-md border bg-background text-foreground">
+          <div className="bk-root flex h-full w-full flex-col overflow-hidden rounded-md border bg-background text-foreground">
             <Toolbar
               onClear={() => replaceAll([])}
               onOpenJson={() => setJsonOpen(true)}
               onOpenIssues={() => setIssuesOpen(true)}
               onOpenSend={() => setSendOpen(true)}
+              onOpenPalette={() => setPaletteOpen(true)}
               canSend={blocks.length > 0}
               canClear={blocks.length > 0}
               errorCount={validation.total}
@@ -169,13 +185,17 @@ export function BlockKitchen(props: BlockKitchenProps) {
               docsLink={docsLink}
             />
             <div className="flex min-h-0 flex-1 items-stretch">
-              <Palette
-                onAddBlock={(block) => addBlock(block)}
-                sections={paletteSections}
-                showSearch={showPaletteSearch}
-                searchPlaceholder={paletteSearchPlaceholder}
-                defaultOpenSections={defaultOpenSections}
-              />
+              {/* Desktop: persistent left aside. Mobile: collapsed to the
+                  palette sheet trigger in the toolbar. */}
+              <div className="hidden min-h-0 md:flex">
+                <Palette
+                  onAddBlock={(block) => addBlock(block)}
+                  sections={paletteSections}
+                  showSearch={showPaletteSearch}
+                  searchPlaceholder={paletteSearchPlaceholder}
+                  defaultOpenSections={defaultOpenSections}
+                />
+              </div>
               <Surface
                 blocks={blocks}
                 workspaceName={workspaceName}
@@ -190,6 +210,7 @@ export function BlockKitchen(props: BlockKitchenProps) {
                 onDelete={removeBlock}
                 onReorder={reorderBlock}
                 isPaletteDrag={activePaletteVariant !== null}
+                onOpenPalette={() => setPaletteOpen(true)}
               />
             </div>
           </div>
@@ -201,6 +222,34 @@ export function BlockKitchen(props: BlockKitchenProps) {
               </div>
             ) : null}
           </DragOverlay>
+          {/* Mobile-only palette sheet. The desktop aside above stays put;
+              this opens from the bottom on a tap of the toolbar's Blocks
+              button. Tap-to-add closes the sheet so the user sees the new
+              row land in the surface. */}
+          <Sheet open={paletteOpen && isMobile} onOpenChange={setPaletteOpen}>
+            <SheetContent
+              side="bottom"
+              className="bk-portal-content flex h-[85svh] max-h-[85svh] flex-col gap-3 p-0 sm:max-w-none"
+            >
+              <div className="flex flex-col gap-1 px-4 pt-5">
+                <SheetTitle>Add a block</SheetTitle>
+                <SheetDescription>Tap a block to add it to the bottom of your draft.</SheetDescription>
+              </div>
+              <div className="flex min-h-0 flex-1 flex-col">
+                <Palette
+                  onAddBlock={(block) => {
+                    addBlock(block);
+                    setPaletteOpen(false);
+                  }}
+                  sections={paletteSections}
+                  showSearch={showPaletteSearch}
+                  searchPlaceholder={paletteSearchPlaceholder}
+                  defaultOpenSections={defaultOpenSections}
+                  variant="sheet"
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
           <JsonDrawer open={jsonOpen} onOpenChange={setJsonOpen} blocks={blockPayloads} onApply={replaceAll} />
           <SendDialog
             open={sendOpen}

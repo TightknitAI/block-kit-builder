@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { LayoutGrid, X } from 'lucide-react';
+import { LayoutGrid, Plus, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { cn } from '../lib/cn';
 import type { BuilderBlock, PreviewHooks, PreviewSurface, PreviewTheme, SupportedBlock } from '../types';
@@ -44,7 +44,8 @@ export function Surface({
   onDuplicate,
   onDelete,
   onReorder,
-  isPaletteDrag = false
+  isPaletteDrag = false,
+  onOpenPalette
 }: {
   blocks: BuilderBlock[];
   workspaceName?: string;
@@ -64,6 +65,8 @@ export function Surface({
   onReorder?: (id: string, toIndex: number) => void;
   /** True while a palette item is being dragged (vs. reordering an existing block). */
   isPaletteDrag?: boolean;
+  /** When provided, the empty state shows a mobile-friendly CTA that opens the palette sheet. */
+  onOpenPalette?: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: SURFACE_DROPPABLE_ID });
   const isDark = previewTheme === 'dark';
@@ -77,7 +80,7 @@ export function Surface({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex min-h-[240px] flex-col px-5 py-2 transition-colors',
+        'flex min-h-[180px] flex-col px-3 py-2 transition-colors sm:min-h-[240px] sm:px-5',
         isDark ? 'bg-[#1a1d21]' : 'bg-white',
         isPaletteDrag &&
           (isDark
@@ -87,7 +90,7 @@ export function Surface({
       )}
     >
       {blocks.length === 0 ? (
-        <EmptyState isDark={isDark} isPaletteDrag={isPaletteDrag} isOver={isOver} />
+        <EmptyState isDark={isDark} isPaletteDrag={isPaletteDrag} isOver={isOver} onOpenPalette={onOpenPalette} />
       ) : (
         <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
           {blocks.map((block, idx) => (
@@ -121,7 +124,7 @@ export function Surface({
       // host theme's --muted token so brand presets reach it. The inner
       // Slack frame keeps Slack's own canvas colors via isDark below,
       // since that surface is mimicking Slack itself.
-      className={cn('flex flex-1 flex-col bg-muted p-6')}
+      className={cn('flex min-w-0 flex-1 flex-col overflow-y-auto bg-muted p-3 sm:p-6')}
     >
       <div className="mx-auto w-full max-w-2xl">
         {previewSurface === 'modal' ? (
@@ -344,7 +347,17 @@ function AppHomeFrame({
  * @param props.isOver - whether the cursor is currently over the surface
  * @returns the rendered placeholder
  */
-function EmptyState({ isDark, isPaletteDrag, isOver }: { isDark: boolean; isPaletteDrag: boolean; isOver: boolean }) {
+function EmptyState({
+  isDark,
+  isPaletteDrag,
+  isOver,
+  onOpenPalette
+}: {
+  isDark: boolean;
+  isPaletteDrag: boolean;
+  isOver: boolean;
+  onOpenPalette?: () => void;
+}) {
   const active = isPaletteDrag && isOver;
   return (
     <div
@@ -361,7 +374,7 @@ function EmptyState({ isDark, isPaletteDrag, isOver }: { isDark: boolean; isPale
       >
         <LayoutGrid className="h-6 w-6" />
       </span>
-      <div className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-1">
         <p
           className={cn(
             'text-sm font-semibold transition-colors',
@@ -371,9 +384,26 @@ function EmptyState({ isDark, isPaletteDrag, isOver }: { isDark: boolean; isPale
           {active ? 'Drop to add block' : 'Start adding blocks!'}
         </p>
         <p className="text-xs">
-          {active ? 'Release to insert it here.' : 'Drag a block from the left, or click one to add it here.'}
+          {active ? (
+            'Release to insert it here.'
+          ) : (
+            <>
+              <span className="hidden md:inline">Drag a block from the left, or click one to add it here.</span>
+              <span className="md:hidden">Tap “Add a block” below to get started.</span>
+            </>
+          )}
         </p>
       </div>
+      {!active && onOpenPalette ? (
+        <button
+          type="button"
+          onClick={onOpenPalette}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
+        >
+          <Plus className="h-4 w-4" />
+          Add a block
+        </button>
+      ) : null}
     </div>
   );
 }

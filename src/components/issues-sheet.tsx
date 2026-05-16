@@ -46,7 +46,7 @@ export function IssuesSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col gap-3 sm:max-w-md">
+      <SheetContent className="flex w-full max-w-full flex-col gap-3 sm:max-w-md">
         <div className="flex flex-col gap-1">
           <SheetTitle className="flex items-center gap-2">
             {validation.total === 0 ? (

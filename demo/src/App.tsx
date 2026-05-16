@@ -37,7 +37,7 @@ const MOCK_CHANNELS: ChannelOption[] = [
 const INITIAL_BLOCKS: SupportedBlock[] = [
   {
     type: 'header',
-    text: { type: 'plain_text', text: 'Welcome to the Block Kit Builder demo' }
+    text: { type: 'plain_text', text: 'Welcome to the Block Kitchen demo' }
   },
   {
     type: 'section',
