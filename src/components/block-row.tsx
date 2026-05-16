@@ -93,10 +93,6 @@ export function BlockRow({
 
   const hasErrors = !!errors && errors.length > 0;
   const isRichText = builderBlock.block.type === 'rich_text';
-  // Divider renders as a `w-full` element with no intrinsic content; inside a
-  // `w-fit` parent it would collapse to zero. Every other block sizes to its
-  // own content so `w-fit max-w-full` shrinks the chrome to the visible block.
-  const isDivider = builderBlock.block.type === 'divider';
   const [inlineEditing, setInlineEditing] = useState(false);
   // Show the insertion bar only for palette drags; sortable reorders
   // already get strong feedback from verticalListSortingStrategy.
@@ -114,7 +110,7 @@ export function BlockRow({
           <span className="-left-1 -top-[3px] absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_0_2px_var(--color-background)]" />
         </div>
       ) : null}
-      <div className={cn('relative', isDivider ? 'w-full' : 'w-fit max-w-full')}>
+      <div className="relative w-full">
         {isRichText && inlineEditing ? (
           <RichTextInlineEditor
             block={builderBlock.block as RichTextBlock}
