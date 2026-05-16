@@ -165,27 +165,36 @@ export function App() {
     <div style={{ height: '100%' }}>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 16, gap: 12 }}>
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 600 }}>block-kitchen — live demo</div>
-            <div style={{ fontSize: 12, opacity: 0.7 }}>
-              Drag blocks from the palette, edit them in place, and send to a (mocked) Slack channel.{' '}
-              <a
-                href="https://github.com/TightknitAI/block-kitchen"
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: 'inherit', textDecoration: 'underline' }}
-              >
-                GitHub
-              </a>
-              {' · '}
-              <a
-                href="https://www.npmjs.com/package/@tightknitai/block-kitchen"
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: 'inherit', textDecoration: 'underline' }}
-              >
-                npm
-              </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img
+              src="/logo.png"
+              alt=""
+              width={32}
+              height={32}
+              style={{ borderRadius: 6, flexShrink: 0 }}
+            />
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>block-kitchen — live demo</div>
+              <div style={{ fontSize: 12, opacity: 0.7 }}>
+                Drag blocks from the palette, edit them in place, and send to a (mocked) Slack channel.{' '}
+                <a
+                  href="https://github.com/TightknitAI/block-kitchen"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: 'inherit', textDecoration: 'underline' }}
+                >
+                  GitHub
+                </a>
+                {' · '}
+                <a
+                  href="https://www.npmjs.com/package/@tightknitai/block-kitchen"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: 'inherit', textDecoration: 'underline' }}
+                >
+                  npm
+                </a>
+              </div>
             </div>
           </div>
           <button
