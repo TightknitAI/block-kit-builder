@@ -92,6 +92,19 @@
   color: #ffffff;
 }
 
+/* Chevron centering on select previews: upstream's stylesheet
+   (compiled with Tailwind v3) applies the legacy `transform:
+   translate(...)` declaration directly to `.-translate-y-1/2`, while
+   our local Tailwind v4 build emits the modern `translate` CSS
+   property for the same class. Both apply -50%Y and, per CSS
+   Transforms Level 2, stack — pushing the dropdown chevron a full
+   element-height above its input. Drop the legacy transform inside
+   the preview namespace; the `translate` property already handles
+   the offset. */
+#slack_blocks_to_jsx .-translate-y-1\/2 {
+  transform: none;
+}
+
 /* TipTap rich text editor: nested-list marker cycle that matches
    slack-blocks-to-jsx's preview rendering (decimal → lower-alpha →
    lower-roman, repeating every three levels up to Slack's max indent
