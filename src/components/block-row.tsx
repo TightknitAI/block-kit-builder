@@ -56,7 +56,8 @@ export function BlockRow({
   onOpenChange,
   onUpdate,
   onDuplicate,
-  onDelete
+  onDelete,
+  isPaletteDrag = false
 }: {
   builderBlock: BuilderBlock;
   previewHooks?: PreviewHooks;
@@ -70,8 +71,12 @@ export function BlockRow({
   onUpdate: (id: string, block: SupportedBlock) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
+  /** True while a palette item is being dragged (vs. reordering an existing block). */
+  isPaletteDrag?: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: builderBlock.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({
+    id: builderBlock.id
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -81,11 +86,22 @@ export function BlockRow({
   const hasErrors = !!errors && errors.length > 0;
   const isRichText = builderBlock.block.type === 'rich_text';
   const [inlineEditing, setInlineEditing] = useState(false);
+  // Show the insertion bar only for palette drags; sortable reorders
+  // already get strong feedback from verticalListSortingStrategy.
+  const showDropIndicator = isPaletteDrag && isOver;
 
   const preview = <SlackBlockPreview block={builderBlock.block} hooks={previewHooks} theme={previewTheme} />;
 
   return (
     <div ref={setNodeRef} style={style} className={cn('group relative hover:z-10', isDragging && 'opacity-40')}>
+      {showDropIndicator ? (
+        <div
+          aria-hidden="true"
+          className="-top-1 pointer-events-none absolute right-0 left-0 z-20 h-0.5 rounded-full bg-primary"
+        >
+          <span className="-left-1 -top-[3px] absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_0_2px_var(--color-background)]" />
+        </div>
+      ) : null}
       {isRichText && inlineEditing ? (
         <RichTextInlineEditor
           block={builderBlock.block as RichTextBlock}
