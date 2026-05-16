@@ -307,6 +307,40 @@ export type PreviewTheme = 'light' | 'dark';
 export type PreviewSurface = 'message' | 'modal' | 'app_home';
 
 /**
+ * A reusable block layout the user can apply as a starting point.
+ * Consumed by the standalone `<TemplatePicker>` component, which renders
+ * a categorized grid of template cards (modeled on Slack's own Block
+ * Kit Builder templates page) and emits the selected one. The picker
+ * is decoupled from {@link BlockKitchen} — wire `onSelect` to whatever
+ * state owns the draft blocks (e.g. lift `initialBlocks` into your own
+ * state and reset it from the handler).
+ */
+export interface Template {
+  /** Stable identifier used as the React key and for persistence. */
+  id: string;
+  /** Display name shown on the template card. */
+  name: string;
+  /** Optional one-line description shown under the name on the card. */
+  description?: string;
+  /**
+   * Which Slack surface this template was authored for. The picker can
+   * filter to a single surface via its `surface` prop; the field is also
+   * available to consumers who render templates in their own UI.
+   */
+  surface: PreviewSurface;
+  /**
+   * Optional category name used to group templates into sections in the
+   * picker (e.g. `"Approvals"`, `"Notifications"`, `"Onboarding"`).
+   * Templates without a category fall into a trailing "Other" section
+   * when at least one other template specifies one; otherwise the grid
+   * is rendered flat without section headers.
+   */
+  category?: string;
+  /** Block payloads applied to the draft when the template is selected. */
+  blocks: SupportedBlock[];
+}
+
+/**
  * Props for the top-level {@link BlockKitchen} component.
  * The package is integration-agnostic: every I/O concern is brokered
  * through these props. The component never makes a network call itself.
