@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.1-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.6.0-alpha.0...block-kitchen-v0.6.1-alpha.0) (2026-05-16)
+
+
+### Features
+
+* **demo:** make templates panel resizable and auto-shrinking ([#54](https://github.com/TightknitAI/block-kitchen/issues/54)) ([8e28fe8](https://github.com/TightknitAI/block-kitchen/commit/8e28fe84717c44a18a055451007e7167bbfaaa59))
+* **demo:** prepare for public hosting ([#45](https://github.com/TightknitAI/block-kitchen/issues/45)) ([a77cf11](https://github.com/TightknitAI/block-kitchen/commit/a77cf1167c34f33f6bec701913dd76f79195d361))
+* **theme:** add eclectic preset themes (Slack, Ocean, Sunset, Mono, Cyberpunk) ([#50](https://github.com/TightknitAI/block-kitchen/issues/50)) ([cd611aa](https://github.com/TightknitAI/block-kitchen/commit/cd611aa3d419c9080a7fef9612eeb72a0517d6a9))
+
+
+### Bug Fixes
+
+* **ci:** publish to npm from release-please workflow ([#53](https://github.com/TightknitAI/block-kitchen/issues/53)) ([42ec905](https://github.com/TightknitAI/block-kitchen/commit/42ec9050a2dbb821cfc37990499e8e6032032d76))
+* **preview:** give preview canvas a Slack-style grey for contrast ([#55](https://github.com/TightknitAI/block-kitchen/issues/55)) ([1b9ddfc](https://github.com/TightknitAI/block-kitchen/commit/1b9ddfce30bb12380b6f64235bb5206ea92a04c9))
+* **preview:** make every block row span the full preview width ([#49](https://github.com/TightknitAI/block-kitchen/issues/49)) ([f8fd36c](https://github.com/TightknitAI/block-kitchen/commit/f8fd36c46c5684f4fb947e16263b971f0727f1c1))
+* **preview:** tighten markdown block list spacing ([#57](https://github.com/TightknitAI/block-kitchen/issues/57)) ([50774a1](https://github.com/TightknitAI/block-kitchen/commit/50774a128ad862a8eebe4645f3ec919d5ea61715))
+* **security:** sanitize URL schemes in block payloads, preview, and editors ([#46](https://github.com/TightknitAI/block-kitchen/issues/46)) ([43b1dfc](https://github.com/TightknitAI/block-kitchen/commit/43b1dfc2c729092e72fc5cba50528c61e194f33b))
+
 ## [0.6.0-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.5.2-alpha.0...block-kitchen-v0.6.0-alpha.0) (2026-05-16)
 
 
