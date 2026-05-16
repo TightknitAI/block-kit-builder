@@ -175,21 +175,22 @@ export function TemplatePicker({
   const { grouped, sections } = groupByCategory(visible);
 
   return (
-    <div className={cn('flex h-full w-full flex-col gap-8 overflow-y-auto bg-muted/30 p-8', className)}>
-      {heading ? <h2 className="text-xl font-semibold tracking-tight text-foreground">{heading}</h2> : null}
+    <div className={cn('flex h-full w-full flex-col gap-6 overflow-y-auto bg-muted/30 p-4 sm:gap-8 sm:p-8', className)}>
+      {heading ? <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">{heading}</h2> : null}
       {visible.length === 0 ? (
         <p className="text-sm text-foreground/75">{emptyLabel}</p>
       ) : (
         sections.map((section) => (
-          <section key={section.category} className="flex flex-col gap-4">
+          <section key={section.category} className="flex flex-col gap-3 sm:gap-4">
             {grouped ? (
               <h3 className="text-xs font-semibold tracking-wider text-foreground/60 uppercase">{section.category}</h3>
             ) : null}
-            {/* Container-driven grid: each column is at least 280px wide and
-                grows to fill, so the picker adapts the same whether it's a
-                narrow sidebar (1 col) or a full-page view (3-4 cols) without
-                relying on viewport breakpoints. */}
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
+            {/* Container-driven grid: each column is at least 240px wide on
+                mobile (280px on sm+) and grows to fill, so the picker
+                adapts the same whether it's a narrow sidebar (1 col) or
+                a full-page view (3-4 cols) without relying on viewport
+                breakpoints. */}
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] sm:gap-5">
               {section.templates.map((template) => (
                 <TemplateCard key={template.id} template={template} theme={theme} onSelect={onSelect} />
               ))}

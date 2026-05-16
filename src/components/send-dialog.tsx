@@ -147,7 +147,7 @@ export function SendDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-lg rounded-lg">
         <DialogHeader>
           <DialogTitle>Send to Slack</DialogTitle>
           <DialogDescription>Pick a channel and choose who to post as.</DialogDescription>

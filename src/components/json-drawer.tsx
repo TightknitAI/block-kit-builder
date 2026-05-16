@@ -110,8 +110,8 @@ export function JsonDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col gap-3 sm:max-w-xl">
-        <div className="flex flex-col gap-1">
+      <SheetContent className="flex w-full max-w-full flex-col gap-3 sm:max-w-xl">
+        <div className="flex flex-col gap-1 pr-8">
           <SheetTitle>Block Kit JSON</SheetTitle>
           <SheetDescription>Edits update the preview as you type. Parse errors show below.</SheetDescription>
         </div>
