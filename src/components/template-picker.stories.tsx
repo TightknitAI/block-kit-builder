@@ -3,6 +3,11 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import type { Template } from '../types';
 import { TemplatePicker } from './template-picker';
 
+// Inline fixtures: these are story-only and intentionally lightweight. The
+// package does not ship templates — they are use-case examples that belong
+// in the consuming app's config (see `demo/src/templates.ts` for a richer
+// real-world set). These samples cover enough variety to exercise the
+// picker's categorization, surface filtering, and empty state.
 const SAMPLE_TEMPLATES: Template[] = [
   {
     id: 'approval-request',
