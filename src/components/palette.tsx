@@ -84,7 +84,7 @@ export function Palette({
     : PALETTE_SECTIONS;
 
   return (
-    <aside className="flex min-h-0 w-60 shrink-0 flex-col overflow-y-auto border-r bg-muted/20 p-3">
+    <aside className="flex min-h-0 w-60 shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r bg-muted/20 p-3">
       {sections.map((section) => {
         const Icon = SECTION_ICONS[section.blockType];
         return (
@@ -126,7 +126,7 @@ function PaletteItem({ variant, onAdd }: { variant: PaletteVariant; onAdd: () =>
     >
       <div
         ref={setActivatorNodeRef}
-        className="-my-1.5 flex flex-1 cursor-grab items-center gap-2 rounded py-1.5 active:cursor-grabbing focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="-my-1.5 flex min-w-0 flex-1 cursor-grab items-center gap-2 rounded py-1.5 active:cursor-grabbing focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         {...attributes}
         {...listeners}
       >
