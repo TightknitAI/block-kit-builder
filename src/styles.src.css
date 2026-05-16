@@ -61,6 +61,37 @@
   --radius-sm: calc(var(--radius, 0.5rem) - 4px);
 }
 
+/* Accessibility overrides for upstream slack-blocks-to-jsx markup.
+   All selectors are scoped under #slack_blocks_to_jsx so they apply only
+   inside the preview pane and don't leak into consumer styles.
+
+   - Inline code: upstream uses rgb(224 30 90) on a tinted bg, giving 4.31:1
+     contrast (fails WCAG AA's 4.5:1 for normal text). Darken the foreground.
+   - Links: upstream only underlines on :hover, leaving color as the sole
+     visual cue at rest. Add a permanent underline so links remain
+     distinguishable per WCAG 1.4.1 ("Use of color"), with no reliance on
+     the 2.73:1 link-vs-body contrast.
+   - Filled-style buttons in dark mode: upstream applies the dark text
+     token (rgb 209 210 211) on .bg-green-primary (primary) and
+     .bg-red-primary (danger), yielding 3.52:1 and 3.19:1 respectively.
+     Force white so both hit 4.5:1+ in both themes. */
+#slack_blocks_to_jsx code.slack_code_inline,
+#slack_blocks_to_jsx pre code.text-red-primary {
+  color: #c4144b;
+}
+
+#slack_blocks_to_jsx a.text-blue-primary {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#slack_blocks_to_jsx .bg-green-primary,
+#slack_blocks_to_jsx .bg-green-primary *,
+#slack_blocks_to_jsx .bg-red-primary,
+#slack_blocks_to_jsx .bg-red-primary * {
+  color: #ffffff;
+}
+
 /* TipTap rich text editor: nested-list marker cycle that matches
    slack-blocks-to-jsx's preview rendering (decimal → lower-alpha →
    lower-roman, repeating every three levels up to Slack's max indent
