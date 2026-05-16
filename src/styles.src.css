@@ -128,6 +128,19 @@
   transform: none;
 }
 
+/* The library applies `my-2` to standalone card, image, and carousel
+   blocks, which leaves transparent bands above/below the visible block
+   inside our selection ring (and offsets the block from our block-type
+   label). Surface row spacing handles vertical rhythm via gap, so zero
+   these out so the chrome hugs the visible block. The library's own
+   `my-2` utility is scoped under `#slack_blocks_to_jsx` (ID specificity),
+   so we match that ID here to win specificity. */
+#slack_blocks_to_jsx .slack_blocks_to_jsx__card:not(.slack_blocks_to_jsx__card--in_carousel),
+#slack_blocks_to_jsx .slack_blocks_to_jsx__image,
+#slack_blocks_to_jsx .slack_blocks_to_jsx__carousel {
+  margin-block: 0;
+}
+
 /* TipTap rich text editor: nested-list marker cycle that matches
    slack-blocks-to-jsx's preview rendering (decimal → lower-alpha →
    lower-roman, repeating every three levels up to Slack's max indent

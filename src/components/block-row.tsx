@@ -93,6 +93,10 @@ export function BlockRow({
 
   const hasErrors = !!errors && errors.length > 0;
   const isRichText = builderBlock.block.type === 'rich_text';
+  // Divider renders as a `w-full` element with no intrinsic content; inside a
+  // `w-fit` parent it would collapse to zero. Every other block sizes to its
+  // own content so `w-fit max-w-full` shrinks the chrome to the visible block.
+  const isDivider = builderBlock.block.type === 'divider';
   const [inlineEditing, setInlineEditing] = useState(false);
   // Show the insertion bar only for palette drags; sortable reorders
   // already get strong feedback from verticalListSortingStrategy.
@@ -110,131 +114,133 @@ export function BlockRow({
           <span className="-left-1 -top-[3px] absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_0_2px_var(--color-background)]" />
         </div>
       ) : null}
-      {isRichText && inlineEditing ? (
-        <RichTextInlineEditor
-          block={builderBlock.block as RichTextBlock}
-          onSave={(next) => {
-            onUpdate(builderBlock.id, next);
-            setInlineEditing(false);
-          }}
-          onCancel={() => setInlineEditing(false)}
-        />
-      ) : isRichText ? (
-        <button
-          type="button"
-          aria-label="Edit block"
-          onClick={() => setInlineEditing(true)}
-          {...attributes}
-          {...listeners}
+      <div className={cn('relative', isDivider ? 'w-full' : 'w-fit max-w-full')}>
+        {isRichText && inlineEditing ? (
+          <RichTextInlineEditor
+            block={builderBlock.block as RichTextBlock}
+            onSave={(next) => {
+              onUpdate(builderBlock.id, next);
+              setInlineEditing(false);
+            }}
+            onCancel={() => setInlineEditing(false)}
+          />
+        ) : isRichText ? (
+          <button
+            type="button"
+            aria-label="Edit block"
+            onClick={() => setInlineEditing(true)}
+            {...attributes}
+            {...listeners}
+            className={cn(
+              'block w-full cursor-grab rounded-sm border-0 bg-transparent p-0 text-left transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing',
+              hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
+            )}
+          >
+            {preview}
+          </button>
+        ) : (
+          <Popover open={isOpen} onOpenChange={onOpenChange}>
+            <PopoverTrigger asChild>
+              <div
+                role="button"
+                tabIndex={0}
+                aria-label="Edit block"
+                {...sortableA11yAttrs}
+                {...listeners}
+                className={cn(
+                  'block w-full cursor-grab rounded-sm transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing',
+                  hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
+                )}
+              >
+                {preview}
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-[32rem]" align="start">
+              <BlockEditor
+                block={builderBlock.block}
+                errors={errors}
+                onChange={(next) => onUpdate(builderBlock.id, next)}
+              />
+            </PopoverContent>
+          </Popover>
+        )}
+        <span className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 bg-background px-1.5 text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+          {BLOCK_TYPE_LABELS[builderBlock.block.type]}
+        </span>
+        <div
           className={cn(
-            'block w-full cursor-grab rounded-sm border-0 bg-transparent p-0 text-left transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing',
-            hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
+            'absolute -top-3 right-2 z-10 flex items-center gap-0.5 rounded-md border bg-background p-0.5 shadow-sm transition-opacity',
+            hasErrors ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
           )}
         >
-          {preview}
-        </button>
-      ) : (
-        <Popover open={isOpen} onOpenChange={onOpenChange}>
-          <PopoverTrigger asChild>
-            <div
-              role="button"
-              tabIndex={0}
-              aria-label="Edit block"
-              {...sortableA11yAttrs}
-              {...listeners}
-              className={cn(
-                'block w-full cursor-grab rounded-sm transition-shadow hover:shadow-md focus-visible:ring-1 focus-visible:ring-ring active:cursor-grabbing',
-                hasErrors ? 'ring-1 ring-destructive/60 hover:ring-destructive' : 'hover:ring-1 hover:ring-border'
-              )}
-            >
-              {preview}
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="w-[32rem]" align="start">
-            <BlockEditor
-              block={builderBlock.block}
-              errors={errors}
-              onChange={(next) => onUpdate(builderBlock.id, next)}
-            />
-          </PopoverContent>
-        </Popover>
-      )}
-      <span className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 bg-background px-1.5 text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-        {BLOCK_TYPE_LABELS[builderBlock.block.type]}
-      </span>
-      <div
-        className={cn(
-          'absolute -top-3 right-2 z-10 flex items-center gap-0.5 rounded-md border bg-background p-0.5 shadow-sm transition-opacity',
-          hasErrors ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-        )}
-      >
-        {hasErrors ? (
+          {hasErrors ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={`Show ${errors!.length} validation ${errors!.length === 1 ? 'issue' : 'issues'}`}
+                  onClick={() => onOpenChange?.(true)}
+                  className="flex h-6 w-6 items-center justify-center rounded text-destructive hover:bg-destructive/10"
+                >
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" align="end">
+                <ul className="flex flex-col gap-0.5">
+                  {errors!.slice(0, 4).map((err, i) => (
+                    <li key={i}>{err}</li>
+                  ))}
+                  {errors!.length > 4 ? <li className="text-muted-foreground">and {errors!.length - 4} more</li> : null}
+                </ul>
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
-                aria-label={`Show ${errors!.length} validation ${errors!.length === 1 ? 'issue' : 'issues'}`}
-                onClick={() => onOpenChange?.(true)}
-                className="flex h-6 w-6 items-center justify-center rounded text-destructive hover:bg-destructive/10"
+                aria-label="Edit block"
+                onClick={() => {
+                  if (isRichText) {
+                    setInlineEditing(true);
+                  } else {
+                    onOpenChange?.(true);
+                  }
+                }}
+                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
               >
-                <AlertTriangle className="h-3.5 w-3.5" />
+                <Pencil className="h-3.5 w-3.5" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top" align="end">
-              <ul className="flex flex-col gap-0.5">
-                {errors!.slice(0, 4).map((err, i) => (
-                  <li key={i}>{err}</li>
-                ))}
-                {errors!.length > 4 ? <li className="text-muted-foreground">and {errors!.length - 4} more</li> : null}
-              </ul>
-            </TooltipContent>
+            <TooltipContent side="top">Edit</TooltipContent>
           </Tooltip>
-        ) : null}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label="Edit block"
-              onClick={() => {
-                if (isRichText) {
-                  setInlineEditing(true);
-                } else {
-                  onOpenChange?.(true);
-                }
-              }}
-              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Edit</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label="Duplicate block"
-              onClick={() => onDuplicate(builderBlock.id)}
-              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              <Copy className="h-3.5 w-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Duplicate</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label="Delete block"
-              onClick={() => onDelete(builderBlock.id)}
-              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Delete</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label="Duplicate block"
+                onClick={() => onDuplicate(builderBlock.id)}
+                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Duplicate</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label="Delete block"
+                onClick={() => onDelete(builderBlock.id)}
+                className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Delete</TooltipContent>
+          </Tooltip>
+        </div>
       </div>
     </div>
   );
