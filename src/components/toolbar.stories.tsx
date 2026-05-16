@@ -18,6 +18,7 @@ const meta = {
     onPreviewThemeChange: fn(),
     previewSurface: 'message',
     onPreviewSurfaceChange: fn(),
+    allowedSurfaces: ['message', 'modal', 'app_home'],
     errorCount: 0
   },
   decorators: [
@@ -51,7 +52,7 @@ export const WithIssues: Story = {
 };
 
 export const SurfaceControlHidden: Story = {
-  args: { showSurfaceControl: false }
+  args: { allowedSurfaces: ['message'] }
 };
 
 export const ThemeControlHidden: Story = {

@@ -67,12 +67,25 @@ export function parsePaletteDragId(id: string | number): string | null {
  * @param props - palette props
  * @param props.onAddBlock - called when a palette item is added via its
  *   chevron button (appends the block to the bottom of the preview)
+ * @param props.allowedBlockTypes - if provided, restricts the palette to
+ *   sections whose block type is in the list. When omitted, every section
+ *   is rendered.
  * @returns the rendered palette aside
  */
-export function Palette({ onAddBlock }: { onAddBlock: (block: SupportedBlock) => void }) {
+export function Palette({
+  onAddBlock,
+  allowedBlockTypes
+}: {
+  onAddBlock: (block: SupportedBlock) => void;
+  allowedBlockTypes?: readonly SupportedBlockType[];
+}) {
+  const sections = allowedBlockTypes
+    ? PALETTE_SECTIONS.filter((s) => allowedBlockTypes.includes(s.blockType))
+    : PALETTE_SECTIONS;
+
   return (
     <aside className="flex min-h-0 w-60 shrink-0 flex-col overflow-y-auto border-r bg-muted/20 p-3">
-      {PALETTE_SECTIONS.map((section) => {
+      {sections.map((section) => {
         const Icon = SECTION_ICONS[section.blockType];
         return (
           <div key={section.name} className="mt-4 flex flex-col first:mt-0">

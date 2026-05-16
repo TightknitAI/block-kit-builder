@@ -9,6 +9,8 @@ export type {
   BuilderBlock,
   ChannelOption,
   PreviewHooks,
+  PreviewSurface,
+  PreviewTheme,
   SendAsUserStatus,
   SendPayload,
   SendResult,

@@ -59,8 +59,21 @@ export const WithStarterBlocks: Story = {
 export const MessageSurfaceLocked: Story = {
   args: {
     initialBlocks: STARTER_BLOCKS,
-    showSurfaceControl: false,
     showThemeControl: false
+  }
+};
+
+export const AllSurfaces: Story = {
+  args: {
+    initialBlocks: STARTER_BLOCKS,
+    allowedSurfaces: ['message', 'modal', 'app_home']
+  }
+};
+
+export const RestrictedBlockTypes: Story = {
+  args: {
+    initialBlocks: STARTER_BLOCKS,
+    allowedBlockTypes: ['section', 'header', 'divider', 'markdown']
   }
 };
 
