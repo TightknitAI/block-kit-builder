@@ -360,6 +360,32 @@ export interface BlockKitchenProps {
    */
   palette?: readonly PaletteSection[];
   /**
+   * Whether the palette renders a quick-search input above the section
+   * list. Defaults to `true`. Set `false` for compact palettes (e.g.
+   * when you've passed a small custom `palette`) where scanning by eye
+   * is faster than typing.
+   */
+  showPaletteSearch?: boolean;
+  /**
+   * Placeholder text for the palette search input. Defaults to
+   * `'Search blocks…'`. Useful for localization.
+   */
+  paletteSearchPlaceholder?: string;
+  /**
+   * Controls which palette section headers are expanded on first paint.
+   * - `true` (default) — every section starts open
+   * - `false` — every section starts closed (Slack-style)
+   * - array of section names — only sections whose `name` is in the
+   *   list start open (e.g. `['Section', 'Actions']`); matched
+   *   case-sensitively against `PaletteSection.name` so consumer-defined
+   *   sections are addressable too.
+   *
+   * After mount, each section owns its own collapse state, so users can
+   * still toggle headers freely. An active palette search overrides the
+   * collapse state for matching sections.
+   */
+  defaultOpenSections?: boolean | readonly string[];
+  /**
    * Which Slack preview surfaces the toolbar exposes. Defaults to
    * `['message']`, which locks the preview to Message and hides the
    * surface dropdown. Pass two or more to show the dropdown with those
