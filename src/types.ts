@@ -387,6 +387,16 @@ export interface BlockKitchenProps {
    * curate the variants and pre-configured presets your users can drag
    * onto the surface. An empty array renders an empty palette.
    *
+   * The `defaultPalette` mirrors Slack's Block Kit Builder, which
+   * consolidates related variants into single showcase entries (e.g.
+   * **All selects** is one `actions` block with every select type). If
+   * you previously relied on the long flat list of single-element
+   * `input` variants (`input_users_select`, `input_multi_users_select`,
+   * `input_radio_buttons`, etc.), import `legacyInputVariants` and
+   * spread them into a custom section. The modal-only `alert` block was
+   * also dropped from the default; reach for `extraAlertVariant` to
+   * keep it.
+   *
    * Variant ids must be unique across the array — the drag-drop lookup
    * keys by id, so duplicates would shadow each other. The palette is
    * also expected to be referentially stable across renders (wrap in

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { AlignLeft } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { defaultPalette, type PaletteSection } from '../lib/default-blocks';
 import type { SupportedBlock } from '../types';
@@ -71,8 +72,10 @@ export const AllSurfaces: Story = {
   }
 };
 
-const RESTRICTED_TYPES = new Set(['section', 'header', 'divider', 'markdown']);
-const RESTRICTED_PALETTE: readonly PaletteSection[] = defaultPalette.filter((s) => RESTRICTED_TYPES.has(s.blockType));
+const RESTRICTED_SECTION_NAMES = new Set(['Section', 'Markdown', 'Structure']);
+const RESTRICTED_PALETTE: readonly PaletteSection[] = defaultPalette.filter((s) =>
+  RESTRICTED_SECTION_NAMES.has(s.name)
+);
 
 export const RestrictedBlockTypes: Story = {
   args: {
@@ -85,7 +88,7 @@ const CUSTOM_VARIANT_PALETTE: readonly PaletteSection[] = [
   ...defaultPalette,
   {
     name: 'Company presets',
-    blockType: 'section',
+    icon: AlignLeft,
     variants: [
       {
         id: 'help_footer',
