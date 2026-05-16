@@ -15,6 +15,10 @@ Inspired by [Slack's Block Kit Builder](https://app.slack.com/block-kit-builder)
 
 **[Try the live demo →](https://block-kitchen.tightknit.dev)** (mocked Slack — drag, drop, edit, preview)
 
+<p align="center">
+  <img src="./assets/screenshot.png" alt="block-kitchen demo screenshot" width="900" />
+</p>
+
 The package owns the entire builder UX — palette, sortable preview surface, per-block popover editors, send dialog. It knows nothing about how channels are listed, who the user is, or how messages are sent. The consumer wires those concerns through callback props. A working end-to-end app is shown in [block-kit-builder-template](https://github.com/TightknitAI/block-kit-builder-template).
 
 ## Install

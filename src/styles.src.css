@@ -141,6 +141,46 @@
   margin-block: 0;
 }
 
+/* Markdown block (`type: "markdown"`) is rendered via react-markdown,
+   and the library only sets `margin-bottom` on the elements it emits
+   (`<p>`, `<ul>`, `<ol>`, `<h1..h6>`, etc. all carry `mb-0.5`). Two
+   things compound to add ~24px of unwanted vertical space between
+   adjacent items:
+
+   1. We deliberately skip Tailwind preflight (see the imports at the
+      top of this file) so user-agent default `margin-top: 1em` on
+      block elements cascades through and stacks against the preceding
+      block. Drop those top margins here so the library's intended
+      2px (`mb-0.5`) rhythm is what actually renders.
+
+   2. The library applies `white-space: pre-wrap !important` to
+      `.slack_blocks_to_jsx.styles_enabled` (so mrkdwn newlines render
+      as breaks). That inherits into `<ul>` / `<ol>`, where the `\n`
+      text nodes that `mdast-util-to-hast` inserts between every `<li>`
+      child (and between any block-level markdown nodes) suddenly count
+      as visible content — rendering at the full line-height (~22px)
+      between every item. Reset whitespace handling to `normal` inside
+      the markdown block: react-markdown has already normalized inline
+      whitespace per CommonMark, and code blocks set their own
+      `whitespace-pre-wrap` on the inner `<code>`, so this is safe.
+
+   `:where()` keeps the margin rule at (0,1,0) — equal to the library's
+   own utilities, so neither side outranks the other. The white-space
+   override needs `!important` to win against the library's own
+   `!important` rule. We deliberately don't touch `padding-inline-start`
+   on lists: the library's `pl-6` (a physical `padding-left`) wins
+   against its own bundled preflight thanks to source order, and a
+   logical-property override here would (re)win the cascade and remove
+   the bullet column. */
+#slack_blocks_to_jsx
+  .slack_blocks_to_jsx__markdown_block
+  :where(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, pre) {
+  margin-top: 0;
+}
+#slack_blocks_to_jsx .slack_blocks_to_jsx__markdown_block {
+  white-space: normal !important;
+}
+
 /* TipTap rich text editor: nested-list marker cycle that matches
    slack-blocks-to-jsx's preview rendering (decimal → lower-alpha →
    lower-roman, repeating every three levels up to Slack's max indent

@@ -7,12 +7,41 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: googleapis/release-please-action@v5
+        id: release
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      # Everything below runs only when release-please merges its PR and
+      # creates a release. Publish-side gating is intentionally minimal:
+      # lint + typecheck + build. The full test suite (incl. Playwright)
+      # already ran in CI against the same commit before release-please
+      # merged it to main, and re-installing Chromium on the npm-token-
+      # bearing job widens the supply-chain surface for no security gain.
+      - uses: actions/checkout@v6
+        if: ${{ steps.release.outputs.release_created }}
+
+      - uses: ./.github/actions/setup
+        if: ${{ steps.release.outputs.release_created }}
+
+      - run: pnpm run lint
+        if: ${{ steps.release.outputs.release_created }}
+
+      - run: pnpm run typecheck
+        if: ${{ steps.release.outputs.release_created }}
+
+      - run: pnpm run build:clean
+        if: ${{ steps.release.outputs.release_created }}
+
+      - run: pnpm publish --provenance --access public --no-git-checks
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
