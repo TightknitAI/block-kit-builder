@@ -5,6 +5,7 @@ import type {
   RichTextSectionElementStyleWithCode,
   RichTextSectionLink
 } from 'slack-web-api-client';
+import { sanitizeHref } from './url-safety';
 
 type RichStyle = RichTextSectionElementStyleWithCode;
 
@@ -415,7 +416,12 @@ function proseMirrorInlinesToRichTextElements(nodes: PMNode[]): AnyRichTextSecti
     const linkMark = node.marks?.find((m) => m.type === 'link');
     const style = marksToStyle(node.marks ?? []);
     if (linkMark) {
-      const url = String(linkMark.attrs?.href ?? '');
+      // TipTap's setLink/toggleLink already gate on isAllowedUri, but
+      // a link mark can also enter the editor via setContent() (used
+      // when seeding from a payload). Sanitize once more here so a
+      // crafted Slack rich_text payload that already contains an unsafe
+      // href cannot round-trip back out unchanged.
+      const url = sanitizeHref(String(linkMark.attrs?.href ?? ''));
       const link: RichTextSectionLink = {
         type: 'link',
         url,

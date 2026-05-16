@@ -17,16 +17,53 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
+      # Security-sensitive packages are excluded from auto-merge so a
+      # compromised upstream release cannot ship to consumers without a
+      # human eyeballing the diff. These are the packages whose code
+      # directly renders or sanitizes user-controlled content (links,
+      # markdown, block payloads) — a malicious minor release here is
+      # the worst case for our supply-chain posture.
+      - name: Check exclusion list
+        id: excluded
+        env:
+          PACKAGE_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+        run: |
+          set -euo pipefail
+          excluded=false
+          IFS=', ' read -r -a names <<< "$PACKAGE_NAMES"
+          for pkg in "${names[@]}"; do
+            case "$pkg" in
+              slack-blocks-to-jsx|react-markdown|remark-gfm|@tiptap/extension-link|@tiptap/starter-kit|@tiptap/core|@tiptap/react|@tiptap/pm|@tightknitai/slack-block-kit-validator|ajv|ajv-formats|slack-web-api-client)
+                excluded=true
+                ;;
+            esac
+          done
+          echo "excluded=$excluded" >> "$GITHUB_OUTPUT"
+
       - name: Enable auto-merge for minor/patch updates
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        if: |
+          steps.metadata.outputs.update-type != 'version-update:semver-major' &&
+          steps.excluded.outputs.excluded != 'true'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Approve PR
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        if: |
+          steps.metadata.outputs.update-type != 'version-update:semver-major' &&
+          steps.excluded.outputs.excluded != 'true'
         run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment when held for manual review
+        if: |
+          steps.metadata.outputs.update-type != 'version-update:semver-major' &&
+          steps.excluded.outputs.excluded == 'true'
+        run: |
+          gh pr comment "$PR_URL" --body "Held for manual review: \`${{ steps.metadata.outputs.dependency-names }}\` is on the security-sensitive auto-merge exclusion list. Verify the changelog and source diff before merging."
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

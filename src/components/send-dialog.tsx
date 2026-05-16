@@ -4,6 +4,7 @@ import { toSlackBlocks } from '../lib/to-slack-blocks';
 import { Button } from '../lib/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../lib/ui/dialog';
 import { Label } from '../lib/ui/label';
+import { isSafeHref } from '../lib/url-safety';
 import type { ChannelOption, SendAsUserStatus, SendPayload, SupportedBlock } from '../types';
 
 type SendStatus = { kind: 'idle' } | { kind: 'sending' } | { kind: 'success' } | { kind: 'error'; error: string };
@@ -190,12 +191,12 @@ export function SendDialog({
                 {userStatus && !userStatus.canSendAsUser ? ' (Slack sign-in required)' : ''}
               </option>
             </select>
-            {userStatus && !userStatus.canSendAsUser && userStatus.oauthUrl && (
+            {userStatus && !userStatus.canSendAsUser && userStatus.oauthUrl && isSafeHref(userStatus.oauthUrl) && (
               <p className="text-xs text-muted-foreground">
                 <a
                   href={userStatus.oauthUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-primary hover:underline"
                 >
                   Sign in with Slack <ExternalLink className="h-3 w-3" />

@@ -1,8 +1,10 @@
 import 'slack-blocks-to-jsx/dist/style.css';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { Block } from 'slack-blocks-to-jsx';
 import { Message } from 'slack-blocks-to-jsx';
+import { sanitizeBlock } from '../../lib/sanitize-blocks';
+import { isSafeHref, isSafeImageSrc } from '../../lib/url-safety';
 import type { PreviewHooks, PreviewTheme, SupportedBlock } from '../../types';
 
 /**
@@ -33,10 +35,28 @@ export function SlackBlockPreview({
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
 
+  // Strip dangerous URI schemes (`javascript:`, `data:text/html`, etc.)
+  // from every `url`/`image_url` field in the block before handing it
+  // to slack-blocks-to-jsx, which renders rich-text links, button URLs,
+  // and image sources directly into `<a href>` / `<img src>` without
+  // its own scheme filter. Memoized so an unchanged block keeps the
+  // same reference and doesn't churn the renderer.
+  const safeBlock = useMemo(() => sanitizeBlock(block), [block]);
+
   // slack-blocks-to-jsx renders an SVG-only collapse toggle in image and
   // video blocks without an aria-label, which violates axe's `button-name`
   // rule and is unreachable to screen readers. Post-mount we add a label
-  // to any such buttons we find under our wrapper.
+  // to any such buttons we find under our wrapper. We also do a final
+  // pass to neutralize any `<a href>` or `<img src>` that carries a
+  // disallowed URI scheme — the block-payload sanitizer catches URLs
+  // that live in structured fields (`url`, `image_url`), but mrkdwn /
+  // rich-text content can encode link URLs inside text strings
+  // (`[label](javascript:...)` or `<javascript:...|label>`) that
+  // `slack-blocks-to-jsx`'s own parser hands straight to `<a href>`
+  // without filtering. React 19 also blocks `javascript:` URLs at
+  // setAttribute time, but we don't rely on that — this loop applies
+  // our allowlist (which is tighter and covers `data:`/`vbscript:`/`file:`
+  // as well) and replaces unsafe values with `#`.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -46,6 +66,20 @@ export function SlackBlockPreview({
       for (const btn of wrapper.querySelectorAll<HTMLButtonElement>('button:not([aria-label])')) {
         const title = wrapper.querySelector('.slack_blocks_to_jsx__image_title')?.textContent?.trim();
         btn.setAttribute('aria-label', title ? `Toggle ${title}` : 'Toggle media');
+      }
+    }
+    for (const a of root.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+      const href = a.getAttribute('href');
+      if (!isSafeHref(href)) {
+        a.setAttribute('href', '#');
+        a.setAttribute('data-bk-blocked-href', '1');
+      }
+    }
+    for (const img of root.querySelectorAll<HTMLImageElement>('img[src]')) {
+      const src = img.getAttribute('src');
+      if (!isSafeImageSrc(src)) {
+        img.removeAttribute('src');
+        img.setAttribute('data-bk-blocked-src', '1');
       }
     }
   });
@@ -64,7 +98,7 @@ export function SlackBlockPreview({
         logo=""
         withoutWrapper
         theme={theme}
-        blocks={[block as unknown as Block]}
+        blocks={[safeBlock as unknown as Block]}
         hooks={hooks as Record<string, unknown> | undefined}
       />
     </div>

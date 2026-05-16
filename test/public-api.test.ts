@@ -75,6 +75,43 @@ describe('url-state', () => {
     ];
     expect(decodeBlocksFromString(encodeBlocksToString(blocks))).toEqual(blocks);
   });
+
+  it('rejects encoded input larger than 1 MiB without invoking atob', () => {
+    // 1 MiB + 1 byte of arbitrary characters. We never construct a real
+    // payload of this size; the guard exists so a pathological URL hash
+    // returns null promptly instead of stalling the tab inside atob
+    // and JSON.parse.
+    const oversized = 'a'.repeat(1024 * 1024 + 1);
+    expect(decodeBlocksFromString(oversized)).toBeNull();
+  });
+});
+
+describe('toSlackBlocks URL sanitization', () => {
+  it('scrubs javascript: from a section button url', () => {
+    const input = [
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: 'hi' },
+        accessory: {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Click' },
+          url: 'javascript:alert(1)',
+          action_id: 'a'
+        }
+      }
+    ] as unknown as SupportedBlock[];
+    const [out] = toSlackBlocks(input);
+    const url = (out as { accessory: { url: string } }).accessory.url;
+    expect(url).toBe('');
+  });
+
+  it('scrubs data:image/svg+xml from image_url', () => {
+    const input = [
+      { type: 'image', image_url: 'data:image/svg+xml,<svg onload=alert(1)>', alt_text: 'evil' }
+    ] as unknown as SupportedBlock[];
+    const [out] = toSlackBlocks(input);
+    expect((out as { image_url: string }).image_url).toBe('');
+  });
 });
 
 describe('palette factories', () => {

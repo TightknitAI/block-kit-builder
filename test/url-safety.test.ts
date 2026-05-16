@@ -1,0 +1,98 @@
+import { isSafeHref, isSafeImageSrc, sanitizeHref, sanitizeImageSrc } from '../src/lib/url-safety';
+
+describe('isSafeHref', () => {
+  it.each([
+    'https://example.com',
+    'http://example.com/path?q=1#frag',
+    'mailto:foo@example.com',
+    'tel:+1234567890',
+    'sms:+1234567890',
+    'xmpp:user@server',
+    'ircs://irc.example.com/channel',
+    '/relative/path',
+    './sibling',
+    '../parent',
+    '#anchor',
+    '?query=only',
+    'relative-no-scheme',
+    ''
+  ])('accepts safe href %p', (input) => {
+    expect(isSafeHref(input)).toBe(true);
+  });
+
+  it.each([
+    'javascript:alert(1)',
+    ' javascript:alert(1)',
+    'JaVaScRiPt:alert(1)',
+    'javascript:void(0)',
+    '\tjavascript:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'data:image/svg+xml,<svg onload=alert(1)>',
+    'vbscript:msgbox(1)',
+    'file:///etc/passwd',
+    'about:blank',
+    'chrome://settings',
+    'view-source:https://example.com',
+    // Unknown schemes are rejected by allowlist (e.g. browsers treat
+    // `path:foo` as having scheme `path`, not as a relative path).
+    'path:with:colons/in/segment'
+  ])('rejects unsafe href %p', (input) => {
+    expect(isSafeHref(input)).toBe(false);
+  });
+
+  it.each([null, undefined, 0, false, {}, [], 42])('rejects non-string %p', (input) => {
+    expect(isSafeHref(input as unknown as string)).toBe(false);
+  });
+});
+
+describe('isSafeImageSrc', () => {
+  it.each([
+    'https://example.com/cat.png',
+    'http://example.com/cat.jpg',
+    '/relative/cat.gif',
+    '',
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
+    'data:image/jpeg;base64,/9j/2wBDAA=='
+  ])('accepts safe image src %p', (input) => {
+    expect(isSafeImageSrc(input)).toBe(true);
+  });
+
+  it.each([
+    'javascript:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'data:image/svg+xml,<svg onload=alert(1)>',
+    'data:application/javascript,alert(1)',
+    'vbscript:msgbox(1)',
+    'file:///etc/passwd',
+    'ftp://example.com/cat.png'
+  ])('rejects unsafe image src %p', (input) => {
+    expect(isSafeImageSrc(input)).toBe(false);
+  });
+});
+
+describe('sanitize*', () => {
+  it('sanitizeHref returns the URL when safe', () => {
+    expect(sanitizeHref('https://example.com')).toBe('https://example.com');
+  });
+
+  it('sanitizeHref returns empty string when unsafe', () => {
+    expect(sanitizeHref('javascript:alert(1)')).toBe('');
+  });
+
+  it('sanitizeImageSrc returns the URL when safe', () => {
+    expect(sanitizeImageSrc('https://example.com/cat.png')).toBe('https://example.com/cat.png');
+  });
+
+  it('sanitizeImageSrc returns empty string when unsafe', () => {
+    expect(sanitizeImageSrc('data:image/svg+xml,<svg onload=alert(1)>')).toBe('');
+  });
+
+  it('sanitizeHref preserves an empty string', () => {
+    expect(sanitizeHref('')).toBe('');
+  });
+
+  it('sanitizeHref converts null/undefined to empty string', () => {
+    expect(sanitizeHref(null)).toBe('');
+    expect(sanitizeHref(undefined)).toBe('');
+  });
+});

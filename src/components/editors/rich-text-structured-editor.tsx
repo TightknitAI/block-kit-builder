@@ -16,6 +16,7 @@ import { Button } from '../../lib/ui/button';
 import { Input } from '../../lib/ui/input';
 import { Label } from '../../lib/ui/label';
 import { RadioGroup, RadioGroupItem } from '../../lib/ui/radio-group';
+import { isSafeHref } from '../../lib/url-safety';
 import { EditorField } from './field';
 import type { BlockEditorProps } from './types';
 
@@ -454,16 +455,25 @@ function InlineFields({
 
   if (kind === 'link') {
     const link = element as RichTextSectionLink;
+    const urlValue = link.url ?? '';
+    const urlIsUnsafe = urlValue.length > 0 && !isSafeHref(urlValue);
     return (
       <div className="flex flex-col gap-2">
         <EditorField label="URL" htmlFor={`${idPrefix}-url`}>
           <Input
             id={`${idPrefix}-url`}
             type="url"
-            value={link.url ?? ''}
+            value={urlValue}
             placeholder="e.g. https://slack.com"
             onChange={(e) => onChange({ ...link, url: e.target.value })}
+            aria-invalid={urlIsUnsafe || undefined}
           />
+          {urlIsUnsafe && (
+            <p className="mt-1 text-[11px] text-destructive">
+              Only http(s), mailto, tel, sms, and xmpp links are allowed. This URL will be stripped before send and
+              preview.
+            </p>
+          )}
         </EditorField>
         <EditorField
           label="Display text"
