@@ -138,6 +138,11 @@ async function onSend(payload: SendPayload): Promise<SendResult> {
 const ASIDE_MIN = 280;
 const ASIDE_MAX = 640;
 const ASIDE_DEFAULT = 380;
+const ASIDE_COLLAPSED = 32;
+// Below this viewport width, the palette + editor + templates can't fit
+// inline without the editor's internal palette (288px) bleeding into the
+// templates panel. Auto-collapse rather than ship that broken layout.
+const AUTO_COLLAPSE_BELOW = 960;
 
 export function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -171,6 +176,28 @@ export function App() {
   };
 
   const [asideWidth, setAsideWidth] = useState<number>(ASIDE_DEFAULT);
+
+  // Collapse state. `narrow` follows the viewport; user clicks override
+  // until the next viewport-threshold crossing, then auto rules again.
+  const [narrow, setNarrow] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.innerWidth < AUTO_COLLAPSE_BELOW
+  );
+  const [manualCollapsed, setManualCollapsed] = useState<boolean | null>(null);
+  const collapsed = manualCollapsed ?? narrow;
+
+  useEffect(() => {
+    const update = () => setNarrow(window.innerWidth < AUTO_COLLAPSE_BELOW);
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // Drop any manual override when the viewport crosses the threshold so
+  // the auto rule resumes — otherwise users get stuck with a stale choice.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally
+  // resets manual override only on threshold crossings.
+  useEffect(() => {
+    setManualCollapsed(null);
+  }, [narrow]);
 
   const handleResizePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -268,42 +295,115 @@ export function App() {
           <aside
             className="bk-root"
             style={{
-              flex: `0 1 ${asideWidth}px`,
-              minWidth: ASIDE_MIN,
-              maxWidth: ASIDE_MAX,
+              flex: collapsed ? `0 0 ${ASIDE_COLLAPSED}px` : `0 1 ${asideWidth}px`,
+              minWidth: collapsed ? ASIDE_COLLAPSED : ASIDE_MIN,
+              maxWidth: collapsed ? ASIDE_COLLAPSED : ASIDE_MAX,
               position: 'relative',
               borderRadius: 6,
               border: '1px solid hsl(var(--border))',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              background: 'hsl(var(--background))'
             }}
           >
-            <div
-              role="separator"
-              aria-orientation="vertical"
-              aria-label="Resize templates panel"
-              aria-valuemin={ASIDE_MIN}
-              aria-valuemax={ASIDE_MAX}
-              aria-valuenow={asideWidth}
-              tabIndex={0}
-              onPointerDown={handleResizePointerDown}
-              onKeyDown={handleResizeKeyDown}
-              style={{
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: -3,
-                width: 6,
-                cursor: 'col-resize',
-                zIndex: 1,
-                touchAction: 'none'
-              }}
-            />
-            <TemplatePicker
-              templates={TEMPLATES}
-              heading="Templates"
-              theme={theme}
-              onSelect={handleSelectTemplate}
-            />
+            {collapsed ? (
+              <button
+                type="button"
+                onClick={() => setManualCollapsed(false)}
+                title="Show templates"
+                aria-label="Show templates panel"
+                aria-expanded={false}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  background: 'transparent',
+                  border: 0,
+                  padding: 0,
+                  cursor: 'pointer',
+                  color: 'hsl(var(--foreground))',
+                  font: 'inherit'
+                }}
+              >
+                <span aria-hidden="true" style={{ fontSize: 14, lineHeight: 1 }}>
+                  ‹
+                </span>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    writingMode: 'vertical-rl',
+                    transform: 'rotate(180deg)',
+                    opacity: 0.7
+                  }}
+                >
+                  Templates
+                </span>
+              </button>
+            ) : (
+              <>
+                <div
+                  role="separator"
+                  aria-orientation="vertical"
+                  aria-label="Resize templates panel"
+                  aria-valuemin={ASIDE_MIN}
+                  aria-valuemax={ASIDE_MAX}
+                  aria-valuenow={asideWidth}
+                  tabIndex={0}
+                  onPointerDown={handleResizePointerDown}
+                  onKeyDown={handleResizeKeyDown}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: -3,
+                    width: 6,
+                    cursor: 'col-resize',
+                    zIndex: 1,
+                    touchAction: 'none'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setManualCollapsed(true)}
+                  title="Hide templates"
+                  aria-label="Hide templates panel"
+                  aria-expanded={true}
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    zIndex: 2,
+                    width: 24,
+                    height: 24,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: 4,
+                    cursor: 'pointer',
+                    color: 'hsl(var(--foreground))',
+                    fontSize: 14,
+                    lineHeight: 1
+                  }}
+                >
+                  ›
+                </button>
+                <TemplatePicker
+                  templates={TEMPLATES}
+                  heading="Templates"
+                  theme={theme}
+                  onSelect={handleSelectTemplate}
+                />
+              </>
+            )}
           </aside>
         </div>
       </div>
