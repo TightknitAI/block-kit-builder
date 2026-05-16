@@ -124,7 +124,7 @@ const SAMPLE_TEMPLATES: Template[] = [
 const meta = {
   title: 'BlockKitchen/TemplatePicker',
   component: TemplatePicker,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', a11y: { test: 'error' } },
   args: {
     templates: SAMPLE_TEMPLATES,
     onSelect: fn(),

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AlignLeft } from 'lucide-react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
 import { defaultPalette, type PaletteSection } from '../lib/default-blocks';
 import type { SupportedBlock } from '../types';
 import { BlockKitchen } from './block-kitchen';
@@ -218,5 +218,59 @@ export const AddSectionFromPalette: Story = {
     await expect(args.onChange).toHaveBeenCalled();
     const sendBtn = await canvas.findByRole('button', { name: /^send$/i });
     await expect(sendBtn).toBeEnabled();
+  }
+};
+
+export const ReorderBlocksViaDrag: Story = {
+  args: {
+    initialBlocks: STARTER_BLOCKS
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    // Anchor on rendered preview text to find each block's row trigger.
+    // The hover toolbar also has aria-label="Edit block" pencil buttons,
+    // so finding by role would be ambiguous; the row trigger is the
+    // role="button" div ancestor of the preview content.
+    const headerText = await canvas.findByText('Welcome to Block Kit');
+    const sectionText = await canvas.findByText(/compose slack messages/i);
+    const headerRow = headerText.closest('div[role="button"]') as HTMLElement | null;
+    const sectionRow = sectionText.closest('div[role="button"]') as HTMLElement | null;
+    expect(headerRow).not.toBeNull();
+    expect(sectionRow).not.toBeNull();
+
+    const headerRect = headerRow!.getBoundingClientRect();
+    const sectionRect = sectionRow!.getBoundingClientRect();
+
+    // dnd-kit's PointerSensor checks `event.isPrimary` and `button === 0`;
+    // PointerEventInit defaults isPrimary to false, so set it explicitly.
+    const pointer = { pointerId: 1, button: 0, isPrimary: true };
+
+    fireEvent.pointerDown(headerRow!, {
+      ...pointer,
+      clientX: headerRect.left + headerRect.width / 2,
+      clientY: headerRect.top + headerRect.height / 2
+    });
+    // Clear the 4px activation distance configured in block-kitchen.tsx.
+    fireEvent.pointerMove(headerRow!, {
+      ...pointer,
+      clientX: headerRect.left + headerRect.width / 2,
+      clientY: headerRect.top + headerRect.height / 2 + 12
+    });
+    // Land inside the section row so `pointerWithin` resolves it as the
+    // drop target, which reorders the dragged header to that index.
+    fireEvent.pointerMove(sectionRow!, {
+      ...pointer,
+      clientX: sectionRect.left + sectionRect.width / 2,
+      clientY: sectionRect.top + sectionRect.height / 2
+    });
+    fireEvent.pointerUp(sectionRow!, pointer);
+
+    await waitFor(() => {
+      const calls = (args.onChange as ReturnType<typeof fn>).mock.calls;
+      expect(calls.length).toBeGreaterThan(0);
+      const latest = calls[calls.length - 1][0] as SupportedBlock[];
+      expect(latest.map((b) => b.type)).toEqual(['section', 'header', 'divider', 'context']);
+    });
   }
 };

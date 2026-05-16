@@ -8,6 +8,7 @@ import { Palette } from './palette';
 const meta = {
   title: 'BlockKitchen/Palette',
   component: Palette,
+  parameters: { a11y: { test: 'error' } },
   args: {
     onAddBlock: fn(),
     sections: defaultPalette

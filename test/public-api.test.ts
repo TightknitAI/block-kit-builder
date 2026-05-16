@@ -1,3 +1,4 @@
+import { validateBlockKit } from '@tightknitai/slack-block-kit-validator';
 import { defaultPalette, extraAlertVariant, legacyInputVariants } from '../src/lib/default-blocks';
 import { toSlackBlocks } from '../src/lib/to-slack-blocks';
 import { decodeBlocksFromString, encodeBlocksToString } from '../src/lib/url-state';
@@ -139,5 +140,32 @@ describe('palette factories', () => {
       expect(variant.factory().type).toBe('input');
     }
     expect(extraAlertVariant.factory().type).toBe('alert');
+  });
+
+  // Catches the failure mode where a palette default drifts out of sync with
+  // the Slack Block Kit schema — users add the block, see nothing wrong in
+  // the builder, and Slack rejects the payload on send. Validating every
+  // factory's output through the same path the runtime uses
+  // (`toSlackBlocks` → `validateBlockKit`) keeps factories honest.
+  it('every default palette factory produces a payload that validates', () => {
+    for (const section of defaultPalette) {
+      for (const variant of section.variants) {
+        const block = variant.factory();
+        const result = validateBlockKit(toSlackBlocks([block]), { target: 'blocks' });
+        if (!result.valid) {
+          throw new Error(`Palette variant "${variant.id}" produced an invalid block:\n${result.errors.join('\n')}`);
+        }
+      }
+    }
+  });
+
+  it('legacy input + extra alert factories also validate', () => {
+    for (const variant of [...legacyInputVariants, extraAlertVariant]) {
+      const block = variant.factory();
+      const result = validateBlockKit(toSlackBlocks([block]), { target: 'blocks' });
+      if (!result.valid) {
+        throw new Error(`Legacy variant "${variant.id}" produced an invalid block:\n${result.errors.join('\n')}`);
+      }
+    }
   });
 });

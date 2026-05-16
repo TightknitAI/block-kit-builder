@@ -1,11 +1,30 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { validateBlockKit } from '@tightknitai/slack-block-kit-validator';
 import { TextCursorInput } from 'lucide-react';
 import { useArgs } from 'storybook/preview-api';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { buildVariantById, defaultPalette, extraAlertVariant, legacyInputVariants } from '../../lib/default-blocks';
+import { toSlackBlocks } from '../../lib/to-slack-blocks';
 import { TooltipProvider } from '../../lib/ui/tooltip';
 import type { SupportedBlock } from '../../types';
 import { BlockEditor } from './block-editor';
+
+/**
+ * Pulls the most recent `onChange` payload from a Vitest spy and asserts
+ * the resulting block validates as Slack Block Kit. Play tests use this
+ * to catch the case where a field edit produces a structurally-correct
+ * React state but a payload Slack would reject on send.
+ */
+function expectLastOnChangeIsValid(onChange: ReturnType<typeof fn>): SupportedBlock {
+  const calls = onChange.mock.calls;
+  expect(calls.length).toBeGreaterThan(0);
+  const latest = calls[calls.length - 1][0] as SupportedBlock;
+  const result = validateBlockKit(toSlackBlocks([latest]), { target: 'blocks' });
+  if (!result.valid) {
+    throw new Error(`Edited block failed validation:\n${result.errors.join('\n')}`);
+  }
+  return latest;
+}
 
 // Stories cover every editor code path — including element types that
 // only live in `legacyInputVariants` (single/multi users-select, the
@@ -280,5 +299,48 @@ export const TypingSectionTextInvokesOnChange: Story = {
     await userEvent.click(textarea);
     await userEvent.keyboard(' Edited.');
     await expect(args.onChange).toHaveBeenCalled();
+    expectLastOnChangeIsValid(args.onChange as ReturnType<typeof fn>);
+  }
+};
+
+export const TypingHeaderTextProducesValidBlock: Story = {
+  args: { block: variant('structure_header') },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const input = await canvas.findByLabelText(/heading text/i);
+    await userEvent.click(input);
+    await userEvent.keyboard(' (edited)');
+    await expect(args.onChange).toHaveBeenCalled();
+    const latest = expectLastOnChangeIsValid(args.onChange as ReturnType<typeof fn>);
+    expect(latest.type).toBe('header');
+  }
+};
+
+export const TypingMarkdownTextProducesValidBlock: Story = {
+  args: { block: variant('markdown_list') },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const textarea = await canvas.findByLabelText(/^markdown$/i);
+    await userEvent.click(textarea);
+    await userEvent.keyboard('\n- Added line');
+    await expect(args.onChange).toHaveBeenCalled();
+    const latest = expectLastOnChangeIsValid(args.onChange as ReturnType<typeof fn>);
+    expect(latest.type).toBe('markdown');
+  }
+};
+
+export const EditingImageUrlAndAltProducesValidBlock: Story = {
+  args: { block: variant('image_with_title') },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const url = await canvas.findByLabelText(/image url/i);
+    await userEvent.clear(url);
+    await userEvent.type(url, 'https://example.com/new.png');
+    const alt = await canvas.findByLabelText(/alt text/i);
+    await userEvent.clear(alt);
+    await userEvent.type(alt, 'New cover');
+    await expect(args.onChange).toHaveBeenCalled();
+    const latest = expectLastOnChangeIsValid(args.onChange as ReturnType<typeof fn>);
+    expect(latest.type).toBe('image');
   }
 };

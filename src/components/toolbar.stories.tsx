@@ -6,7 +6,7 @@ import { Toolbar } from './toolbar';
 const meta = {
   title: 'BlockKitchen/Toolbar',
   component: Toolbar,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', a11y: { test: 'error' } },
   args: {
     onClear: fn(),
     onOpenJson: fn(),
