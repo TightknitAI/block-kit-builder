@@ -8,7 +8,7 @@ import {
   type Template,
   TemplatePicker
 } from '@tightknitai/block-kitchen';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const MOCK_CHANNELS: ChannelOption[] = [
   { id: 'C0001', name: 'general' },
@@ -132,6 +132,20 @@ async function onSend(payload: SendPayload): Promise<SendResult> {
 
 export function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  // Mirror `theme` onto <html> so the .dark CSS-variable rule reaches
+  // Radix portals (sheets, dialogs, popovers, tooltips). They mount
+  // under <body>, so a wrapper-div .dark would never cascade to them.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    return () => root.classList.remove('dark');
+  }, [theme]);
+
   // Lifted draft blocks. The builder reads them on mount; updating this
   // state alone won't refresh an already-mounted builder, so we pair it
   // with `builderKey` below.
@@ -148,7 +162,7 @@ export function App() {
   };
 
   return (
-    <div className={theme === 'dark' ? 'dark' : ''} style={{ height: '100%' }}>
+    <div style={{ height: '100%' }}>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 16, gap: 12 }}>
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
