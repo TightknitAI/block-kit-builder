@@ -453,7 +453,12 @@ export const defaultPalette: readonly PaletteSection[] = [
           label: { type: 'plain_text', text: 'Label', emoji: true },
           element: {
             type: 'plain_text_input',
-            action_id: 'plain_text_input'
+            action_id: 'plain_text_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Enter some text',
+              emoji: true
+            }
           }
         })
       },
@@ -466,7 +471,12 @@ export const defaultPalette: readonly PaletteSection[] = [
           element: {
             type: 'plain_text_input',
             action_id: 'plain_text_input_multiline',
-            multiline: true
+            multiline: true,
+            placeholder: {
+              type: 'plain_text',
+              text: 'Enter a longer description',
+              emoji: true
+            }
           }
         })
       },
@@ -478,7 +488,12 @@ export const defaultPalette: readonly PaletteSection[] = [
           label: { type: 'plain_text', text: 'Email address', emoji: true },
           element: {
             type: 'email_text_input',
-            action_id: 'email_text_input'
+            action_id: 'email_text_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'name@example.com',
+              emoji: true
+            }
           }
         })
       },
@@ -490,7 +505,12 @@ export const defaultPalette: readonly PaletteSection[] = [
           label: { type: 'plain_text', text: 'Website', emoji: true },
           element: {
             type: 'url_text_input',
-            action_id: 'url_text_input'
+            action_id: 'url_text_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'https://example.com',
+              emoji: true
+            }
           }
         })
       },
@@ -503,7 +523,8 @@ export const defaultPalette: readonly PaletteSection[] = [
           element: {
             type: 'number_input',
             action_id: 'number_input',
-            is_decimal_allowed: false
+            is_decimal_allowed: false,
+            placeholder: { type: 'plain_text', text: '0', emoji: true }
           }
         })
       },
@@ -515,7 +536,12 @@ export const defaultPalette: readonly PaletteSection[] = [
           label: { type: 'plain_text', text: 'Pick a date', emoji: true },
           element: {
             type: 'datepicker',
-            action_id: 'datepicker'
+            action_id: 'datepicker',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select a date',
+              emoji: true
+            }
           }
         })
       },
@@ -528,6 +554,11 @@ export const defaultPalette: readonly PaletteSection[] = [
           element: {
             type: 'static_select',
             action_id: 'static_select',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Choose one',
+              emoji: true
+            },
             options: [
               {
                 text: { type: 'plain_text', text: 'Option 1', emoji: true },
@@ -553,7 +584,12 @@ export const defaultPalette: readonly PaletteSection[] = [
           label: { type: 'plain_text', text: 'Description', emoji: true },
           element: {
             type: 'rich_text_input',
-            action_id: 'rich_text_input'
+            action_id: 'rich_text_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Type something',
+              emoji: true
+            }
           }
         })
       },
@@ -819,7 +855,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Label', emoji: true },
       element: {
         type: 'plain_text_input',
-        action_id: 'plain_text_input'
+        action_id: 'plain_text_input',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Enter some text',
+          emoji: true
+        }
       }
     })
   },
@@ -832,7 +873,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       element: {
         type: 'plain_text_input',
         action_id: 'plain_text_input_multiline',
-        multiline: true
+        multiline: true,
+        placeholder: {
+          type: 'plain_text',
+          text: 'Enter a longer description',
+          emoji: true
+        }
       }
     })
   },
@@ -844,7 +890,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Email address', emoji: true },
       element: {
         type: 'email_text_input',
-        action_id: 'email_text_input'
+        action_id: 'email_text_input',
+        placeholder: {
+          type: 'plain_text',
+          text: 'name@example.com',
+          emoji: true
+        }
       }
     })
   },
@@ -856,7 +907,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Website', emoji: true },
       element: {
         type: 'url_text_input',
-        action_id: 'url_text_input'
+        action_id: 'url_text_input',
+        placeholder: {
+          type: 'plain_text',
+          text: 'https://example.com',
+          emoji: true
+        }
       }
     })
   },
@@ -869,7 +925,8 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       element: {
         type: 'number_input',
         action_id: 'number_input',
-        is_decimal_allowed: false
+        is_decimal_allowed: false,
+        placeholder: { type: 'plain_text', text: '0', emoji: true }
       }
     })
   },
@@ -881,7 +938,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Pick a date', emoji: true },
       element: {
         type: 'datepicker',
-        action_id: 'datepicker'
+        action_id: 'datepicker',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select a date',
+          emoji: true
+        }
       }
     })
   },
@@ -893,7 +955,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Pick a time', emoji: true },
       element: {
         type: 'timepicker',
-        action_id: 'timepicker'
+        action_id: 'timepicker',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select a time',
+          emoji: true
+        }
       }
     })
   },
@@ -922,6 +989,11 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       element: {
         type: 'static_select',
         action_id: 'static_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Choose one',
+          emoji: true
+        },
         options: [
           {
             text: { type: 'plain_text', text: 'Option 1', emoji: true },
@@ -948,6 +1020,11 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       element: {
         type: 'multi_static_select',
         action_id: 'multi_static_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Choose one or more',
+          emoji: true
+        },
         options: [
           {
             text: { type: 'plain_text', text: 'Option 1', emoji: true },
@@ -973,7 +1050,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Pick a user', emoji: true },
       element: {
         type: 'users_select',
-        action_id: 'users_select'
+        action_id: 'users_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select a user',
+          emoji: true
+        }
       }
     })
   },
@@ -985,7 +1067,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Pick users', emoji: true },
       element: {
         type: 'multi_users_select',
-        action_id: 'multi_users_select'
+        action_id: 'multi_users_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select users',
+          emoji: true
+        }
       }
     })
   },
@@ -997,7 +1084,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Pick a channel', emoji: true },
       element: {
         type: 'channels_select',
-        action_id: 'channels_select'
+        action_id: 'channels_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select a channel',
+          emoji: true
+        }
       }
     })
   },
@@ -1009,7 +1101,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Pick channels', emoji: true },
       element: {
         type: 'multi_channels_select',
-        action_id: 'multi_channels_select'
+        action_id: 'multi_channels_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select channels',
+          emoji: true
+        }
       }
     })
   },
@@ -1025,7 +1122,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       },
       element: {
         type: 'conversations_select',
-        action_id: 'conversations_select'
+        action_id: 'conversations_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select a conversation',
+          emoji: true
+        }
       }
     })
   },
@@ -1041,7 +1143,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       },
       element: {
         type: 'multi_conversations_select',
-        action_id: 'multi_conversations_select'
+        action_id: 'multi_conversations_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select conversations',
+          emoji: true
+        }
       }
     })
   },
@@ -1054,6 +1161,11 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       element: {
         type: 'external_select',
         action_id: 'external_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Choose one',
+          emoji: true
+        },
         min_query_length: 0
       }
     })
@@ -1067,6 +1179,11 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       element: {
         type: 'multi_external_select',
         action_id: 'multi_external_select',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Choose one or more',
+          emoji: true
+        },
         min_query_length: 0
       }
     })
@@ -1131,7 +1248,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
       label: { type: 'plain_text', text: 'Description', emoji: true },
       element: {
         type: 'rich_text_input',
-        action_id: 'rich_text_input'
+        action_id: 'rich_text_input',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Type something',
+          emoji: true
+        }
       }
     })
   },
