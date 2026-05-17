@@ -199,7 +199,11 @@ function PlainTextInputEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField
+        element={element}
+        onChange={onChange}
+        example={element.multiline ? 'e.g. Enter a longer description' : 'e.g. Enter some text'}
+      />
       <EditorField
         label="Initial value"
         help="Pre-filled value shown when the input loads."
@@ -265,7 +269,7 @@ function EmailInputEditor({ element, onChange }: { element: EmailInput; onChange
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. name@example.com" />
       <EditorField label="Initial value" help="Pre-filled email address." htmlFor="email-initial">
         <Input
           id="email-initial"
@@ -289,7 +293,7 @@ function URLInputEditor({ element, onChange }: { element: URLInput; onChange: (n
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. https://example.com" />
       <EditorField label="Initial value" help="Pre-filled URL." htmlFor="url-initial">
         <Input
           id="url-initial"
@@ -313,7 +317,7 @@ function NumberInputEditor({ element, onChange }: { element: NumberInput; onChan
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. 0" />
       <CheckboxField
         id="number-decimal"
         label="Allow decimals"
@@ -376,7 +380,7 @@ function DatepickerEditor({ element, onChange }: { element: Datepicker; onChange
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select a date" />
       <EditorField label="Initial date" help="YYYY-MM-DD. Pre-selected on load." htmlFor="date-initial">
         <Input
           id="date-initial"
@@ -400,7 +404,7 @@ function TimepickerEditor({ element, onChange }: { element: Timepicker; onChange
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select a time" />
       <EditorField label="Initial time" help="HH:mm in 24-hour clock." htmlFor="time-initial">
         <Input
           id="time-initial"
@@ -476,7 +480,7 @@ function StaticSelectEditor({ element, onChange }: { element: StaticSelect; onCh
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Choose one" />
       <PlainTextOptionsField
         options={element.options ?? []}
         onChange={(next) => onChange({ ...element, options: next })}
@@ -502,7 +506,7 @@ function MultiStaticSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Choose one or more" />
       <PlainTextOptionsField
         options={element.options ?? []}
         onChange={(next) => onChange({ ...element, options: next })}
@@ -523,7 +527,7 @@ function UsersSelectEditor({ element, onChange }: { element: UsersSelect; onChan
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select a user" />
       <EditorField label="Initial user ID" help="Optional. Pre-selects this Slack user." htmlFor="users-initial">
         <Input
           id="users-initial"
@@ -553,7 +557,7 @@ function MultiUsersSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select users" />
       <MaxSelectedField element={element} onChange={onChange} />
     </>
   );
@@ -576,7 +580,7 @@ function ChannelsSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select a channel" />
       <EditorField label="Initial channel ID" help="Optional. Pre-selects this channel." htmlFor="channels-initial">
         <Input
           id="channels-initial"
@@ -611,7 +615,7 @@ function MultiChannelsSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select channels" />
       <MaxSelectedField element={element} onChange={onChange} />
     </>
   );
@@ -634,7 +638,7 @@ function ConversationsSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select a conversation" />
       <EditorField
         label="Initial conversation ID"
         help="Optional. Pre-selects this conversation."
@@ -685,7 +689,7 @@ function MultiConversationsSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Select conversations" />
       <MaxSelectedField element={element} onChange={onChange} />
       <CheckboxField
         id="multi-convos-default-current"
@@ -720,7 +724,7 @@ function ExternalSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Choose one" />
       <EditorField
         label="Min query length"
         help="Characters typed before Slack fetches options from your app."
@@ -760,7 +764,7 @@ function MultiExternalSelectEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Choose one or more" />
       <EditorField
         label="Min query length"
         help="Characters typed before Slack fetches options from your app."
@@ -840,7 +844,7 @@ function RichTextInputEditor({
   return (
     <>
       <ActionIdField element={element} onChange={onChange} />
-      <PlaceholderField element={element} onChange={onChange} />
+      <PlaceholderField element={element} onChange={onChange} example="e.g. Type something" />
       <p className="text-[11px] leading-snug text-muted-foreground">
         Edit the initial rich-text value via the View JSON drawer.
       </p>
@@ -934,22 +938,32 @@ function ActionIdField<T extends { action_id?: string }>({
 /**
  * Shared placeholder field used by every element that supports
  * `placeholder` (i.e. anything implementing `Placeholdable`).
+ *
+ * `example` is shown as the input's own `placeholder` attribute so the
+ * user gets a per-element-type hint about what to type. The element's
+ * factory in `default-blocks.ts` intentionally ships without a default
+ * `placeholder.text` so this hint and the live preview don't render the
+ * same string twice when the editor first opens.
+ *
  * @param props - props
  * @param props.element - the element being edited
  * @param props.onChange - called with the updated element
+ * @param props.example - greyed-out hint shown in the editor input (not
+ *   stored on the block); defaults to a generic suggestion
  * @returns the rendered field
  */
 function PlaceholderField<
   T extends {
     placeholder?: { type: 'plain_text'; text: string; emoji?: boolean };
   }
->({ element, onChange }: { element: T; onChange: (next: T) => void }) {
+>({ element, onChange, example = 'e.g. Type a hint' }: { element: T; onChange: (next: T) => void; example?: string }) {
   return (
     <EditorField label="Placeholder" help="Greyed-out hint shown when the input is empty." htmlFor="placeholder">
       <Input
         id="placeholder"
         value={element.placeholder?.text ?? ''}
         maxLength={150}
+        placeholder={example}
         onChange={(e) =>
           onChange({
             ...element,
