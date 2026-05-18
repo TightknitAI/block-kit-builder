@@ -175,8 +175,8 @@ export function App() {
   return (
     <div style={{ height: '100%' }}>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 16, gap: 12 }}>
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <img
               src="/logo.png"
               alt=""
@@ -184,9 +184,19 @@ export function App() {
               height={32}
               style={{ borderRadius: 6, flexShrink: 0 }}
             />
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>block-kitchen — live demo</div>
-              <div style={{ fontSize: 12, opacity: 0.7 }}>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                block-kitchen <span className="hidden sm:inline">— live demo</span>
+              </div>
+              <div className="hidden sm:block" style={{ fontSize: 12, opacity: 0.7 }}>
                 Drag blocks from the palette, edit them in place, and send to a (mocked) Slack channel.{' '}
                 <a
                   href="https://github.com/TightknitAI/block-kitchen"
@@ -217,7 +227,7 @@ export function App() {
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <label
               htmlFor="brand-preset-picker"
               style={{
@@ -225,12 +235,14 @@ export function App() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                color: 'hsl(var(--foreground))'
+                color: 'hsl(var(--foreground))',
+                whiteSpace: 'nowrap'
               }}
             >
-              Theme
+              <span className="hidden sm:inline">Theme</span>
               <select
                 id="brand-preset-picker"
+                aria-label="Theme"
                 value={preset}
                 onChange={(e) => setPreset(e.target.value as BrandPreset)}
                 style={{
@@ -253,6 +265,7 @@ export function App() {
             <button
               type="button"
               onClick={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode (current: ${theme})`}
               style={{
                 fontSize: 12,
                 padding: '6px 10px',
@@ -260,10 +273,12 @@ export function App() {
                 border: '1px solid hsl(var(--border))',
                 background: 'hsl(var(--background))',
                 color: 'hsl(var(--foreground))',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
               }}
             >
-              Mode: {theme}
+              <span className="hidden sm:inline">Mode: </span>
+              {theme}
             </button>
           </div>
         </header>
