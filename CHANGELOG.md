@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.3-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.6.2-alpha.0...block-kitchen-v0.6.3-alpha.0) (2026-05-18)
+
+
+### Features
+
+* **input:** show per-element hint in empty Placeholder field ([#67](https://github.com/TightknitAI/block-kitchen/issues/67)) ([4ee73ad](https://github.com/TightknitAI/block-kitchen/commit/4ee73adcc74875f5fe5a2447e774b04538d92f90))
+
+
+### Bug Fixes
+
+* **ui:** mobile-friendly toolbar, palette sheet, and demo header ([#69](https://github.com/TightknitAI/block-kitchen/issues/69)) ([44b4731](https://github.com/TightknitAI/block-kitchen/commit/44b473115eaf93d13cdc4c81511a0b6a6dc6714f))
+
 ## [0.6.2-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.6.1-alpha.0...block-kitchen-v0.6.2-alpha.0) (2026-05-16)
 
 
