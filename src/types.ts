@@ -404,6 +404,17 @@ export interface BlockKitchenProps {
    */
   palette?: readonly PaletteSection[];
   /**
+   * Block types to hide from the palette without rebuilding it. Each
+   * palette section is keyed by a `blockType`; any section whose
+   * `blockType` matches an entry here is filtered out before render.
+   * Convenient when you want the default palette minus a few block
+   * types (e.g. `disabledBlockTypes: ['image', 'table']` for a
+   * text-only builder). For finer-grained control (filtering
+   * individual variants, reordering, or adding custom presets), pass
+   * a custom `palette` array instead.
+   */
+  disabledBlockTypes?: readonly SupportedBlockType[];
+  /**
    * Whether the palette renders a quick-search input above the section
    * list. Defaults to `true`. Set `false` for compact palettes (e.g.
    * when you've passed a small custom `palette`) where scanning by eye

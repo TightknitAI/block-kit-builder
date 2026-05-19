@@ -11,13 +11,25 @@
  * vars — the standard shadcn/ui token set works as-is.
  */
 
+/* Cascade-layer order: declare our named layers up front so consumer
+   stylesheets that load after ours can override deterministically.
+   - `bk-theme` carries our `@theme` token mappings.
+   - `bk-utilities` carries every Tailwind utility class compiled from
+     this package. Consumer Tailwind utilities are typically in the
+     unnamed (top-level) cascade or in their own `utilities` layer,
+     either of which wins against a named layer per CSS Cascade Level
+     5. A consumer who wants explicit ordering can write
+     `@layer bk-theme, bk-utilities, utilities;` (or similar) at the
+     top of their own root stylesheet. */
+@layer bk-theme, bk-utilities;
+
 /* Tailwind v4 split imports. Skip the `preflight` layer so the package
    does not re-reset the host document's `*`, `body`, headings, etc.
    Studio loads this stylesheet from a route module; in an SPA it stays
    parsed for the rest of the session, so a global preflight here would
    affect every other page after a single visit. */
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import "tailwindcss/theme.css" layer(bk-theme);
+@import "tailwindcss/utilities.css" layer(bk-utilities);
 
 /* Bundle slack-blocks-to-jsx's own stylesheet so the preview component
    gets its button / mention / divider styling out of the box. The

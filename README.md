@@ -6,6 +6,7 @@
 
 [![CI](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml/badge.svg)](https://github.com/TightknitAI/block-kitchen/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@tightknitai/block-kitchen.svg)](https://www.npmjs.com/package/@tightknitai/block-kitchen)
+[![minzipped size](https://img.shields.io/bundlephobia/minzip/@tightknitai/block-kitchen)](https://bundlephobia.com/package/@tightknitai/block-kitchen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Live demo](https://img.shields.io/badge/demo-live-6366f1)](https://block-kitchen.tightknit.dev)
 
@@ -27,9 +28,47 @@ The package owns the entire builder UX — palette, sortable preview surface, pe
 pnpm add @tightknitai/block-kitchen
 ```
 
-Peer deps: `react`, `react-dom`.
+Modern package managers (pnpm 8+, npm 7+, yarn berry) auto-install peer
+dependencies — no extra command needed. The peer set is deliberately
+narrow: only the dependencies a typical consumer is likely to *already*
+have, where deduplication gives them a real win:
+
+- `react` `^18 || ^19`, `react-dom` `^18 || ^19`
+- `@radix-ui/react-{dialog,label,popover,radio-group,slot,tooltip}` —
+  the dialog/popover/tooltip/sheet primitives the builder uses. If
+  you already use shadcn/ui you already have these, and peer
+  deduplication avoids two Radix copies (which would split React
+  context — a `<TooltipProvider>` from your copy can't reach a
+  `<Tooltip>` from ours).
+- `lucide-react` — every icon in the toolbar, palette, and editors.
+  Universal in modern React UI stacks; peer keeps a single copy.
+
+Everything else (`@dnd-kit/*`, `@tiptap/*`, `slack-blocks-to-jsx`,
+`@tightknitai/slack-block-kit-validator`) is a regular dependency.
+Most consumers don't already have these, so there's no dedupe benefit
+to forcing them into a peer position — and you don't have to think
+about their versions.
+
+If your package manager doesn't auto-install peers:
+
+```bash
+pnpm add @tightknitai/block-kitchen \
+  react react-dom \
+  @radix-ui/react-dialog @radix-ui/react-label \
+  @radix-ui/react-popover @radix-ui/react-radio-group \
+  @radix-ui/react-slot @radix-ui/react-tooltip \
+  lucide-react
+```
 
 ## Usage
+
+> **Import the stylesheet once, at app root.** The builder mounts
+> dialogs, popovers, tooltips, and the mobile palette sheet via React
+> portals, which render to `document.body` — outside the route tree.
+> If you import `styles.css` inside a single route module, those
+> portal contents will be unstyled on every other route that doesn't
+> import it. Put the import in your root layout (Next.js `app/layout.tsx`,
+> Remix `app/root.tsx`, Vite `src/main.tsx`, etc.).
 
 ```tsx
 import { BlockKitchen } from "@tightknitai/block-kitchen";
@@ -71,6 +110,7 @@ export function MyBuilderPage() {
 | `onSend` | `(payload) => Promise<{ ok: boolean; error?: string }>` | yes | Called when the user submits the send dialog. Payload is `{ channelId, blocks, sendAsUser }`. |
 | `previewHooks` | `PreviewHooks` | no | Hooks forwarded to `slack-blocks-to-jsx`'s `<Message>` for resolving user / channel / emoji directives. |
 | `palette` | `PaletteSection[]` | no | The left-hand palette of draggable variants. Defaults to `defaultPalette`. Spread it to filter, reorder, or add your own pre-configured variants — see [Customizing the palette](#customizing-the-palette). |
+| `disabledBlockTypes` | `SupportedBlockType[]` | no | Block types to hide from the palette without rebuilding it. Filters at the variant level — a section keeps any variants whose block types aren't disabled; sections that end up empty are dropped. Convenient when you want the default palette minus a few types (e.g. `['image', 'table']` for a text-only builder). |
 | `defaultOpenSections` | `boolean \| string[]` | no | Which palette section headers are expanded on first paint. `true` (default) opens all sections; `false` collapses all (Slack-style); an array opens only sections whose `name` is in the list (e.g. `['Section', 'Actions']`). The palette also has a built-in search input that expands matching sections on demand. |
 | `showPaletteSearch` | `boolean` | no | Whether the palette renders the quick-search input above the section list. Defaults to `true`. Set `false` for compact palettes (e.g. when you've passed a small custom `palette`) where scanning by eye is faster than typing. |
 | `paletteSearchPlaceholder` | `string` | no | Placeholder text for the palette search input. Defaults to `'Search blocks…'`. Useful for localization. |
@@ -182,6 +222,85 @@ The lower-level CSS-variable contract above keeps working; the `theme` prop simp
 ### Typography
 
 Fonts are deliberately not part of `BrandTheme`. The builder sets no `font-family` of its own (aside from `font-mono` on the JSON viewer, which is intentional), so it inherits whatever the host page declares on `<html>` or `<body>`. Set your brand typography globally and the builder will pick it up automatically — no additional configuration needed. The Slack preview surface continues to render with Slack's own typography via `slack-blocks-to-jsx`.
+
+## Frameworks & SSR
+
+The builder is client-only by design — it uses drag sensors, contentEditable
+(TipTap), portals, and `useEffect`-driven state. It cannot be statically
+rendered on the server. The component still ships fine inside SSR/SSG
+frameworks; just mark its tree as client-side.
+
+- **Next.js (App Router)** — put `'use client'` at the top of the file
+  that renders `<BlockKitchen>`. Import `styles.css` from
+  `app/layout.tsx` (the root layout) so portal content stays styled
+  on every route.
+- **Next.js (Pages Router)** — render the component inside a page
+  module; the bundled-client default works. Import `styles.css` from
+  `pages/_app.tsx`.
+- **Remix / React Router** — render inside any route component;
+  put the `styles.css` import in `app/root.tsx`. If you ship the
+  builder on a single route, import the stylesheet there *and*
+  in `root.tsx` so portals on other routes don't render unstyled.
+- **Vite SPA** — import `styles.css` once from `src/main.tsx`.
+- **Astro** — load the React component with `client:only="react"`.
+
+The package exports React JSX with the automatic runtime, so any
+JSX-transform-aware bundler from the last few years works without
+extra configuration.
+
+## Subpath exports
+
+Three import paths are published:
+
+```ts
+// 1. Full builder (default)
+import { BlockKitchen } from "@tightknitai/block-kitchen";
+
+// 2. Headless helpers — no React component tree, safe for backends.
+//    Use this when you only need to round-trip / validate / encode
+//    blocks (e.g. inside a Worker that calls Slack's chat.postMessage).
+import {
+  toSlackBlocks,
+  encodeBlocksToString,
+  decodeBlocksFromString,
+} from "@tightknitai/block-kitchen/helpers";
+
+// 3. Palette catalog — for tooling that needs the default variants
+//    (e.g. a Storybook story or a config generator) without pulling
+//    in the builder.
+import {
+  defaultPalette,
+  legacyInputVariants,
+  extraAlertVariant,
+} from "@tightknitai/block-kitchen/palette";
+```
+
+The root entry (`.`) still re-exports everything from `./helpers` and
+`./palette`, so existing imports keep working — the subpaths are a tree-
+shaking-friendly shortcut, not a breaking split.
+
+## Cascade layer ordering (Tailwind users)
+
+The stylesheet emits all utility classes into a named cascade layer:
+
+```css
+@layer bk-theme, bk-utilities;
+```
+
+Per CSS Cascade Level 5, unlayered rules and rules in later-declared
+layers win over `bk-utilities`. In practice this means a consumer who
+imports both this package's `styles.css` and their own Tailwind output
+will see *their* utilities win on any class-name collision (e.g. they
+define `bg-background` differently). No action needed for that
+common case.
+
+If you want explicit control — for example, to make this package's
+utilities win, or to layer them alongside a `shadcn/ui` token stack —
+declare the order at the top of your own root stylesheet:
+
+```css
+@layer bk-theme, bk-utilities, theme, base, components, utilities;
+```
 
 ## License
 
