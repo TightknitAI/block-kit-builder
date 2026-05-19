@@ -1,5 +1,6 @@
 import {
   AlignLeft,
+  Bell,
   FileText,
   GalleryHorizontal,
   Image as ImageIcon,
@@ -659,6 +660,71 @@ export const defaultPalette: readonly PaletteSection[] = [
     ]
   },
   {
+    name: 'Alert',
+    icon: Bell,
+    variants: [
+      {
+        id: 'alert_default',
+        label: 'Default',
+        factory: () => ({
+          type: 'alert',
+          text: {
+            type: 'mrkdwn',
+            text: 'A neutral alert message.'
+          }
+        })
+      },
+      {
+        id: 'alert_info',
+        label: 'Info',
+        factory: () => ({
+          type: 'alert',
+          level: 'info',
+          text: {
+            type: 'mrkdwn',
+            text: 'FYI: the build finished in 42 seconds.'
+          }
+        })
+      },
+      {
+        id: 'alert_warning',
+        label: 'Warning',
+        factory: () => ({
+          type: 'alert',
+          level: 'warning',
+          text: {
+            type: 'mrkdwn',
+            text: 'Heads up: this action cannot be undone.'
+          }
+        })
+      },
+      {
+        id: 'alert_error',
+        label: 'Error',
+        factory: () => ({
+          type: 'alert',
+          level: 'error',
+          text: {
+            type: 'mrkdwn',
+            text: 'Something went wrong. Please try again.'
+          }
+        })
+      },
+      {
+        id: 'alert_success',
+        label: 'Success',
+        factory: () => ({
+          type: 'alert',
+          level: 'success',
+          text: {
+            type: 'mrkdwn',
+            text: 'Your changes have been saved.'
+          }
+        })
+      }
+    ]
+  },
+  {
     name: 'Rich Text',
     icon: Pilcrow,
     variants: [
@@ -1273,10 +1339,12 @@ export const legacyInputVariants: readonly PaletteVariant[] = [
 ] as const;
 
 /**
- * Modal-only `alert` block variant. Dropped from `defaultPalette` to
- * match Slack's Block Kit Builder sidebar (which doesn't list it), but
- * kept reachable so consumers who want it back can re-add via a custom
- * palette section.
+ * Standalone `alert` block variant. The full set of severity-level alert
+ * variants ships in `defaultPalette` under the "Alert" section; this
+ * export is retained for backward compatibility with consumers who
+ * previously spread it onto a custom palette. Shares the `alert_warning`
+ * id with its counterpart in `defaultPalette` — spread after
+ * `defaultPalette` (or omit it entirely) to avoid duplicate-id lookups.
  */
 export const extraAlertVariant: PaletteVariant = {
   id: 'alert_warning',
