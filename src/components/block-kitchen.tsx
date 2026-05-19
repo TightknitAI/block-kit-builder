@@ -15,7 +15,7 @@ import {
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { GripVertical } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { buildVariantById, defaultPalette } from '../lib/default-blocks';
+import { buildVariantById, defaultPalette, type PaletteSection } from '../lib/default-blocks';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '../lib/ui/sheet';
 import { TooltipProvider } from '../lib/ui/tooltip';
 import { useIsMobile } from '../lib/use-is-mobile';
@@ -48,6 +48,7 @@ export function BlockKitchen(props: BlockKitchenProps) {
     loadSendAsUserStatus,
     onSend,
     palette,
+    disabledBlockTypes,
     showPaletteSearch,
     paletteSearchPlaceholder,
     defaultOpenSections,
@@ -58,7 +59,25 @@ export function BlockKitchen(props: BlockKitchenProps) {
     theme
   } = props;
 
-  const paletteSections = palette ?? defaultPalette;
+  const paletteSections = useMemo(() => {
+    const sections = palette ?? defaultPalette;
+    if (!disabledBlockTypes || disabledBlockTypes.length === 0) {
+      return sections;
+    }
+    // Filter at the variant level: a section may mix block types (e.g.
+    // Structure contains divider + header + context), so dropping a
+    // whole section by name would over-prune. Run each factory once to
+    // peek at the block type; drop sections that end up empty.
+    const blocked = new Set(disabledBlockTypes);
+    const filtered: PaletteSection[] = [];
+    for (const section of sections) {
+      const variants = section.variants.filter((variant) => !blocked.has(variant.factory().type));
+      if (variants.length > 0) {
+        filtered.push({ ...section, variants });
+      }
+    }
+    return filtered;
+  }, [palette, disabledBlockTypes]);
   const variantById = useMemo(() => buildVariantById(paletteSections), [paletteSections]);
 
   // Default to message-only when omitted (or passed empty). The toolbar
