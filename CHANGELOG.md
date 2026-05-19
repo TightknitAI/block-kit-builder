@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.8.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.7.0...block-kitchen-v0.8.0) (2026-05-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* prepare 0.7.0 release with peer-dep migration and consumer polish ([#70](https://github.com/TightknitAI/block-kitchen/issues/70))
+* **palette:** consolidate variants to mirror Slack's Block Kit Builder ([#39](https://github.com/TightknitAI/block-kitchen/issues/39))
+* rename package to @tightknitai/block-kitchen ([#30](https://github.com/TightknitAI/block-kitchen/issues/30))
+* **palette:** consumer-defined palette via `palette` prop ([#26](https://github.com/TightknitAI/block-kitchen/issues/26))
+* allowedBlockTypes + allowedSurfaces allowlists ([#17](https://github.com/TightknitAI/block-kitchen/issues/17))
+
+### Features
+
+* **a11y:** enforce axe in Storybook and fix violations ([#14](https://github.com/TightknitAI/block-kitchen/issues/14)) ([565b656](https://github.com/TightknitAI/block-kitchen/commit/565b656752e2f684a727b88cc8a59fbe0ea6968f))
+* add `theme` prop for branding the builder chrome ([#29](https://github.com/TightknitAI/block-kitchen/issues/29)) ([957c7cd](https://github.com/TightknitAI/block-kitchen/commit/957c7cd25dcbe5c40ee6fd6b815069b8eb0a7deb))
+* add standalone TemplatePicker component ([#34](https://github.com/TightknitAI/block-kitchen/issues/34)) ([ef63a69](https://github.com/TightknitAI/block-kitchen/commit/ef63a697de8073b5c135d0fb54b4edf679dd4a81))
+* allowedBlockTypes + allowedSurfaces allowlists ([#17](https://github.com/TightknitAI/block-kitchen/issues/17)) ([a5185ad](https://github.com/TightknitAI/block-kitchen/commit/a5185adbf9ee6bc75400352c305f5c3f8d9bf367))
+* **demo:** make templates panel resizable and auto-shrinking ([#54](https://github.com/TightknitAI/block-kitchen/issues/54)) ([8e28fe8](https://github.com/TightknitAI/block-kitchen/commit/8e28fe84717c44a18a055451007e7167bbfaaa59))
+* **demo:** prepare for public hosting ([#45](https://github.com/TightknitAI/block-kitchen/issues/45)) ([a77cf11](https://github.com/TightknitAI/block-kitchen/commit/a77cf1167c34f33f6bec701913dd76f79195d361))
+* **dnd:** show clear landing position while dragging a block ([#19](https://github.com/TightknitAI/block-kitchen/issues/19)) ([dd3554b](https://github.com/TightknitAI/block-kitchen/commit/dd3554bb11bc50c96d5048044cfecb64d334430f))
+* **input:** show per-element hint in empty Placeholder field ([#67](https://github.com/TightknitAI/block-kitchen/issues/67)) ([4ee73ad](https://github.com/TightknitAI/block-kitchen/commit/4ee73adcc74875f5fe5a2447e774b04538d92f90))
+* **mobile:** make the builder fully responsive ([#65](https://github.com/TightknitAI/block-kitchen/issues/65)) ([5bee7cd](https://github.com/TightknitAI/block-kitchen/commit/5bee7cd39e0ee0c8520185cdf2c6500eb00037e2))
+* **palette:** consolidate variants to mirror Slack's Block Kit Builder ([#39](https://github.com/TightknitAI/block-kitchen/issues/39)) ([b3950c5](https://github.com/TightknitAI/block-kitchen/commit/b3950c51acbb85623fbc632fbafc77db25ef9623))
+* **palette:** consumer-defined palette via `palette` prop ([#26](https://github.com/TightknitAI/block-kitchen/issues/26)) ([07f09c5](https://github.com/TightknitAI/block-kitchen/commit/07f09c5b94faec8201a6ef88621416708fe960dc))
+* **palette:** quick search + collapsible categories ([#35](https://github.com/TightknitAI/block-kitchen/issues/35)) ([62e9d00](https://github.com/TightknitAI/block-kitchen/commit/62e9d00f84f5ab46af7b2b4b50375febed6e43bf))
+* prepare 0.7.0 release with peer-dep migration and consumer polish ([#70](https://github.com/TightknitAI/block-kitchen/issues/70)) ([f6c9d7a](https://github.com/TightknitAI/block-kitchen/commit/f6c9d7aca9cdae0e6f8120d636f4d9558c1e35b9))
+* rename package to @tightknitai/block-kitchen ([#30](https://github.com/TightknitAI/block-kitchen/issues/30)) ([f34bd51](https://github.com/TightknitAI/block-kitchen/commit/f34bd5145e6a0e5bf50f7b79f3f1885b81e5f3e0))
+* **templates:** ship richer default template gallery as library export ([#56](https://github.com/TightknitAI/block-kitchen/issues/56)) ([a0c4886](https://github.com/TightknitAI/block-kitchen/commit/a0c488621900dd1db43bea27f0a3e6e89f7fed0f))
+* **theme:** add eclectic preset themes (Slack, Ocean, Sunset, Mono, Cyberpunk) ([#50](https://github.com/TightknitAI/block-kitchen/issues/50)) ([cd611aa](https://github.com/TightknitAI/block-kitchen/commit/cd611aa3d419c9080a7fef9612eeb72a0517d6a9))
+* **toolbar:** restyle docs link and make it configurable ([#41](https://github.com/TightknitAI/block-kitchen/issues/41)) ([74cf1d0](https://github.com/TightknitAI/block-kitchen/commit/74cf1d05d025d543bce76d0c6c50240c09c80a63))
+
+
+### Bug Fixes
+
+* **a11y:** keyboard-accessible block reordering + tighter focus order ([#60](https://github.com/TightknitAI/block-kitchen/issues/60)) ([01aa7e9](https://github.com/TightknitAI/block-kitchen/commit/01aa7e96ba57955219349a44b1d40ddfea22fa7b))
+* **a11y:** label upstream image/video toggle so axe button-name passes ([#24](https://github.com/TightknitAI/block-kitchen/issues/24)) ([543436f](https://github.com/TightknitAI/block-kitchen/commit/543436fbb59ac91bfc1a1959c73970084f0d412e))
+* **block-row:** align selection chrome with the visible block ([#37](https://github.com/TightknitAI/block-kitchen/issues/37)) ([f0a3a4d](https://github.com/TightknitAI/block-kitchen/commit/f0a3a4de605dd0df9e9b5b02f0d4c048be8d071f))
+* **ci:** publish to npm from release-please workflow ([#53](https://github.com/TightknitAI/block-kitchen/issues/53)) ([42ec905](https://github.com/TightknitAI/block-kitchen/commit/42ec9050a2dbb821cfc37990499e8e6032032d76))
+* **demo:** apply .dark to &lt;html&gt; so portals follow dark mode ([#42](https://github.com/TightknitAI/block-kitchen/issues/42)) ([c81d1a7](https://github.com/TightknitAI/block-kitchen/commit/c81d1a7723edfbe063bed60a2b601521ddb60dd4))
+* **demo:** move templates collapse button to inner edge ([#59](https://github.com/TightknitAI/block-kitchen/issues/59)) ([5c2967b](https://github.com/TightknitAI/block-kitchen/commit/5c2967b7b38742318828fbcd02ff7fca15842308))
+* **palette:** align focus + hover styling on the same row element ([#31](https://github.com/TightknitAI/block-kitchen/issues/31)) ([ac9495f](https://github.com/TightknitAI/block-kitchen/commit/ac9495ff4abef96ffdd17b0e72d20b2f66350355))
+* **palette:** prevent horizontal scroll on the block menu list ([#27](https://github.com/TightknitAI/block-kitchen/issues/27)) ([ba4a1cb](https://github.com/TightknitAI/block-kitchen/commit/ba4a1cbb22cb80eb2418cd5662071e05df614792))
+* **preview:** clip preview frame children to rounded corners ([#43](https://github.com/TightknitAI/block-kitchen/issues/43)) ([4d05156](https://github.com/TightknitAI/block-kitchen/commit/4d0515611960ad7310bfa003da460ffd56949515))
+* **preview:** give preview canvas a Slack-style grey for contrast ([#55](https://github.com/TightknitAI/block-kitchen/issues/55)) ([1b9ddfc](https://github.com/TightknitAI/block-kitchen/commit/1b9ddfce30bb12380b6f64235bb5206ea92a04c9))
+* **preview:** make every block row span the full preview width ([#49](https://github.com/TightknitAI/block-kitchen/issues/49)) ([f8fd36c](https://github.com/TightknitAI/block-kitchen/commit/f8fd36c46c5684f4fb947e16263b971f0727f1c1))
+* **preview:** stop double-translating select chevrons ([#33](https://github.com/TightknitAI/block-kitchen/issues/33)) ([ce2a228](https://github.com/TightknitAI/block-kitchen/commit/ce2a228b578b1f00e9976ae99734e8eced4670b5))
+* **preview:** theme the preview canvas via --muted token ([#66](https://github.com/TightknitAI/block-kitchen/issues/66)) ([80d766e](https://github.com/TightknitAI/block-kitchen/commit/80d766e4a7fca101e2374a0d657c2ba646593df2))
+* **preview:** tighten markdown block list spacing ([#57](https://github.com/TightknitAI/block-kitchen/issues/57)) ([50774a1](https://github.com/TightknitAI/block-kitchen/commit/50774a128ad862a8eebe4645f3ec919d5ea61715))
+* **release:** drop test step from prepublishOnly ([#63](https://github.com/TightknitAI/block-kitchen/issues/63)) ([431ef49](https://github.com/TightknitAI/block-kitchen/commit/431ef49fa6c72a64bd6b06ef7f89da68fb82c08d))
+* **security:** sanitize URL schemes in block payloads, preview, and editors ([#46](https://github.com/TightknitAI/block-kitchen/issues/46)) ([43b1dfc](https://github.com/TightknitAI/block-kitchen/commit/43b1dfc2c729092e72fc5cba50528c61e194f33b))
+* **ui:** mobile-friendly toolbar, palette sheet, and demo header ([#69](https://github.com/TightknitAI/block-kitchen/issues/69)) ([44b4731](https://github.com/TightknitAI/block-kitchen/commit/44b473115eaf93d13cdc4c81511a0b6a6dc6714f))
+
 ## [0.6.3-alpha.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.6.2-alpha.0...block-kitchen-v0.6.3-alpha.0) (2026-05-18)
 
 
