@@ -41,7 +41,11 @@ jobs:
       - run: pnpm run build:clean
         if: ${{ steps.release.outputs.releases_created }}
 
-      - run: pnpm publish --provenance --access public --no-git-checks
+      # Trusted Publisher (OIDC) needs npm CLI >= 11.5.1; Node 22 ships with
+      # npm 10.x, and pnpm <11.0.7 does not perform the OIDC exchange. So we
+      # publish with npm from the upgraded CLI instead of `pnpm publish`.
+      - run: npm install -g npm@latest
         if: ${{ steps.release.outputs.releases_created }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - run: npm publish --provenance --access public
+        if: ${{ steps.release.outputs.releases_created }}
