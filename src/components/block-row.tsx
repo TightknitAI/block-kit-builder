@@ -26,7 +26,10 @@ const BLOCK_TYPE_LABELS: Record<SupportedBlockType, string> = {
   card: 'Card',
   carousel: 'Carousel',
   context_actions: 'Context Actions',
-  input: 'Input'
+  input: 'Input',
+  video: 'Video',
+  plan: 'Plan',
+  task_card: 'Task Card'
 };
 
 /**

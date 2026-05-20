@@ -14,9 +14,12 @@ import type {
   ContextActionsBlock,
   InputBlock,
   MarkdownBlock,
+  PlanBlock,
   SupportedBlock,
   SupportedBlockType,
-  TableBlock
+  TableBlock,
+  TaskCardBlock,
+  VideoBlock
 } from '../../types';
 import { ActionsEditor } from './actions-editor';
 import { AlertEditor } from './alert-editor';
@@ -29,9 +32,12 @@ import { HeaderEditor } from './header-editor';
 import { ImageEditor } from './image-editor';
 import { InputEditor } from './input-editor';
 import { MarkdownEditor } from './markdown-editor';
+import { PlanEditor } from './plan-editor';
 import { RichTextEditor } from './rich-text-editor';
 import { SectionEditor } from './section-editor';
 import { TableEditor } from './table-editor';
+import { TaskCardEditor } from './task-card-editor';
+import { VideoEditor } from './video-editor';
 
 /**
  * Dispatches to the correct per-block editor form. Provides a consistent
@@ -107,6 +113,12 @@ function dispatch(block: SupportedBlock, onChange: (next: SupportedBlock) => voi
       return <ContextActionsEditor block={block as ContextActionsBlock} onChange={(next) => onChange(next)} />;
     case 'input':
       return <InputEditor block={block as InputBlock} onChange={(next) => onChange(next)} />;
+    case 'video':
+      return <VideoEditor block={block as VideoBlock} onChange={(next) => onChange(next)} />;
+    case 'plan':
+      return <PlanEditor block={block as PlanBlock} onChange={(next) => onChange(next)} />;
+    case 'task_card':
+      return <TaskCardEditor block={block as TaskCardBlock} onChange={(next) => onChange(next)} />;
     default:
       return null;
   }
