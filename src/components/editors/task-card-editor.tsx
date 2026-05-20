@@ -31,7 +31,7 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
   const status: TaskCardStatus = block.status ?? 'pending';
   return (
     <div className="flex flex-col gap-4">
-      <EditorField label="Title" help="Short label shown at the top of the card." htmlFor="task-card-title">
+      <EditorField label="Title" help="Title of the task in plain text." htmlFor="task-card-title">
         <Input
           id="task-card-title"
           value={block.title}
@@ -40,11 +40,7 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
         />
       </EditorField>
 
-      <EditorField
-        label="Task ID"
-        help="Stable identifier you can reference from interaction payloads."
-        htmlFor="task-card-id"
-      >
+      <EditorField label="Task ID" help="ID for the task." htmlFor="task-card-id">
         <Input
           id="task-card-id"
           value={block.task_id}
@@ -53,7 +49,7 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
         />
       </EditorField>
 
-      <EditorField label="Status" help="Slack renders a matching status chip on the card.">
+      <EditorField label="Status" help='The state of a task. Can be "pending", "in_progress", "complete", or "error".'>
         <RadioGroup
           value={status}
           onValueChange={(v) => onChange({ ...block, status: v as TaskCardStatus })}
@@ -72,14 +68,14 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
 
       <RichTextField
         label="Details"
-        help="Optional rich-text body shown inside the card."
+        help="Details of the task in the form of a single rich_text entity."
         value={block.details}
         onChange={(next) => onChange({ ...block, details: next })}
       />
 
       <RichTextField
         label="Output"
-        help="Optional rich-text result Slack renders beneath the details."
+        help="Output of the task in the form of a single rich_text entity."
         value={block.output}
         onChange={(next) => onChange({ ...block, output: next })}
       />
@@ -177,11 +173,9 @@ function SourcesField({
   return (
     <div className="flex flex-col gap-2 rounded-md border bg-muted/20 p-3">
       <span className="text-xs font-medium text-foreground">Sources</span>
-      {sources.length === 0 ? (
-        <p className="text-[11px] leading-snug text-muted-foreground">
-          No sources. Add one to cite a document or link beneath the card.
-        </p>
-      ) : null}
+      <p className="text-[11px] leading-snug text-muted-foreground">
+        Array of URL source elements used to generate a response.
+      </p>
       {sources.map((src, idx) => (
         <div key={idx} className="flex flex-col gap-2 rounded border bg-background p-2">
           <div className="flex items-center justify-between">
