@@ -1,19 +1,27 @@
 import { Plus, Trash2 } from 'lucide-react';
+import type { RichTextBlock } from 'slack-web-api-client';
 import { Button } from '../../lib/ui/button';
 import { Input } from '../../lib/ui/input';
 import { Label } from '../../lib/ui/label';
 import { RadioGroup, RadioGroupItem } from '../../lib/ui/radio-group';
 import type { TaskCardBlock, TaskCardStatus, UrlSourceElement } from '../../types';
 import { EditorField } from './field';
+import { RichTextEditor } from './rich-text-editor';
 import type { BlockEditorProps } from './types';
 
 const STATUSES: readonly TaskCardStatus[] = ['pending', 'in_progress', 'complete', 'error'] as const;
 
+const EMPTY_RICH_TEXT: RichTextBlock = {
+  type: 'rich_text',
+  elements: [{ type: 'rich_text_section', elements: [{ type: 'text', text: '' }] }]
+};
+
 /**
- * Editor form for task_card blocks. Edits the task id, title, status, and
- * the cited sources list. The rich-text `details` and `output` fields
- * round-trip through the payload but are not editable in the visual
- * builder — palette variants that include them keep them on save.
+ * Editor form for task_card blocks. Edits the task id, title, status,
+ * the cited sources list, and the optional rich-text `details` and
+ * `output` fields. Details and output are togglable — adding one swaps
+ * in an empty rich_text block; removing one drops the field from the
+ * payload.
  * @param props - editor props
  * @param props.block - the task_card block to edit
  * @param props.onChange - called with the updated block payload
@@ -23,7 +31,7 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
   const status: TaskCardStatus = block.status ?? 'pending';
   return (
     <div className="flex flex-col gap-4">
-      <EditorField label="Title" help="Short label shown at the top of the card." htmlFor="task-card-title">
+      <EditorField label="Title" help="Title of the task in plain text." htmlFor="task-card-title">
         <Input
           id="task-card-title"
           value={block.title}
@@ -32,11 +40,7 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
         />
       </EditorField>
 
-      <EditorField
-        label="Task ID"
-        help="Stable identifier you can reference from interaction payloads."
-        htmlFor="task-card-id"
-      >
+      <EditorField label="Task ID" help="ID for the task." htmlFor="task-card-id">
         <Input
           id="task-card-id"
           value={block.task_id}
@@ -45,7 +49,7 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
         />
       </EditorField>
 
-      <EditorField label="Status" help="Slack renders a matching status chip on the card.">
+      <EditorField label="Status" help='The state of a task. Can be "pending", "in_progress", "complete", or "error".'>
         <RadioGroup
           value={status}
           onValueChange={(v) => onChange({ ...block, status: v as TaskCardStatus })}
@@ -62,10 +66,83 @@ export function TaskCardEditor({ block, onChange }: BlockEditorProps<TaskCardBlo
         </RadioGroup>
       </EditorField>
 
+      <RichTextField
+        label="Details"
+        help="Details of the task in the form of a single rich_text entity."
+        value={block.details}
+        onChange={(next) => onChange({ ...block, details: next })}
+      />
+
+      <RichTextField
+        label="Output"
+        help="Output of the task in the form of a single rich_text entity."
+        value={block.output}
+        onChange={(next) => onChange({ ...block, output: next })}
+      />
+
       <SourcesField
         sources={block.sources ?? []}
         onChange={(next) => onChange({ ...block, sources: next.length > 0 ? next : undefined })}
       />
+    </div>
+  );
+}
+
+/**
+ * Sub-editor for an optional rich-text field on the task card (`details`
+ * or `output`). When the field is unset, renders an "Add" button that
+ * swaps in an empty rich_text block; once set, renders the standard
+ * {@link RichTextEditor} plus a remove affordance.
+ * @param props - field props
+ * @param props.label - visible label for the field
+ * @param props.help - one-line helper text
+ * @param props.value - the current rich_text payload, if any
+ * @param props.onChange - called with the new payload or `undefined`
+ * @returns the rendered field
+ */
+function RichTextField({
+  label,
+  help,
+  value,
+  onChange
+}: {
+  label: string;
+  help?: string;
+  value: RichTextBlock | undefined;
+  onChange: (next: RichTextBlock | undefined) => void;
+}) {
+  if (!value) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        <Label>{label}</Label>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="self-start"
+          onClick={() => onChange(EMPTY_RICH_TEXT)}
+        >
+          <Plus className="h-3.5 w-3.5" /> Add {label.toLowerCase()}
+        </Button>
+        {help && <p className="text-[11px] leading-snug text-muted-foreground">{help}</p>}
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <Label>{label}</Label>
+        <button
+          type="button"
+          aria-label={`Remove ${label.toLowerCase()}`}
+          onClick={() => onChange(undefined)}
+          className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <RichTextEditor block={value} onChange={onChange} />
+      {help && <p className="text-[11px] leading-snug text-muted-foreground">{help}</p>}
     </div>
   );
 }
@@ -96,11 +173,9 @@ function SourcesField({
   return (
     <div className="flex flex-col gap-2 rounded-md border bg-muted/20 p-3">
       <span className="text-xs font-medium text-foreground">Sources</span>
-      {sources.length === 0 ? (
-        <p className="text-[11px] leading-snug text-muted-foreground">
-          No sources. Add one to cite a document or link beneath the card.
-        </p>
-      ) : null}
+      <p className="text-[11px] leading-snug text-muted-foreground">
+        Array of URL source elements used to generate a response.
+      </p>
       {sources.map((src, idx) => (
         <div key={idx} className="flex flex-col gap-2 rounded border bg-background p-2">
           <div className="flex items-center justify-between">
