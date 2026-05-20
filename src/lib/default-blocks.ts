@@ -9,7 +9,8 @@ import {
   Pilcrow,
   Sparkles,
   Table as TableIcon,
-  TextCursorInput
+  TextCursorInput,
+  Video as VideoIcon
 } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
 import type { SupportedBlock, SupportedBlockType } from '../types';
@@ -101,6 +102,66 @@ export const defaultPalette: readonly PaletteSection[] = [
                 text: { type: 'plain_text', text: '👎' },
                 value: 'negative'
               }
+            }
+          ]
+        })
+      },
+      {
+        id: 'agents_plan',
+        label: 'Plan',
+        factory: () => ({
+          type: 'plan',
+          title: 'Investigating the issue',
+          tasks: [
+            {
+              type: 'task_card',
+              task_id: 'task_1',
+              title: 'Read the bug report',
+              status: 'complete'
+            },
+            {
+              type: 'task_card',
+              task_id: 'task_2',
+              title: 'Reproduce the error locally',
+              status: 'in_progress'
+            },
+            {
+              type: 'task_card',
+              task_id: 'task_3',
+              title: 'Identify the root cause',
+              status: 'pending'
+            }
+          ]
+        })
+      },
+      {
+        id: 'agents_task_card',
+        label: 'Task card',
+        factory: () => ({
+          type: 'task_card',
+          task_id: 'task_1',
+          title: 'Summarize the latest release notes',
+          status: 'in_progress'
+        })
+      },
+      {
+        id: 'agents_task_card_with_sources',
+        label: 'Task card with sources',
+        factory: () => ({
+          type: 'task_card',
+          task_id: 'task_2',
+          title: 'Cite supporting docs',
+          status: 'complete',
+          sources: [
+            {
+              type: 'url',
+              url: 'https://example.com/runbook',
+              text: 'Runbook'
+            },
+            {
+              type: 'url',
+              url: 'https://example.com/changelog',
+              text: 'Changelog'
             }
           ]
         })
@@ -775,6 +836,43 @@ export const defaultPalette: readonly PaletteSection[] = [
     ]
   },
   {
+    name: 'Video',
+    icon: VideoIcon,
+    variants: [
+      {
+        id: 'video_basic',
+        label: 'Basic',
+        factory: () => ({
+          type: 'video',
+          alt_text: 'A short demo video',
+          title: { type: 'plain_text', text: 'Product demo', emoji: true },
+          thumbnail_url: 'https://placehold.co/600x340?text=Video',
+          video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+        })
+      },
+      {
+        id: 'video_with_metadata',
+        label: 'With metadata',
+        factory: () => ({
+          type: 'video',
+          alt_text: 'A short demo video',
+          title: { type: 'plain_text', text: 'Product demo', emoji: true },
+          title_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+          thumbnail_url: 'https://placehold.co/600x340?text=Video',
+          video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          author_name: 'Acme',
+          description: {
+            type: 'plain_text',
+            text: 'A short walkthrough of the new release.',
+            emoji: true
+          },
+          provider_name: 'YouTube',
+          provider_icon_url: 'https://placehold.co/16x16?text=YT'
+        })
+      }
+    ]
+  },
+  {
     name: 'Card and Carousel',
     icon: GalleryHorizontal,
     variants: [
@@ -1406,5 +1504,11 @@ export function labelForBlockType(type: SupportedBlockType): string {
       return 'Context Actions';
     case 'input':
       return 'Input';
+    case 'video':
+      return 'Video';
+    case 'plan':
+      return 'Plan';
+    case 'task_card':
+      return 'Task Card';
   }
 }

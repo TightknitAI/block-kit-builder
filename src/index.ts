@@ -29,6 +29,7 @@ export type {
   IconButtonIcon,
   InputBlock,
   MarkdownBlock,
+  PlanBlock,
   PreviewHooks,
   PreviewSurface,
   PreviewTheme,
@@ -41,5 +42,9 @@ export type {
   TableBlock,
   TableCell,
   TableColumnSetting,
-  Template
+  TaskCardBlock,
+  TaskCardStatus,
+  Template,
+  UrlSourceElement,
+  VideoBlock
 } from './types';

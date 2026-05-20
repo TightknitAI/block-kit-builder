@@ -30,7 +30,10 @@ export type SupportedBlockType =
   | 'card'
   | 'carousel'
   | 'context_actions'
-  | 'input';
+  | 'input'
+  | 'video'
+  | 'plan'
+  | 'task_card';
 
 /**
  * Slack `markdown` block payload. Renders standard markdown (GFM)
@@ -205,6 +208,75 @@ export interface ContextActionsBlock {
 export type InputBlock = ViewInputBlock;
 
 /**
+ * Slack `video` block payload. Renders an embedded video player with
+ * thumbnail, title, optional description, and provider metadata. Sending
+ * requires the `links.embed:write` OAuth scope and `video_url` to live in
+ * the app's configured unfurl domains. `slack-web-api-client` doesn't ship
+ * this type yet, so we declare it.
+ */
+export interface VideoBlock {
+  type: 'video';
+  alt_text: string;
+  title: { type: 'plain_text'; text: string; emoji?: boolean };
+  thumbnail_url: string;
+  video_url: string;
+  author_name?: string;
+  description?: { type: 'plain_text'; text: string; emoji?: boolean };
+  provider_icon_url?: string;
+  provider_name?: string;
+  title_url?: string;
+  block_id?: string;
+}
+
+/**
+ * Status of a {@link TaskCardBlock} as shown by Slack. `pending`,
+ * `in_progress`, and `complete` render distinct status chips; `error`
+ * renders a failure state.
+ */
+export type TaskCardStatus = 'pending' | 'in_progress' | 'complete' | 'error';
+
+/**
+ * URL source attached to a {@link TaskCardBlock}. Rendered as a labeled
+ * link below the task body so agents can cite which document, ticket, or
+ * page their step consulted.
+ */
+export interface UrlSourceElement {
+  type: 'url';
+  url: string;
+  text: string;
+}
+
+/**
+ * Slack `task_card` block payload. Renders an agent-facing card showing a
+ * tracked task with optional details (rich text), output (rich text), and
+ * cited sources. Valid on message surfaces only.
+ * `slack-web-api-client` doesn't ship this type yet, so we declare it.
+ */
+export interface TaskCardBlock {
+  type: 'task_card';
+  task_id: string;
+  title: string;
+  details?: RichTextBlock;
+  output?: RichTextBlock;
+  sources?: UrlSourceElement[];
+  status?: TaskCardStatus;
+  block_id?: string;
+}
+
+/**
+ * Slack `plan` block payload. Renders a titled checklist of tasks an
+ * agent is executing. Each task is an inline {@link TaskCardBlock}.
+ * Valid on message surfaces only. `slack-web-api-client` doesn't ship
+ * this type yet, so we declare it.
+ */
+export interface PlanBlock {
+  type: 'plan';
+  title: string | { type: 'plain_text'; text: string; emoji?: boolean };
+  tasks?: TaskCardBlock[];
+  block_id?: string;
+}
+
+/**
  * Header heading level shown in the preview. Slack's API has no
  * `level` field on header blocks, so this is a builder-only extension
  * that round-trips on the block payload but is otherwise cosmetic.
@@ -236,7 +308,10 @@ export type SupportedBlock =
   | CardBlock
   | CarouselBlock
   | ContextActionsBlock
-  | InputBlock;
+  | InputBlock
+  | VideoBlock
+  | PlanBlock
+  | TaskCardBlock;
 
 /**
  * A block as represented inside the builder's working state.
