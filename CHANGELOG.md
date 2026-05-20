@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.2](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.8.1...block-kitchen-v0.8.2) (2026-05-20)
+
+
+### Bug Fixes
+
+* **ci:** publish via npm CLI for Trusted Publisher OIDC ([#76](https://github.com/TightknitAI/block-kitchen/issues/76)) ([aab5ec8](https://github.com/TightknitAI/block-kitchen/commit/aab5ec827125b3b7b2f86b2f8beb9ea885c0be46))
+* **ci:** publish via npx and tag prereleases explicitly ([#78](https://github.com/TightknitAI/block-kitchen/issues/78)) ([7475c86](https://github.com/TightknitAI/block-kitchen/commit/7475c86cf7d51cbe702733ca353b3dc894243164))
+
 ## [0.8.1](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.8.0...block-kitchen-v0.8.1) (2026-05-20)
 
 
