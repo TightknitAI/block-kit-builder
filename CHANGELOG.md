@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.8.0...block-kitchen-v0.8.1) (2026-05-20)
+
+
+### Bug Fixes
+
+* **ci:** publish on releases_created (manifest mode) ([#74](https://github.com/TightknitAI/block-kitchen/issues/74)) ([c29a2ce](https://github.com/TightknitAI/block-kitchen/commit/c29a2cef84fedcc26baa96c007e5c92276118760))
+
 ## [0.8.0](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.7.0...block-kitchen-v0.8.0) (2026-05-19)
 
 
