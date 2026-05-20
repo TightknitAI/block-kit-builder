@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.3](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.8.2...block-kitchen-v0.8.3) (2026-05-20)
+
+
+### Features
+
+* **task-card:** edit details and output rich-text fields in the UI ([de41c81](https://github.com/TightknitAI/block-kitchen/commit/de41c81cc1fae6e81fddeebc5e3afb81c93600f3))
+* **task-card:** edit details and output rich-text fields in the UI ([bbe39ef](https://github.com/TightknitAI/block-kitchen/commit/bbe39ef72f3dde37e58b447e4d10bf3abee8c0e2))
+
 ## [0.8.2](https://github.com/TightknitAI/block-kitchen/compare/block-kitchen-v0.8.1...block-kitchen-v0.8.2) (2026-05-20)
 
 
